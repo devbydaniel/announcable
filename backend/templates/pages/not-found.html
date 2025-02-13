@@ -1,0 +1,17 @@
+{{ define "page-css" }}
+  <link rel="stylesheet" href="static/css/components/card.css" />
+  <link rel="stylesheet" href="static/css/components/button.css" />
+{{ end }}
+
+{{ define "page-js" }}
+{{ end }}
+
+{{ define "main" }}
+  <div class="card">
+    <h2 class="card__title">Not found</h2>
+    <p class="card__paragraph">The page you were looking for does not exist.</p>
+    <div class="card__footer">
+      <a href="/" class="button button--primary">Go back home</a>
+    </div>
+  </div>
+{{ end }}

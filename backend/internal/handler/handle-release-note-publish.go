@@ -1,0 +1,61 @@
+package handler
+
+import (
+	"net/http"
+
+	releasenotes "github.com/devbydaniel/release-notes-go/internal/domain/release-notes"
+	mw "github.com/devbydaniel/release-notes-go/internal/middleware"
+	"github.com/devbydaniel/release-notes-go/templates"
+	"github.com/go-chi/chi/v5"
+	"github.com/google/uuid"
+)
+
+var publishButtonTmpl = templates.Construct("publish-btn", "partials/hx-publish-rn-button.html")
+
+func (h *Handler) HandleReleaseNotePublish(w http.ResponseWriter, r *http.Request) {
+	h.log.Trace().Msg("HandleNewReleaseNote")
+	ctx := r.Context()
+	releaseNotesService := releasenotes.NewService(*releasenotes.NewRepository(h.DB, h.ObjStore))
+
+	id, err := uuid.Parse(chi.URLParam(r, "id"))
+	if err != nil {
+		h.log.Error().Err(err).Msg("Error parsing ID")
+		http.Error(w, "Error updating release note", http.StatusBadRequest)
+		return
+	}
+
+	userId := ctx.Value(mw.UserIDKey).(string)
+	if userId == "" {
+		h.log.Error().Msg("User ID not found in context")
+		http.Error(w, "Error updating release note", http.StatusInternalServerError)
+	}
+
+	orgId := ctx.Value(mw.OrgIDKey).(string)
+	if orgId == "" {
+		h.log.Error().Msg("Organisation ID not found in context")
+		http.Error(w, "Error updating release note", http.StatusInternalServerError)
+	}
+
+	shouldPublish := r.FormValue("publish") == "true"
+
+	h.log.Debug().Interface("publishDTO", shouldPublish).Msg("publishDTO")
+	if err := releaseNotesService.ChangePublishedStatus(id, shouldPublish); err != nil {
+		h.log.Error().Err(err).Msg("Error updating release note")
+		http.Error(w, "Error updating release note", http.StatusInternalServerError)
+		return
+	}
+
+	var templateName string
+	if shouldPublish {
+		templateName = "hx-unpublish-rn-button"
+	} else {
+		templateName = "hx-publish-rn-button"
+	}
+
+	err = publishButtonTmpl.ExecuteTemplate(w, templateName, id.String())
+	if err != nil {
+		h.log.Error().Err(err).Msg("Error rendering template")
+		http.Error(w, "Error updating release note", http.StatusInternalServerError)
+		return
+	}
+}

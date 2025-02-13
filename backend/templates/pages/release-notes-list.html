@@ -1,0 +1,51 @@
+{{ define "page-css" }}
+  <link rel="stylesheet" href="/static/css/components/button.css" />
+  <link rel="stylesheet" href="/static/css/components/card.css" />
+  <link rel="stylesheet" href="/static/css/components/table.css" />
+  <link rel="stylesheet" href="/static/css/components/badge.css" />
+  <link rel="stylesheet" href="/static/css/pages/release-notes-list.css" />
+{{ end }}
+
+{{ define "page-actions" }}
+  <a class="button button--primary" href="/release-notes/new">New</a>
+{{ end }}
+
+{{ define "main" }}
+  {{ with .ReleaseNotes }}
+    <div class="card card--no-pad">
+      <table class="table">
+        <thead>
+          <tr class="table__tr table__tr--no-hover">
+            <th class="table__th release-notes-table__date-cell">Date</th>
+            <th class="table__th">Title</th>
+            <th class="table__th table--align-right">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{ range . }}
+            <tr
+              class="table__tr"
+              role="button"
+              onclick="window.location.href=`/release-notes/{{ .ID }}`"
+            >
+              <td class="table__td release-notes-table__date-cell">
+                {{ .ReleaseDate }}
+              </td>
+              <td class="table__td">{{ .Title }}</td>
+              <td class="table__td table--align-right">
+                <span class="badge">
+                  {{ if .IsPublished }}published{{ else }}not published{{ end }}
+                </span>
+              </td>
+            </tr>
+          {{ end }}
+        </tbody>
+      </table>
+    </div>
+  {{ else }}
+    <div class="card empty-state">
+      <span>Create your first release note now!</span
+      ><a href="/release-notes/new" class="button button--primary">Let's go!</a>
+    </div>
+  {{ end }}
+{{ end }}

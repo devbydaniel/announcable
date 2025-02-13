@@ -1,0 +1,43 @@
+{{ define "page-css" }}
+  <link rel="stylesheet" href="/static/css/components/card.css" />
+  <link rel="stylesheet" href="/static/css/components/form.css" />
+  <link rel="stylesheet" href="/static/css/components/button.css" />
+  <link rel="stylesheet" href="/static/css/pages/forgot-pw.css" />
+{{ end }}
+
+{{ define "page-js" }}
+{{ end }}
+
+{{ define "main" }}
+  <div class="card" x-data id="pw-forgot-card">
+    <h2 class="card__title">Password Reset</h2>
+    <p class="card__paragraph">
+      We will send an email with a link to reset your password
+    </p>
+    <form
+      class="form"
+      hx-post="/forgot-pw"
+      hx-target="#pw-forgot-card"
+      hx-swap="outerHTML"
+      @htmx:response-error.camel="toastError($event.detail.xhr.response)"
+    >
+      <div class="form__group">
+        <label class="form__label" for="email">Email</label>
+        <input
+          class="form__input"
+          type="email"
+          id="email"
+          name="email"
+          required
+          autofocus
+        />
+      </div>
+      <div class="form__group">
+        <button class="button button--block button--primary" type="submit">
+          Reset Password
+        </button>
+      </div>
+      <p class="login-hint"><a href="/login">Back to log in</a></p>
+    </form>
+  </div>
+{{ end }}

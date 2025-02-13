@@ -1,0 +1,96 @@
+package config
+
+import (
+	"os"
+	"strconv"
+)
+
+type postgresConfig struct {
+	Host     string
+	Port     int
+	User     string
+	Password string
+	Name     string
+}
+type objStorageConfig struct {
+	AccessKey string
+	SecretKey string
+	Endpoint  string
+	Region    string
+	UseSSL    bool
+}
+type pgAdminConfig struct {
+	Email    string
+	Password string
+	Port     int
+}
+type emailConfig struct {
+	DefaultFrom string
+	Server      string
+	Port        int
+	User        string
+	Password    string
+}
+
+type config struct {
+	BaseURL    string
+	Postgres   postgresConfig
+	ObjStorage objStorageConfig
+	PgAdmin    pgAdminConfig
+	Email      emailConfig
+}
+
+func New() *config {
+	return &config{
+		BaseURL: getEnv("BASE_URL"),
+		Postgres: postgresConfig{
+			Host:     getEnv("POSTGRES_HOST"),
+			Port:     getEnvAsInt("POSTGRES_PORT"),
+			User:     getEnv("POSTGRES_USER"),
+			Password: getEnv("POSTGRES_PASSWORD"),
+			Name:     getEnv("POSTGRES_DB"),
+		},
+		ObjStorage: objStorageConfig{
+			AccessKey: getEnv("MINIO_ACCESS_KEY"),
+			SecretKey: getEnv("MINIO_SECRET_KEY"),
+			Endpoint:  getEnv("MINIO_ENDPOINT"),
+			Region:    getEnv("MINIO_REGION"),
+			UseSSL:    getEnvAsBool("MINIO_USE_SSL"),
+		},
+		PgAdmin: pgAdminConfig{
+			Email:    getEnv("PGADMIN_DEFAULT_EMAIL"),
+			Password: getEnv("PGADMIN_DEFAULT_PASSWORD"),
+			Port:     getEnvAsInt("PGADMIN_PORT"),
+		},
+		Email: emailConfig{
+			DefaultFrom: getEnv("EMAIL_DEFAULT_FROM"),
+			Server:      getEnv("EMAIL_SERVER"),
+			Port:        getEnvAsInt("EMAIL_PORT"),
+			User:        getEnv("EMAIL_USER"),
+			Password:    getEnv("EMAIL_PASSWORD"),
+		},
+	}
+}
+
+func getEnv(key string) string {
+	if value, exists := os.LookupEnv(key); exists {
+		return value
+	}
+	panic("Environment variable " + key + " not set")
+}
+
+func getEnvAsInt(name string) int {
+	valueStr := getEnv(name)
+	if value, err := strconv.Atoi(valueStr); err == nil {
+		return value
+	}
+	panic("Environment variable " + name + " is not an integer")
+}
+
+func getEnvAsBool(name string) bool {
+	valStr := getEnv(name)
+	if val, err := strconv.ParseBool(valStr); err == nil {
+		return val
+	}
+	panic("Environment variable " + name + " is not a boolean")
+}

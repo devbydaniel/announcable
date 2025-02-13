@@ -1,0 +1,22 @@
+.header {
+  height: 3rem;
+  display: flex;
+  align-items: center;
+  padding-left: var(--gap-md);
+  padding-right: var(--gap-md);
+  background-color: var(--color-base);
+  font-size: var(--font-size-sm);
+  border-bottom: var(--border-width) solid var(--border-color);
+  position: sticky;
+  top: 0;
+}
+
+.header__bumper {
+  flex: 1 1;
+}
+
+.header__right {
+  display: flex;
+  gap: var(--gap-xs);
+  align-items: center;
+}

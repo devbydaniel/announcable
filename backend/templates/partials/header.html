@@ -1,0 +1,11 @@
+{{ define "header" }}
+  <header class="header">
+    <div class="header__left">
+      {{ .Title }}
+    </div>
+    <div class="header__bumper"></div>
+    <div class="header__right">
+      {{ block "page-actions" . }}{{ end }}
+    </div>
+  </header>
+{{ end }}

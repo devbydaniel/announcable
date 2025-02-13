@@ -1,0 +1,53 @@
+{{ define "root" }}
+  <!doctype html>
+  <html lang="en">
+    <head>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <link rel="stylesheet" href="/static/css/base/reset.css" />
+      <link rel="stylesheet" href="/static/css/base/variables.css" />
+      {{ block "layout-css" . }}{{ end }}
+      {{ block "page-css" . }}{{ end }}
+      <script src="/static/js/app/confirmDialog.js"></script>
+      <script src="/static/js/app/successMsg.js"></script>
+      <!-- Alpine -->
+      <script
+        defer
+        src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
+      ></script>
+      <!-- HTMX -->
+      <script
+        src="https://unpkg.com/htmx.org@2.0.4"
+        integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+"
+        crossorigin="anonymous"
+      ></script>
+      <!-- Toastify -->
+      <link
+        rel="stylesheet"
+        type="text/css"
+        href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"
+      />
+      <!-- Sweet Alert-->
+      <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+      <!-- Feather Icons -->
+      <script src="https://unpkg.com/feather-icons"></script>
+      <title>{{ .Title }}</title>
+    </head>
+    <body>
+      {{ block "body" . }}
+      {{ end }}
+      <script src="/static/js/components/toast.js"></script>
+      <!-- Feather Icons-->
+      <script>
+        feather.replace();
+      </script>
+      <!-- Toastify -->
+      <script
+        type="text/javascript"
+        src="https://cdn.jsdelivr.net/npm/toastify-js"
+      ></script>
+      {{ block "layout-js" . }}{{ end }}
+      {{ block "page-js" . }}{{ end }}
+    </body>
+  </html>
+{{ end }}

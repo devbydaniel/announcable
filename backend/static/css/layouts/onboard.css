@@ -1,0 +1,9 @@
+.onboard {
+  background-color: var(--background);
+}
+
+.onboard__content {
+  max-width: 28em;
+  margin: auto;
+  margin-top: var(--gap-xl);
+}

@@ -1,0 +1,297 @@
+{{ define "page-css" }}
+  <link rel="stylesheet" href="/static/css/components/button.css" />
+  <link rel="stylesheet" href="/static/css/components/card.css" />
+  <link rel="stylesheet" href="/static/css/components/form.css" />
+  <link rel="stylesheet" href="/static/css/components/checkbox.css" />
+  <link rel="stylesheet" href="/static/css/components/file-input.css" />
+  <link rel="stylesheet" href="/static/css/components/popover.css" />
+  <link rel="stylesheet" href="/static/css/components/menu.css" />
+  <link
+    rel="stylesheet"
+    href="/static/css/pages/release-note-create-edit.css"
+  />
+{{ end }}
+
+{{ define "page-js" }}
+  <script src="/static/js/pages/release-note-create-edit.js"></script>
+  <script src="/static/js/components/file-input.js"></script>
+  <script src="/static/js/components/popover.js"></script>
+{{ end }}
+
+{{ define "page-actions" }}
+  {{ if .IsEdit }}
+    <div x-data="popover" class="popover">
+      <button
+        class="button button--ghost button--square button--sm popover__trigger"
+        @click="togglePopover"
+      >
+        <i data-feather="more-vertical" width="16" height="16"></i>
+      </button>
+      <div
+        class="popover__content"
+        x-show="isVisible"
+        x-transition
+        @click.outside="hideIfVisible"
+      >
+        <ul class="menu">
+          <li class="menu__item">
+            <a
+              role="button"
+              class="menu__item__action"
+              hx-delete="/release-notes/{{ .Rn.ID }}"
+              hx-confirm="Are you sure you want to delete this release note?"
+              hx-swap="none"
+            >
+              Delete
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  {{ end }}
+  {{ if .IsEdit }}
+    {{ if .Rn.IsPublished }}
+      {{ template "hx-unpublish-rn-button" .Rn.ID }}
+    {{ else }}
+      {{ template "hx-publish-rn-button" .Rn.ID }}
+    {{ end }}
+  {{ end }}
+  <button id="submit-button" class="button button--primary">Save</button>
+{{ end }}
+
+{{ define "main" }}
+  <div class="card">
+    <form
+      id="form"
+      class="form"
+      x-data="form({{ .TextWebsiteOverrideIsChecked }}, {{ .HideCtaIsChecked }}, {{ .CtaLabelOverrideIsChecked }}, {{ .CtaUrlOverrideIsChecked }})"
+      {{ if .IsEdit }}
+        hx-patch="/release-notes/{{ .Rn.ID }}"
+      {{ else }}
+        hx-post="/release-notes"
+      {{ end }}
+      enctype="multipart/form-data"
+      hx-swap="none"
+      @htmx:response-error.camel="onSubmitError"
+      @custom:submit-success="onSubmitSuccess"
+    >
+      <div>
+        <div class="form__group form__group--no-mt">
+          <label class="form__label" for="title">Title</label>
+          <input
+            class="form__input"
+            type="text"
+            id="title"
+            name="title"
+            required
+            value="{{ .Rn.Title }}"
+          />
+        </div>
+        <div class="form__group">
+          <label class="form__label" for="image">Image</label>
+          <div
+            class="file-input"
+            x-data="fileInput('{{ .Rn.ImageUrl }}')"
+            @click="$refs.imgUpload.click()"
+          >
+            <input
+              class="file-input__input"
+              type="file"
+              id="image"
+              name="image"
+              accept="image/*"
+              x-ref="imgUpload"
+              @change="onImgChange"
+            />
+            <input
+              class="file-input__delete"
+              type="checkbox"
+              id="delete_image"
+              name="delete_image"
+              x-model="deleteImg"
+            />
+            <span class="file-input__placeholder">Click to upload</span>
+            <div x-show="imgUrl && imgUrl !== ''" class="file-input__preview">
+              <button
+                type="button"
+                class="file-input__preview__delete button button--sm button--square button--ghost"
+                @click="onImgDelete"
+              >
+                <i data-feather="x"></i>
+              </button>
+              <img :src="imgUrl" class="file-input__preview__img" />
+            </div>
+          </div>
+        </div>
+        <div class="form__group">
+          <label class="form__label" for="description_short"
+            >Description (Widget)</label
+          >
+          <textarea
+            class="form__input"
+            id="description_short"
+            name="description_short"
+            required
+          >
+{{ .Rn.DescriptionShort }}</textarea
+          >
+        </div>
+        <div>
+          <div class="checkbox">
+            <input
+              class="checkbox__input"
+              type="checkbox"
+              id="text_website_override"
+              name="text_website_override"
+              x-model="textWebsiteOverrideIsChecked"
+              {{ if .Rn.DescriptionLong }}checked{{ end }}
+            />
+            <label class="checkbox__label" for="text_website_override"
+              >Use a different description on the release notes website</label
+            >
+          </div>
+          <div
+            class="form__group form__group--no-mb"
+            x-show="textWebsiteOverrideIsChecked"
+            x-transition
+          >
+            <label class="form__label" for="description_long"
+              >Description (Website)</label
+            >
+            <textarea
+              class="form__input"
+              id="description_long"
+              name="description_long"
+            >
+{{ .Rn.DescriptionLong }}</textarea
+            >
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="form__group form__group--no-mt">
+          <label class="form__label" for="release_date">Release Date</label>
+          <input
+            type="date"
+            class="form__input"
+            id="release_date"
+            name="release_date"
+            value="{{ .Rn.ReleaseDate }}"
+          />
+        </div>
+        <div class="form__group">
+          <div class="form__label">Call to action</div>
+          <div class="form__group__list">
+            <div class="checkbox">
+              <input
+                class="checkbox__input"
+                type="checkbox"
+                id="hide_cta"
+                name="hide_cta"
+                x-ref="hideCta"
+                x-model="hideCtaIsChecked"
+              />
+              <label class="checkbox__label" for="hide_cta"
+                >Hide call to action</label
+              >
+            </div>
+            <div>
+              <div class="checkbox" x-show="!hideCtaIsChecked" x-transition>
+                <input
+                  class="checkbox__input"
+                  type="checkbox"
+                  id="override_cta_label"
+                  name="override_cta_label"
+                  x-model="ctaLabelOverrideIsChecked"
+                />
+                <label class="checkbox__label" for="override_cta_label"
+                  >Override the default call to action label</label
+                >
+              </div>
+              <div
+                class="form__group"
+                x-show="ctaLabelOverrideIsChecked"
+                x-transition
+              >
+                <label class="form__label" for="cta_label_override"
+                  >Call to action label</label
+                >
+                <input
+                  class="form__input"
+                  id="cta_label_override"
+                  name="cta_label_override"
+                  value="{{ .Rn.CtaLabelOverride }}"
+                />
+              </div>
+            </div>
+            <div>
+              <div class="checkbox" x-show="!hideCtaIsChecked" x-transition>
+                <input
+                  class="checkbox__input"
+                  type="checkbox"
+                  id="override_cta_url"
+                  name="override_cta_url"
+                  x-model="ctaUrlOverrideIsChecked"
+                />
+                <label class="checkbox__label" for="override_cta_url"
+                  >Override the default call to action link</label
+                >
+              </div>
+              <div
+                class="form__group"
+                x-show="ctaUrlOverrideIsChecked"
+                x-transition
+              >
+                <label class="form__label" for="cta_url_override"
+                  >Call to action link</label
+                >
+                <input
+                  class="form__input"
+                  id="cta_url_override"
+                  type="url"
+                  name="cta_url_override"
+                  value="{{ .Rn.CtaUrlOverride }}"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="form__group form__group--no-mb">
+          <div class="form__label">Attention mechanism</div>
+          <div class="form__group__list">
+            <div class="checkbox">
+              <input
+                class="checkbox__input"
+                type="radio"
+                id="show_indicator"
+                name="attention_mechanism"
+                value="show_indicator"
+                {{ if or (not .Rn) (not .Rn.AttentionMechanism) (eq .Rn.AttentionMechanism "show_indicator") }}
+                  checked
+                {{ end }}
+              />
+              <label class="checkbox__label" for="hide_cta"
+                >Show indicator on trigger element</label
+              >
+            </div>
+            <div class="checkbox">
+              <input
+                class="checkbox__input"
+                type="radio"
+                id="instant_open"
+                name="attention_mechanism"
+                value="instant_open"
+                {{ if eq .Rn.AttentionMechanism "instant_open" }}
+                  checked
+                {{ end }}
+              />
+              <label class="checkbox__label" for="instant_open"
+                >Instantly open widget on page load</label
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+{{ end }}

@@ -1,0 +1,73 @@
+{{ define "page-css" }}
+  <link rel="stylesheet" href="static/css/components/card.css" />
+  <link rel="stylesheet" href="static/css/components/form.css" />
+  <link rel="stylesheet" href="static/css/components/button.css" />
+  <link rel="stylesheet" href="static/css/components/modal.css" />
+{{ end }}
+
+{{ define "page-js" }}
+{{ end }}
+
+{{ define "main" }}
+  <div class="card">
+    <h2 class="card__title">Verify your e-mail address</h2>
+    <p class="card__paragraph">
+      We've sent an email to your email address to make sure it's really you.
+    </p>
+    <p class="card__paragraph">
+      Please click the link in the email to get started.
+    </p>
+    <div class="card__footer">
+      <button
+        x-data
+        class="button button--block button--primary"
+        type="submit"
+        @click="$dispatch('resend-email')"
+      >
+        Resend email
+      </button>
+    </div>
+  </div>
+  <dialog
+    x-data
+    @resend-email.window="$el.showModal()"
+    x-ref="modal"
+    class="modal"
+  >
+    <button
+      class="modal__close button button--sm button--square button--ghost"
+      @click="$refs.modal.close()"
+    >
+      <i width="16" height="16" data-feather="x"></i>
+    </button>
+    <h2 class="modal__title">Resend verification mail</h2>
+    <div class="modal__content">
+      <form
+        hx-post="/verify-email"
+        hx-swap="none"
+        class="form"
+        @form-submit.window="$el.requestSubmit()"
+        @htmx:response-error.camel="toastError($event.detail.message)"
+        @custom:submit-success="toastSuccess('Verification mail sent'); $refs.modal.close()"
+      >
+        <div class="form__group form__group--no-mt form__group--no-mb">
+          <label class="form__label" for="email">E-Mail</label>
+          <input
+            x-ref="email"
+            class="form__input"
+            type="email"
+            id="email"
+            name="email"
+            required
+            autofocus
+          />
+        </div>
+      </form>
+    </div>
+    <div class="modal__footer">
+      <button class="button button--primary" @click="$dispatch('form-submit')">
+        Send
+      </button>
+    </div>
+  </dialog>
+{{ end }}

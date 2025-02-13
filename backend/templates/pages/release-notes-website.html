@@ -1,0 +1,109 @@
+{{ define "root" }}
+  <!doctype html>
+  <html lang="en">
+    <head>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <link rel="stylesheet" href="/static/css/base/reset.css" />
+      <link rel="stylesheet" href="/static/css/base/variables.css" />
+      <link
+        rel="stylesheet"
+        href="/static/css/pages/release-notes-website.css"
+      />
+      <title>{{ .Cfg.Title }}</title>
+    </head>
+    <body style="background-color: {{ .Cfg.BgColor }};">
+      {{ with eq .Cfg.BrandPosition "left" }}
+        <header class="header">
+          <img
+            class="header__img"
+            src="{{ $.Cfg.ImageUrl }}"
+            alt="Brand logo"
+          />
+        </header>
+      {{ end }}
+      <main class="content">
+        <div class="content__heading">
+          {{ with eq .Cfg.BrandPosition "top" }}
+            <img
+              class="content__img"
+              src="{{ $.Cfg.ImageUrl }}"
+              alt="Brand logo"
+            />
+          {{ end }}
+          <h1
+            class="text-4xl font-semibold"
+            style="color: {{ .Cfg.TextColor }}"
+          >
+            {{ .Cfg.Title }}
+          </h1>
+          <p
+            class="content__heading__title"
+            style="color: {{ .Cfg.TextColorMuted }};"
+          >
+            {{ .Cfg.Description }}
+          </p>
+        </div>
+        <div class="content__rns">
+          {{ range .Rns }}
+            <section
+              class="content__rns__rn"
+              id="{{ .ID }}"
+              style="color: {{ $.Cfg.TextColor }}"
+            >
+              <div class="content__rns__rn__meta">
+                <h2
+                  class="content__rns__rn__meta__title"
+                  style="color: {{ $.Cfg.TextColor }};"
+                >
+                  {{ .Title }}
+                </h2>
+                {{ with .ReleaseDate }}
+                  <p
+                    class="content__rns__rn__meta__date"
+                    style="color: {{ $.Cfg.TextColorMuted }}"
+                  >
+                    {{ . }}
+                  </p>
+                {{ end }}
+              </div>
+              <div class="content__rns__rn__content">
+                {{ with .ImageUrl }}
+                  <img
+                    src="{{ . }}"
+                    alt=""
+                    class="content__rns__rn__content__img"
+                  />
+                {{ end }}
+                <p
+                  class="content__rns__rn__content__description"
+                  style="color: {{ $.Cfg.TextColor }}"
+                >
+                  {{ with .DescriptionLong }}
+                    {{ . }}
+                  {{ else }}
+                    {{ .DescriptionShort }}
+                  {{ end }}
+                </p>
+              </div>
+            </section>
+          {{ end }}
+        </div>
+      </main>
+      <footer class="footer">
+        <a
+          style="color: {{ .Cfg.TextColorMuted }}"
+          href="/privacy"
+          class="footer__link"
+          >Privacy Policy</a
+        >
+        <a
+          style="color: {{ .Cfg.TextColorMuted }}"
+          href="/terms"
+          class="footer__link"
+          >Imprint</a
+        >
+      </footer>
+    </body>
+  </html>
+{{ end }}

@@ -1,0 +1,245 @@
+{{ define "page-css" }}
+  <link rel="stylesheet" href="/static/css/pages/landing-page-config.css" />
+  <link rel="stylesheet" href="/static/css/components/form.css" />
+  <link rel="stylesheet" href="/static/css/components/skeleton.css" />
+  <link rel="stylesheet" href="/static/css/components/button.css" />
+  <link rel="stylesheet" href="/static/css/components/file-input.css" />
+{{ end }}
+
+{{ define "page-js" }}
+  <script src="/static/js/pages/landing-page-config.js"></script>
+  <script src="/static/js/components/file-input.js"></script>
+{{ end }}
+
+{{ define "page-actions" }}
+  <a
+    href="/settings?focus=lp"
+    class="button button--ghost button--sm button--square"
+  >
+    <i data-feather="settings" width="16" height="16"></i>
+  </a>
+{{ end }}
+
+{{ define "main" }}
+  <div
+    class="lp-container"
+    x-data="lpContainer('{{ .Cfg.Title }}', '{{ .Cfg.Description }}', '{{ .Cfg.BgColor }}', '{{ .Cfg.TextColor }}', '{{ .Cfg.TextColorMuted }}', '{{ .Cfg.BrandPosition }}')"
+  >
+    <div class="lp" x-bind="lp">
+      <div class="lp__top">
+        <div class="skeleton lp__brand" x-bind="brand" x-ref="left"></div>
+      </div>
+      <div class="lp__header">
+        <div class="skeleton lp__brand" x-bind="brand" x-ref="top"></div>
+        <h2 class="lp__title" x-bind="title"></h2>
+        <p class="lp__description" x-bind="description"></p>
+      </div>
+      <div class="lp__content">
+        <div class="release-note-entry">
+          <div class="release-note-entry__left">
+            <h3 class="release-note-entry__title" x-bind="text">
+              Another great release
+            </h3>
+            <div
+              class="skeleton release-note-entry__date"
+              x-bind="skeleton"
+            ></div>
+          </div>
+          <div class="release-note-entry__right">
+            <div
+              class="skeleton release-note-entry__img"
+              x-bind="skeleton"
+            ></div>
+            <div class="release-note-entry__right__content">
+              <div
+                class="skeleton release-note-entry__content__skeleton"
+                x-bind="skeleton"
+              ></div>
+              <div
+                class="skeleton release-note-entry__content__skeleton"
+                x-bind="skeleton"
+              ></div>
+              <div
+                class="skeleton release-note-entry__content__skeleton"
+                x-bind="skeleton"
+              ></div>
+            </div>
+          </div>
+        </div>
+        <div class="release-note-entry">
+          <div class="release-note-entry__left">
+            <h3 class="release-note-entry__title" x-bind="text">
+              A new release is out!
+            </h3>
+            <div
+              class="skeleton release-note-entry__date"
+              x-bind="skeleton"
+            ></div>
+          </div>
+          <div class="release-note-entry__right">
+            <div
+              class="skeleton release-note-entry__img"
+              x-bind="skeleton"
+            ></div>
+            <div class="release-note-entry__right__content">
+              <div
+                class="skeleton release-note-entry__content__skeleton"
+                x-bind="skeleton"
+              ></div>
+              <div
+                class="skeleton release-note-entry__content__skeleton"
+                x-bind="skeleton"
+              ></div>
+              <div
+                class="skeleton release-note-entry__content__skeleton"
+                x-bind="skeleton"
+              ></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{{ end }}
+
+{{ define "right-panel" }}
+  <div class="config-panel">
+    <form
+      x-data="form"
+      hx-patch="/lp-config"
+      enctype="multipart/form-data"
+      hx-swap="none"
+      @htmx:response-error.camel="onSubmitError"
+      @custom:submit-success="onSubmitSuccess"
+    >
+      <div class="config-panel__form-container">
+        <div class="form__group form__group--no-mt">
+          <label class="form__label" for="logo">Brand Logo</label>
+          <div
+            class="file-input"
+            x-data="fileInput('{{ .Cfg.ImageUrl }}')"
+            @click="$refs.imgUpload.click()"
+          >
+            <input
+              class="file-input__input"
+              type="file"
+              id="logo"
+              name="logo"
+              accept="image/*"
+              x-ref="imgUpload"
+              @change="onImgChange"
+            />
+            <input
+              class="file-input__delete"
+              type="checkbox"
+              id="delete_image"
+              name="delete_image"
+              x-model="deleteImg"
+            />
+            <span class="file-input__placeholder">Click to upload</span>
+            <div x-show="imgUrl && imgUrl !== ''" class="file-input__preview">
+              <button
+                type="button"
+                class="file-input__preview__delete button button--sm button--square button--ghost"
+                @click="onImgDelete"
+              >
+                <i data-feather="x"></i>
+              </button>
+              <img :src="imgUrl" class="file-input__preview__img" />
+            </div>
+          </div>
+        </div>
+        <div class="form__group form__group--no-mt">
+          <label class="form__label" for="type">Brand Position</label>
+          <select
+            class="form__input"
+            type="text"
+            id="type"
+            name="brand_position"
+            x-bind="brandPosition"
+          >
+            <option
+              value="top"
+              {{ if (eq .Cfg.BrandPosition "top") }}selected{{ end }}
+            >
+              top
+            </option>
+            <option
+              value="left"
+              {{ if (eq .Cfg.BrandPosition "left") }}selected{{ end }}
+            >
+              left
+            </option>
+          </select>
+        </div>
+        <div class="form__group">
+          <label class="form__label" for="title">Title</label>
+          <input
+            class="form__input"
+            type="text"
+            id="title"
+            name="title"
+            required
+            x-bind="title"
+            value="{{ .Cfg.Title }}"
+          />
+        </div>
+        <div class="form__group">
+          <label class="form__label" for="description">Description</label>
+          <input
+            class="form__input"
+            type="text"
+            id="description"
+            name="description"
+            required
+            x-bind="description"
+            value="{{ .Cfg.Description }}"
+          />
+        </div>
+        <div class="form__group">
+          <label class="form__label" for="bg_color">Background Color</label>
+          <input
+            class="form__input"
+            type="color"
+            id="bg_color"
+            name="bg_color"
+            x-bind="bgColor"
+            value="{{ .Cfg.BgColor }}"
+          />
+        </div>
+        <div class="form__group">
+          <label class="form__label" for="text_color">Text Color</label>
+          <input
+            class="form__input"
+            type="color"
+            id="text_color"
+            name="text_color"
+            x-bind="textColor"
+            value="{{ .Cfg.TextColor }}"
+          />
+        </div>
+        <div class="form__group form__group--no-mb">
+          <label class="form__label" for="text_color_muted"
+            >Text Color Muted</label
+          >
+          <input
+            class="form__input"
+            type="color"
+            id="text_color_muted"
+            name="text_color_muted"
+            x-bind="textColorMuted"
+            value="{{ .Cfg.TextColorMuted }}"
+          />
+        </div>
+      </div>
+      <div class="config-panel__footer">
+        <button
+          type="submit"
+          class="config-panel__submit button button--primary button--block"
+        >
+          Update
+        </button>
+      </div>
+    </form>
+  </div>
+{{ end }}

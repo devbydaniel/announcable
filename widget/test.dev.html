@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Widget Test</title>
+  </head>
+  <body>
+    <p>Hello</p>
+    <button class="widgetButton" style="position: relative">Click!</button>
+    <button class="widgetButton" style="position: relative">Click!</button>
+    <p class="text-xl text-red">HELLO</p>
+    <script>
+      var release_beacon_widget_init = {
+        org_id: "8dcd492b-7dfa-4506-adf7-fca85676037b",
+        anchor_query_selector: ".widgetButton",
+        font_family: ["monospace"],
+      };
+    </script>
+    <script
+      type="text/javascript"
+      src="./dist/release-beacon-widget.umd.js"
+    ></script>
+  </body>
+</html>

@@ -1,0 +1,22 @@
+{{ define "layout-css" }}
+  <link rel="stylesheet" href="/static/css/layouts/appframe.css" />
+  <link rel="stylesheet" href="/static/css/components/nav.css" />
+  <link rel="stylesheet" href="/static/css/components/header.css" />
+  <link rel="stylesheet" href="/static/css/components/alert.css" />
+{{ end }}
+
+{{ define "layout-js" }}
+{{ end }}
+
+{{ define "body" }}
+  <div class="app">
+    <div class="app__nav">
+      {{ template "nav" . }}
+    </div>
+    <main class="app__main">
+      {{ template "header" . }}
+      <div class="app__content">{{ template "main" . }}</div>
+    </main>
+    {{ block "right-panel" . }}{{ end }}
+  </div>
+{{ end }}

@@ -1,0 +1,48 @@
+{{ define "nav" }}
+  <nav class="nav">
+    <div class="nav__brand">
+      <span>Awesome Release Notes</span>
+    </div>
+    <ul class="nav__list">
+      <li class="nav__list__item">
+        <a href="/release-notes"
+          ><i data-feather="heart" width="16" height="16"></i>
+          <span>Release Notes</span></a
+        >
+      </li>
+      <li class="nav__list__item">
+        <a href="/widget"
+          ><i data-feather="grid" width="16" height="16"></i
+          ><span>Widget</span></a
+        >
+      </li>
+      <li class="nav__list__item">
+        <a href="/lp-config"
+          ><i data-feather="globe" width="16" height="16"></i
+          ><span>Landing Page</span></a
+        >
+      </li>
+      <li class="nav__list__item">
+        <a href="/users"
+          ><i data-feather="user" width="16" height="16"></i
+          ><span>Users</span></a
+        >
+      </li>
+      <li class="nav__list__item">
+        <a href="/settings"
+          ><i data-feather="settings" width="16" height="16"></i
+          ><span>Settings</span></a
+        >
+      </li>
+    </ul>
+    <div class="nav__divider"></div>
+    <ul class="nav__list">
+      <li class="nav__list__item">
+        <a href="/logout"
+          ><i data-feather="log-out" width="16" height="16"></i
+          ><span>Logout</span></a
+        >
+      </li>
+    </ul>
+  </nav>
+{{ end }}

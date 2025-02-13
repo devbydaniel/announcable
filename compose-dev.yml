@@ -1,0 +1,29 @@
+services:
+  app:
+    image: cosmtrek/air
+    working_dir: /project-package
+    depends_on:
+      - postgres
+    ports:
+      - "3000:3000"
+    env_file: .env
+    volumes:
+      - ./backend/:/project-package/
+      - .env:/.env
+  mail:
+    image: schickling/mailcatcher
+    ports:
+      - 1080:1080
+
+  postgres:
+    ports:
+      - "5432:5432"
+
+  pgadmin:
+    ports:
+      - "${PGADMIN_PORT}:80"
+
+  objstorage:
+    ports:
+      - "9000:9000"
+      - "9001:9001"

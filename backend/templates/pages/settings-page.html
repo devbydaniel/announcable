@@ -1,0 +1,159 @@
+{{ define "page-css" }}
+  <link rel="stylesheet" href="/static/css/components/card.css" />
+  <link rel="stylesheet" href="/static/css/components/button.css" />
+  <link rel="stylesheet" href="/static/css/components/form.css" />
+  <link rel="stylesheet" href="/static/css/components/alert.css" />
+  <link rel="stylesheet" href="/static/css/pages/settings.css" />
+{{ end }}
+
+{{ define "page-js" }}
+  <script src="/static/js/pages/settings.js"></script>
+{{ end }}
+
+{{ define "main" }}
+  <div class="settings">
+    <div class="card" x-ref="widgetCard" x-data="widgetSettings">
+      <h2 class="card__title">Widget</h2>
+      <div class="card__content">
+        <div class="form__group">
+          <label for="widget_id" class="form__label">Your Widget ID</label>
+          <div class="input-row">
+            <input
+              type="text"
+              id="widget_id"
+              class="form__input"
+              disabled
+              value="{{ .WidgetID }}"
+            />
+          </div>
+          <label for="widget_id" class="form__subtext"
+            >This is your unique widget ID. Use this ID to embed the widget on
+            your website.</label
+          >
+        </div>
+      </div>
+      <div class="card__footer">
+        <button
+          class="button button--square button--sm button--ghost"
+          hx-patch="/widget/external-id"
+          hx-swap="none"
+          hx-confirm="You will need to update the widget configuration in your product before the widget can display release notes again."
+          @htmx:response-error.camel="onSubmitError"
+          @custom:submit-success="onSubmitSuccess"
+        >
+          <i data-feather="repeat" width="16" height="16"></i>
+        </button>
+        <button
+          class="button"
+          onclick="navigator.clipboard.writeText('{{ .WidgetID }}'); toastSuccess('Copied to clipboard')"
+        >
+          Copy to Clipboard
+        </button>
+      </div>
+    </div>
+    <div
+      class="card"
+      x-data="landingPageSettings({{ if .CustomUrl }}
+        true
+      {{ else }}
+        false
+      {{ end }}
+          )"
+      x-ref="landingPageCard"
+    >
+      <h2 class="card__title">Landing Page</h2>
+      <div class="card__content">
+        <form
+          id="custom-url-form"
+          hx-patch="/widget/base-url"
+          hx-swap="none"
+          @htmx:response-error.camel="onSubmitError"
+          @custom:submit-success="onSubmitSuccess"
+        >
+          <div class="form__group">
+            <div class="form__radio">
+              <input
+                id="use_custom_url"
+                type="checkbox"
+                name="use_custom_url"
+                x-model="useCustomURL"
+              />
+              <label for="use_custom_url"
+                >I want to disable the default landing page and build my
+                own</label
+              >
+            </div>
+          </div>
+          <div class="form__group" x-show="useCustomURL" x-transition>
+            <label for="custom_url" class="form__label">Custom URL</label>
+            <input
+              type="url"
+              id="custom_url"
+              name="custom_url"
+              class="form__input"
+              {{ if .CustomUrl }}
+                value="{{ .CustomUrl }}"
+              {{ end }}
+            />
+          </div>
+        </form>
+      </div>
+      <div class="card__footer">
+        <button
+          id="custom-url-submit-button"
+          class="button"
+          @click="$dispatch('submit-custom-url-form')"
+        >
+          Save
+        </button>
+      </div>
+    </div>
+    <div class="card">
+      <h2 class="card__title">Reset Password</h2>
+      <div class="card__content">
+        <form
+          id="pw-update-form"
+          x-data="pwUpdate"
+          hx-patch="/profile/password"
+          hx-swap="none"
+          @htmx:response-error.camel="onSubmitError"
+          @custom:submit-success="onSubmitSuccess"
+        >
+          <div class="form__group">
+            <label for="widget_id" class="form__label">Current Password</label>
+            <input
+              type="password"
+              id="widget_id"
+              class="form__input"
+              name="current_password"
+              required
+            />
+          </div>
+          <div class="form__group">
+            <label for="widget_id" class="form__label">New Password</label>
+            <input
+              type="password"
+              id="widget_id"
+              class="form__input"
+              name="new_password"
+              required
+            />
+          </div>
+          <div class="form__group">
+            <label for="widget_id" class="form__label">Confirm</label>
+            <input
+              type="password"
+              id="widget_id"
+              class="form__input"
+              name="confirm"
+              required
+            />
+          </div>
+        </form>
+      </div>
+      <div class="card__footer">
+        <button id="pw-update-submit-button" class="button">Change</button>
+      </div>
+    </div>
+  </div>
+{{ end }}

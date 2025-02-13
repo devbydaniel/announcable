@@ -1,0 +1,131 @@
+.lp-container {
+  margin-top: var(--gap-lg);
+}
+
+.lp {
+  padding: var(--gap-md);
+  max-width: 32em;
+  margin-left: auto;
+  margin-right: auto;
+  border: var(--border-width) solid var(--border-color);
+  border-radius: var(--border-radius);
+  position: relative;
+}
+
+.lp__top {
+  display: flex;
+  justify-content: space-between;
+  height: var(--gap-lg);
+}
+
+.lp__brand {
+  height: var(--gap-md);
+  width: 6em;
+}
+
+.lp__header {
+  margin-top: var(--gap-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--gap-xs);
+  margin-bottom: var(--gap-md);
+}
+
+.lp__title {
+  font-size: var(--font-size-md);
+}
+
+.lp__description {
+  font-size: var(--font-size-sm);
+}
+
+.lp__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-xl);
+  margin-top: var(--gap-xl);
+}
+
+.release-note-entry {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--gap-lg);
+}
+
+.release-note-entry__left {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-xs);
+  width: 12em;
+}
+
+.release-note-entry__title {
+  font-size: var(--font-size-sm);
+}
+
+.release-note-entry__date {
+  height: var(--gap-sm);
+  width: 5em;
+}
+
+.release-note-entry__right {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-sm);
+  flex-grow: 1;
+}
+
+.release-note-entry__right__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-xs);
+}
+
+.release-note-entry__img {
+  height: 8em;
+}
+
+.release-note-entry__content__skeleton {
+  height: var(--gap-sm);
+}
+
+.config-panel {
+  background-color: var(--color-mantle);
+  border-left: var(--border-width) solid var(--border-color);
+  width: 20em;
+  height: 100vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.config-panel__form-container {
+  padding: var(--gap-md);
+  padding-bottom: 0;
+}
+
+.config-panel__heading {
+  color: var(--color-subtext1);
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--gap-md);
+  margin-top: var(--gap-lg);
+}
+
+.config-panel__heading--no-mt {
+  margin-top: inherit;
+}
+
+.config-panel__bumper {
+  height: 4em;
+}
+
+.config-panel__footer {
+  position: sticky;
+  bottom: 0;
+  backdrop-filter: blur(8px);
+  padding: var(--gap-md);
+}
+
+input[type="color"] {
+  width: 100%;
+}

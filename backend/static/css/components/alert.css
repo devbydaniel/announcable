@@ -1,0 +1,65 @@
+.swal-modal {
+  background-color: var(--color-base);
+  border-radius: var(--border-radius);
+  text-align: left;
+}
+
+.swal-title {
+  font-size: var(--font-size-lg);
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  text-align: left;
+  padding: var(--gap-md);
+  padding-bottom: 0;
+}
+
+.swal-text {
+  font-size: var(--font-size);
+  padding: var(--gap-md);
+  max-width: none;
+}
+
+.swal-footer {
+  padding: var(--gap-md);
+  padding-top: 0;
+  margin-top: 0;
+}
+
+.swal-button-container {
+  margin: 0;
+  margin-left: var(--gap-sm);
+}
+
+.swal-button {
+  padding: var(--gap-sm) var(--gap-md);
+  min-width: 5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--gap-sm);
+  border: none;
+  border-radius: var(--border-radius-sm);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: var(--font-family);
+  letter-spacing: var(--tracking-lg);
+  background-color: var(--color-overlay0);
+  border-color: var(--color-overlay0);
+}
+
+.swal-button--danger:hover {
+  filter: brightness(90%) !important;
+  background-color: var(--color-error) !important;
+}
+
+.swal-button--danger:active {
+  filter: brightness(80%) !important;
+  background-color: var(--color-error) !important;
+}
+
+.swal-button--danger {
+  background-color: var(--color-error);
+  border-color: var(--color-error);
+  color: var(--color-base);
+}

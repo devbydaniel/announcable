@@ -1,0 +1,27 @@
+.modal {
+  background-color: var(--color-base);
+  padding: var(--gap-md);
+  border: none;
+  border-radius: var(--border-radius);
+  position: relative;
+  min-width: 24em;
+}
+
+.modal__title {
+  font-size: var(--font-size);
+  padding-bottom: var(--gap-md);
+}
+
+.modal__close {
+  position: absolute;
+  top: var(--gap-sm);
+  right: var(--gap-sm);
+}
+
+.modal__footer {
+  padding-top: var(--gap-md);
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--gap-sm);
+}

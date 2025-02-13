@@ -1,0 +1,31 @@
+.settings {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-md);
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 30em;
+}
+
+.card__title {
+  font-size: var(--font-size);
+}
+
+.card__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--gap-sm);
+}
+
+.input-row {
+  display: flex;
+  gap: var(--gap-sm);
+}
+
+.input-row input {
+  flex-grow: 1;
+}
+
+.has-focus {
+  border: 2px solid var(--color-primary-lighter);
+}

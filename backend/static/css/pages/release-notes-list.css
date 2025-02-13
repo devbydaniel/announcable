@@ -1,0 +1,16 @@
+.release-notes-table__date-cell {
+  width: 8em;
+}
+
+tbody .table__tr {
+  cursor: pointer;
+}
+
+.empty-state {
+  height: 12em;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-md);
+  align-items: center;
+  justify-content: center;
+}

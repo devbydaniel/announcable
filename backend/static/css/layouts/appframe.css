@@ -1,0 +1,41 @@
+.app {
+  position: relative;
+  height: 100vh;
+  display: flex;
+}
+
+.app__nav {
+  width: 14rem;
+  flex-shrink: 0;
+  transition: transform 0.3s ease-in-out;
+  background: var(--color-mantle);
+  z-index: 1000;
+  position: relative;
+}
+
+.app__main {
+  background: var(--color-base);
+  flex-grow: 1;
+  overflow-x: hidden;
+  overflow-y: auto;
+  position: relative;
+}
+
+.app__content {
+  padding: var(--gap-md);
+}
+
+/* Tablet */
+@media (min-width: 768px) {
+}
+/* Desktop */
+@media (min-width: 1024px) {
+}
+
+/* Large Desktop */
+@media (min-width: 1280px) {
+}
+
+/* Extra Large Desktop/4K */
+@media (min-width: 1536px) {
+}

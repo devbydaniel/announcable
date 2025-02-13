@@ -1,0 +1,268 @@
+{{ define "page-css" }}
+  <link rel="stylesheet" href="/static/css/pages/widget.css" />
+  <link rel="stylesheet" href="/static/css/components/form.css" />
+  <link rel="stylesheet" href="/static/css/components/skeleton.css" />
+  <link rel="stylesheet" href="/static/css/components/button.css" />
+{{ end }}
+
+{{ define "page-js" }}
+  <script src="/static/js/pages/widget.js"></script>
+{{ end }}
+
+{{ define "page-actions" }}
+  <a
+    href="/settings?focus=widget"
+    class="button button--ghost button--sm button--square"
+  >
+    <i data-feather="settings" width="16" height="16"></i>
+  </a>
+{{ end }}
+
+{{ define "main" }}
+  <div
+    class="release-note"
+    x-data="widget('{{ .Cfg.Title }}', '{{ .Cfg.Description }}', '{{ .Cfg.ReleaseNoteCtaText }}', '{{ .Cfg.WidgetBorderRadius }}', '{{ .Cfg.WidgetBorderColor }}', '{{ .Cfg.WidgetBorderWidth }}', '{{ .Cfg.WidgetBgColor }}', '{{ .Cfg.WidgetTextColor }}', '{{ .Cfg.ReleaseNoteBorderRadius }}', '{{ .Cfg.ReleaseNoteBorderColor }}', '{{ .Cfg.ReleaseNoteBorderWidth }}', '{{ .Cfg.ReleaseNoteBgColor }}', '{{ .Cfg.ReleaseNoteTextColor }}')"
+  >
+    <div class="release-note__widget" x-bind="widget">
+      <div class="release-note__widget__header">
+        <h2 class="release-note__widget__title" x-bind="title"></h2>
+        <p class="release-note__widget__description" x-bind="description"></p>
+      </div>
+      <div class="release-note__widget__content">
+        <div class="release-note-entry" x-bind="releaseNote">
+          <h3 class="release-note-entry__title" x-bind="releaseNoteText">
+            This is an example release note
+          </h3>
+          <div class="skeleton release-note-entry__img"></div>
+          <div class="release-note-entry__content">
+            <span x-bind="releaseNoteText">What a great release!</span>
+            <div class="skeleton release-note-entry__content__skeleton"></div>
+            <div class="skeleton release-note-entry__content__skeleton"></div>
+            <div class="skeleton release-note-entry__content__skeleton"></div>
+            <div class="skeleton release-note-entry__content__skeleton"></div>
+          </div>
+          <span class="release-note-entry__cta" x-bind="cta"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+{{ end }}
+
+{{ define "right-panel" }}
+  <div class="config-panel">
+    <form
+      x-data="form"
+      hx-patch="/widget"
+      hx-swap="none"
+      @htmx:response-error.camel="onSubmitError"
+      @custom:submit-success="onSubmitSuccess"
+    >
+      <div class="config-panel__form-container">
+        <h3 class="config-panel__heading config-panel__heading--no-mt">
+          Widget
+        </h3>
+        <div class="form__group form__group--no-mt">
+          <label class="form__label" for="title">Title</label>
+          <input
+            class="form__input"
+            type="text"
+            id="title"
+            name="title"
+            required
+            x-bind="title"
+            value="{{ .Cfg.Title }}"
+          />
+        </div>
+        <div class="form__group form__group--no-mt">
+          <label class="form__label" for="description">Description</label>
+          <input
+            class="form__input"
+            type="text"
+            id="description"
+            name="description"
+            required
+            x-bind="description"
+            value="{{ .Cfg.Description }}"
+          />
+        </div>
+        <div class="form__group form__group--no-mt">
+          <label class="form__label" for="type">Widget type</label>
+          <select class="form__input" type="text" id="type" name="widget_type">
+            <option
+              value="modal"
+              {{ if (eq .Cfg.WidgetType "modal") }}selected{{ end }}
+            >
+              Modal
+            </option>
+            <option
+              value="popover"
+              {{ if (eq .Cfg.WidgetType "popover") }}selected{{ end }}
+            >
+              Popover
+            </option>
+            <option
+              value="sidebar"
+              {{ if (eq .Cfg.WidgetType "sidebar") }}selected{{ end }}
+            >
+              Sidebar
+            </option>
+          </select>
+        </div>
+        <div class="form__group form__group--no-mt">
+          <label class="form__label" for="widget_border_radius"
+            >Border Radius</label
+          >
+          <input
+            class="form__input"
+            type="number"
+            id="widget_border_radius"
+            name="widget_border_radius"
+            min="0"
+            x-bind="widgetBorderRadius"
+            value="{{ .Cfg.WidgetBorderRadius }}"
+          />
+        </div>
+        <div class="form__group form__group--no-mt">
+          <label class="form__label" for="widget_border_width"
+            >Border Width</label
+          >
+          <input
+            class="form__input"
+            type="number"
+            id="widget_border_width"
+            name="widget_border_width"
+            min="0"
+            x-bind="widgetBorderWidth"
+            value="{{ .Cfg.WidgetBorderWidth }}"
+          />
+        </div>
+        <div class="form__group form__group--no-mt">
+          <label class="form__label" for="widget_border_color"
+            >Border Color</label
+          >
+          <input
+            class="form__input"
+            type="color"
+            id="widget_border_color"
+            name="widget_border_color"
+            x-bind="widgetBorderColor"
+            value="{{ .Cfg.WidgetBorderColor }}"
+          />
+        </div>
+        <div class="form__group form__group--no-mt">
+          <label class="form__label" for="widget_background_color"
+            >Background Color</label
+          >
+          <input
+            class="form__input"
+            type="color"
+            id="widget_background_color"
+            name="widget_background_color"
+            x-bind="widgetBackgroundColor"
+            value="{{ .Cfg.WidgetBgColor }}"
+          />
+        </div>
+        <div class="form__group form__group--no-mt">
+          <label class="form__label" for="widget_text_color">Text Color</label>
+          <input
+            class="form__input"
+            type="color"
+            id="widget_text_color"
+            name="widget_text_color"
+            x-bind="widgetTextColor"
+            value="{{ .Cfg.WidgetTextColor }}"
+          />
+        </div>
+        <h3 class="config-panel__heading">Release Notes</h3>
+        <div class="form__group form__group--no-mt">
+          <label class="form__label" for="release_note_cta"
+            >Call-to-action</label
+          >
+          <input
+            class="form__input"
+            type="text"
+            id="release_note_cta_text"
+            name="release_note_cta_text"
+            x-bind="release_note_cta_text"
+            value="{{ .Cfg.ReleaseNoteCtaText }}"
+          />
+        </div>
+        <div class="form__group form__group--no-mt">
+          <label class="form__label" for="release_note_border_radius"
+            >Border Radius</label
+          >
+          <input
+            class="form__input"
+            type="number"
+            id="release_note_border_radius"
+            name="release_note_border_radius"
+            min="0"
+            x-bind="releaseNoteBorderRadius"
+            value="{{ .Cfg.ReleaseNoteBorderRadius }}"
+          />
+        </div>
+        <div class="form__group form__group--no-mt">
+          <label class="form__label" for="release_note_border_width"
+            >Border Width</label
+          >
+          <input
+            class="form__input"
+            type="number"
+            id="release_note_border_width"
+            name="release_note_border_width"
+            min="0"
+            x-bind="releaseNoteBorderWidth"
+            value="{{ .Cfg.ReleaseNoteBorderWidth }}"
+          />
+        </div>
+        <div class="form__group form__group--no-mt">
+          <label class="form__label" for="release_note_border_color"
+            >Border Color</label
+          >
+          <input
+            class="form__input"
+            type="color"
+            id="release_note_border_color"
+            name="release_note_border_color"
+            x-bind="releaseNoteBorderColor"
+            value="{{ .Cfg.ReleaseNoteBorderColor }}"
+          />
+        </div>
+        <div class="form__group form__group--no-mt">
+          <label class="form__label" for="release_note_background_color"
+            >Background Color</label
+          >
+          <input
+            class="form__input"
+            type="color"
+            id="release_note_background_color"
+            name="release_note_background_color"
+            x-bind="releaseNoteBackgroundColor"
+            value="{{ .Cfg.ReleaseNoteBgColor }}"
+          />
+        </div>
+        <div class="form__group form__group--no-mt">
+          <label class="form__label" for="release_note_text_color"
+            >Release Note Font Color</label
+          >
+          <input
+            class="form__input"
+            type="color"
+            id="release_note_text_color"
+            name="release_note_text_color"
+            x-bind="releaseNoteTextColor"
+            value="{{ .Cfg.ReleaseNoteTextColor }}"
+          />
+        </div>
+      </div>
+      <div class="config-panel__footer">
+        <button
+          type="submit"
+          class="config-panel__submit button button--primary button--block"
+        >
+          Update
+        </button>
+      </div>
+    </form>
+  </div>
+{{ end }}

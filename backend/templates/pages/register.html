@@ -1,0 +1,71 @@
+{{ define "page-css" }}
+  <link rel="stylesheet" href="static/css/components/card.css" />
+  <link rel="stylesheet" href="static/css/components/form.css" />
+  <link rel="stylesheet" href="static/css/components/button.css" />
+  <link rel="stylesheet" href="static/css/pages/register.css" />
+{{ end }}
+
+{{ define "page-js" }}
+{{ end }}
+
+{{ define "main" }}
+  <div class="card" x-data>
+    <h2 class="card__title">Register</h2>
+    <form
+      class="form"
+      hx-post="/register"
+      hx-swap="none"
+      @htmx:response-error.camel="toastError($event.detail.xhr.response)"
+    >
+      <div class="form__group">
+        <label class="form__label" for="org">Company</label>
+        <input
+          class="form__input"
+          type="text"
+          id="org"
+          name="org"
+          required
+          autofocus
+        />
+      </div>
+      <div class="form__group">
+        <label class="form__label" for="email">Email</label>
+        <input
+          class="form__input"
+          type="email"
+          id="email"
+          name="email"
+          required
+        />
+      </div>
+      <div class="form__group">
+        <label class="form__label" for="password">Password</label>
+        <input
+          class="form__input"
+          type="password"
+          id="password"
+          name="password"
+          required
+        />
+      </div>
+      <div class="form__group">
+        <label class="form__label" for="confirm-password"
+          >Confirm Password</label
+        >
+        <input
+          class="form__input"
+          type="password"
+          id="confirm-password"
+          name="confirm"
+          required
+        />
+      </div>
+      <div class="form__group">
+        <button class="button button--block button--primary" type="submit">
+          Register
+        </button>
+      </div>
+      <p class="login-hint"><a href="/login">Already registered? Login</a></p>
+    </form>
+  </div>
+{{ end }}

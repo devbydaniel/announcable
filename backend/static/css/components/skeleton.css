@@ -1,0 +1,4 @@
+.skeleton {
+  background-color: var(--color-crust);
+  border-radius: var(--border-radius-sm);
+}

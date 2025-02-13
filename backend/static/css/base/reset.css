@@ -1,0 +1,58 @@
+body {
+  font-family: "Inter Variable", sans-serif;
+  background: var(--color-base);
+  color: var(--color-text);
+  margin: 0;
+  padding: 0;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+ul {
+  margin: 0;
+  color: var(--color-text);
+}
+
+hr {
+  border: 0;
+  border-top: var(--border-width) solid var(--border-color);
+  margin: var(--gap-md) 0;
+}
+
+a {
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+label {
+  color: var(--color-text);
+}
+
+input,
+textarea {
+  background: var(--color-surface0);
+  color: var(--color-text);
+}
+
+textarea {
+  min-height: 5rem;
+}
+
+button {
+  text-transform: none;
+}
+
+input[type="checkbox"] {
+  width: var(--gap-md);
+  height: var(--gap-md);
+  accent-color: var(--color-secondary);
+}
+input[type="radio"] {
+  width: var(--gap-md);
+  height: var(--gap-md);
+  accent-color: var(--color-primary);
+}

@@ -1,0 +1,143 @@
+{{ define "page-css" }}
+  <link rel="stylesheet" href="/static/css/components/button.css" />
+  <link rel="stylesheet" href="/static/css/components/card.css" />
+  <link rel="stylesheet" href="/static/css/components/table.css" />
+  <link rel="stylesheet" href="/static/css/components/badge.css" />
+  <link rel="stylesheet" href="/static/css/components/alert.css" />
+  <link rel="stylesheet" href="/static/css/components/modal.css" />
+  <link rel="stylesheet" href="/static/css/components/form.css" />
+  <link rel="stylesheet" href="/static/css/pages/user-list.css" />
+{{ end }}
+
+{{ define "page-js" }}
+{{ end }}
+
+{{ define "page-actions" }}
+  <button x-data class="button button--primary" @click="$dispatch('invite')">
+    Invite
+  </button>
+{{ end }}
+
+{{ define "main" }}
+  <div class="user-tables">
+    {{ if and .Invites (not (len .Invites | eq 0)) }}
+      <div class="card card--no-pad">
+        <table class="table">
+          <thead>
+            <tr class="table__tr table__tr--no-hover">
+              <th class="table__th release-notes-table__date-cell">
+                Invited Users
+              </th>
+              <th class="table__th">Role</th>
+              <th class="table__th">Status</th>
+              <th class="table__th table--align-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{ range .Invites }}
+              <tr class="table__tr" id="{{ .ID }}">
+                <td class="table__td">
+                  {{ .Email }}
+                </td>
+                <td class="table__td">{{ .Role }}</td>
+                <td class="table__td">
+                  <span class="badge"
+                    >{{ if .IsExpired }}expired{{ else }}pending{{ end }}</span
+                  >
+                </td>
+                <td class="table__td table--align-right table__td--no-pad-y">
+                  <button
+                    class="button button--sm button--ghost button--square"
+                    hx-delete="/invites/{{ .ID }}"
+                    hx-confirm="The invite sent to {{ .Email }} will not work anymore."
+                  >
+                    <i width="16" height="16" data-feather="trash"></i>
+                  </button>
+                </td>
+              </tr>
+            {{ end }}
+          </tbody>
+        </table>
+      </div>
+    {{ end }}
+    <div class="card card--no-pad">
+      <table class="table">
+        <thead>
+          <tr class="table__tr table__tr--no-hover">
+            <th class="table__th release-notes-table__date-cell">
+              Active Users
+            </th>
+            <th class="table__th">Role</th>
+            <th class="table__th">Status</th>
+            <th class="table__th table--align-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{ range .Users }}
+            <tr class="table__tr">
+              <td class="table__td">
+                {{ .Email }}
+              </td>
+              <td class="table__td">{{ .Role }}</td>
+              <td class="table__td"><span class="badge">active</span></td>
+              <td class="table__td table--align-right table__td--no-pad-y">
+                {{ if not (eq $.OwnID .UserID) }}
+                  <button
+                    class="button button--sm button--ghost button--square"
+                    hx-delete="/users/{{ .OrgUserID }}"
+                    hx-confirm="The user {{ .Email }} will be removed."
+                  >
+                    <i width="16" height="16" data-feather="trash"></i>
+                  </button>
+                {{ end }}
+              </td>
+            </tr>
+          {{ end }}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <dialog x-data @invite.window="$el.showModal()" x-ref="modal" class="modal">
+    <button
+      class="modal__close button button--sm button--square button--ghost"
+      @click="$refs.modal.close()"
+    >
+      <i width="16" height="16" data-feather="x"></i>
+    </button>
+    <h2 class="modal__title">Invite User</h2>
+    <div class="modal__content">
+      <form
+        hx-post="/invites"
+        class="form"
+        @form-submit.window="$el.requestSubmit()"
+        @htmx:response-error.camel="toastError($event.detail.xhr.response)"
+        @custom:submit-success="toastSuccess('Invite sent')"
+      >
+        <div class="form__group form__group--no-mt">
+          <label class="form__label" for="email">E-Mail</label>
+          <input
+            x-ref="email"
+            class="form__input"
+            type="email"
+            id="email"
+            name="email"
+            required
+            autofocus
+          />
+        </div>
+        <div class="form__group form__group--no-mb">
+          <label class="form__label" for="role">Role</label>
+          <select class="form__input" id="role" name="role" required>
+            <option value="admin">Admin</option>
+            <option value="manager">Member</option>
+          </select>
+        </div>
+      </form>
+    </div>
+    <div class="modal__footer">
+      <button class="button button--primary" @click="$dispatch('form-submit')">
+        Send
+      </button>
+    </div>
+  </dialog>
+{{ end }}

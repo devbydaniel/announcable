@@ -1,0 +1,11 @@
+{{ define "layout-css" }}
+  <link rel="stylesheet" href="/static/css/layouts/onboard.css" />
+{{ end }}
+
+{{ define "body" }}
+  <div class="onboard">
+    <main class="onboard__content">
+      {{ template "main" . }}
+    </main>
+  </div>
+{{ end }}

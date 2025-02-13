@@ -1,0 +1,23 @@
+.card {
+  background-color: var(--color-base);
+  padding: var(--gap-md);
+  border-radius: var(--border-radius);
+  border: var(--border-width) solid var(--border-color);
+}
+
+.card--no-pad {
+  padding: 0;
+}
+
+.card__title {
+  margin-bottom: var(--gap-md);
+}
+
+.card__paragraph {
+  margin-top: var(--gap-sm);
+  margin-bottom: var(--gap-sm);
+}
+
+.card__footer {
+  margin-top: var(--gap-md);
+}

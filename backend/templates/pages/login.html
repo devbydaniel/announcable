@@ -1,0 +1,54 @@
+{{ define "page-css" }}
+  <link rel="stylesheet" href="/static/css/components/card.css" />
+  <link rel="stylesheet" href="/static/css/components/form.css" />
+  <link rel="stylesheet" href="/static/css/components/button.css" />
+  <link rel="stylesheet" href="/static/css/pages/login.css" />
+{{ end }}
+
+{{ define "page-js" }}
+{{ end }}
+
+{{ define "main" }}
+  <div class="card" x-data>
+    <h2 class="card__title">Login</h2>
+    <form
+      class="form"
+      hx-post="/login"
+      hx-swap="none"
+      @htmx:response-error.camel="toastError($event.detail.xhr.response)"
+    >
+      <div class="form__group">
+        <label class="form__label" for="email">Email</label>
+        <input
+          class="form__input"
+          type="email"
+          id="email"
+          name="email"
+          required
+          autofocus
+        />
+      </div>
+      <div class="form__group">
+        <label class="form__label" for="password">Password</label>
+        <input
+          class="form__input"
+          type="password"
+          id="password"
+          name="password"
+          required
+        />
+        <label class="form__subtext" for="password"
+          ><a href="/forgot-pw">Forgot password?</a></label
+        >
+      </div>
+      <div class="form__group">
+        <button class="button button--block button--primary" type="submit">
+          Login
+        </button>
+      </div>
+      <p class="register-hint">
+        <a href="/register">No account yet? Register</a>
+      </p>
+    </form>
+  </div>
+{{ end }}
