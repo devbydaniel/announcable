@@ -6,6 +6,9 @@ WORKDIR /app
 # Copy go mod and sum files
 COPY go.mod go.sum ./
 
+# Copy env file
+COPY ../.env ./
+
 # Download dependencies
 RUN go mod download
 
@@ -23,8 +26,8 @@ WORKDIR /app
 # Copy the binary from builder
 COPY --from=builder /app/main .
 
-# Copy the env file
-COPY ../.env .
+# Copy env
+COPY --from=builder /app/.env .
 
 # Expose the port your app runs on
 EXPOSE 8080
