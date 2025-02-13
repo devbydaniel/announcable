@@ -12,15 +12,6 @@ services:
     depends_on:
       - postgres
 
-  objstorage:
-    image: quay.io/minio/minio
-    env_file: .env
-    volumes:
-      - "minio_data:/data"
-    command: server --console-address ":9001" /data
-
 volumes:
   postgres-data:
-    driver: local
-  minio_data:
     driver: local

@@ -24,6 +24,15 @@ services:
       - "${PGADMIN_PORT}:80"
 
   objstorage:
+    image: quay.io/minio/minio
+    env_file: .env
+    volumes:
+      - "minio_data:/data"
+    command: server --console-address ":9001" /data
     ports:
       - "9000:9000"
       - "9001:9001"
+
+volumes:
+  minio_data:
+    driver: local
