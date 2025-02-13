@@ -8,10 +8,13 @@ services:
       # The Web UI (enabled by --api.insecure=true)
       - "8080:8080"
     volumes:
+      - .env:/app/.env
       - /var/run/docker.sock:/var/run/docker.sock
 
   app:
-    build: ./backend/
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
     depends_on:
       - postgres
     ports:
