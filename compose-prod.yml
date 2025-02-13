@@ -16,6 +16,5 @@ services:
       - postgres
     ports:
       - "3000:3000"
-    environment:
-      - ENV=production
+    env_file: .env
     restart: always
