@@ -9,7 +9,7 @@ services:
     env_file: .env
     volumes:
       - ./backend/:/project-package/
-      - .env:/.env
+      - .env:/project-package/.env
   mail:
     image: schickling/mailcatcher
     ports:

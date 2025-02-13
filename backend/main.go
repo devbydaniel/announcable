@@ -188,7 +188,7 @@ func main() {
 
 func initEnv() {
 	log.Trace().Msg("initEnv")
-	if err := godotenv.Load("../.env"); err != nil {
+	if err := godotenv.Load(".env"); err != nil {
 		log.Error().Err(err).Msg("Error loading .env file")
 		os.Exit(1)
 	}
