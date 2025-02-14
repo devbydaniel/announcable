@@ -35,8 +35,6 @@ services:
       replicas: 2
     depends_on:
       - postgres
-    ports:
-      - "3000:3000"
     env_file: .env
     restart: always
 
