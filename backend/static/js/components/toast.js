@@ -1,6 +1,6 @@
 function toastSuccess(message) {
   Toastify({
-    text: message,
+    text: message || "success",
     className: "toast toast__success",
     gravity: "bottom",
     position: "center",
@@ -26,7 +26,7 @@ function toastInfo(message) {
 
 function toastError(message) {
   Toastify({
-    text: message,
+    text: message || "an error occurred",
     className: "toast toast__error",
     gravity: "bottom",
     position: "center",
