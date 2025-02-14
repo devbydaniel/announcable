@@ -40,5 +40,9 @@ services:
     env_file: .env
     restart: always
 
+  postgres:
+    ports:
+      - ${POSTGRES_PORT}:5432
+
 volumes:
   letsencrypt:
