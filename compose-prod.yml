@@ -1,23 +1,44 @@
 services:
   reverse-proxy:
     image: traefik:v3.3
-    command: --api.insecure=true --providers.docker
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker"
+      - "--providers.docker.exposedbydefault=false" # every container needs a label to be exposed
+      - "--entryPoints.websecure.address=:443"
+      - "--entryPoints.web.address=:80"
+      - "--entryPoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entryPoints.web.http.redirections.entrypoint.scheme=https"
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      - "--certificatesresolvers.myresolver.acme.email=hello@danielbenner.de"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
     ports:
-      # The HTTP port
-      - "80:80"
-      # The Web UI (enabled by --api.insecure=true)
-      - "8080:8080"
+      - "80:80" # HTTP
+      - "443:443" # HTTPS
+      # - "8080:8080" # WebUI
     volumes:
       - .env:/app/.env
+      - letsencrypt:/letsencrypt
       - /var/run/docker.sock:/var/run/docker.sock
 
   app:
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.app.rule=Host(`release-notes.danielbenner.de`)"
+      - "traefik.http.routers.app.entrypoints=websecure"
+      - "traefik.http.routers.app.tls.certresolver=myresolver"
     build:
       context: .
       dockerfile: Dockerfile.backend
+    deploy:
+      mode: replicated
+      replicas: 2
     depends_on:
       - postgres
     ports:
       - "3000:3000"
     env_file: .env
     restart: always
+
+volumes:
+  letsencrypt:
