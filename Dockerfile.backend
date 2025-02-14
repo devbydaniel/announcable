@@ -26,5 +26,8 @@ COPY --from=builder /app/main .
 # Copy env
 COPY .env .
 
+# Copy migration files
+COPY backend/internal/database/migrations/ ./internal/database/migrations/
+
 # Run the binary
 CMD ["./main"]
