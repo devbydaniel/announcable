@@ -21,9 +21,8 @@ import (
 )
 
 var (
-	log        = logger.Get()
-	fsysStatic = http.FS(static.Assets)
-	cfg        = config.New()
+	log = logger.Get()
+	cfg = config.New()
 )
 
 func main() {
@@ -181,7 +180,8 @@ func main() {
 	})
 
 	// STATIC
-	r.Get("/static/*", http.StripPrefix("/static/", http.FileServer(fsysStatic)).ServeHTTP)
+	fs := http.FileServer(http.FS(static.Assets))
+	r.Get("/static/*", http.StripPrefix("/static/", fs).ServeHTTP)
 	r.Get("/img/*", handler.HandleObjStore)
 
 	// OTHER
