@@ -4,7 +4,7 @@ services:
     command:
       - "--api.insecure=true"
       - "--providers.docker"
-      - "--providers.docker.exposedbydefault=false" # every container needs a label to be exposed
+      - "--providers.docker.exposedbydefault=false"
       - "--entryPoints.websecure.address=:443"
       - "--entryPoints.web.address=:80"
       - "--entryPoints.web.http.redirections.entrypoint.to=websecure"
@@ -12,6 +12,16 @@ services:
       - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
       - "--certificatesresolvers.myresolver.acme.email=hello@danielbenner.de"
       - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+    labels:
+      - "traefik.enable=true"
+      # Dashboard router configuration
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.release-notes.danielbenner.de`)"
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.dashboard.entrypoints=websecure"
+      - "traefik.http.routers.dashboard.tls.certresolver=myresolver"
+      # Basic auth middleware
+      - "traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_USER}:${TRAEFIK_PASSWORD}"
+      - "traefik.http.routers.dashboard.middlewares=auth"
     ports:
       - "80:80" # HTTP
       - "443:443" # HTTPS
@@ -20,6 +30,7 @@ services:
       - .env:/app/.env
       - letsencrypt:/letsencrypt
       - /var/run/docker.sock:/var/run/docker.sock
+    env_file: .env
 
   app:
     labels:

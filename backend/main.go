@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"embed"
 	"net/http"
 	"os"
 
