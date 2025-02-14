@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"embed"
 	"net/http"
 	"os"
 
@@ -11,13 +12,17 @@ import (
 	"github.com/devbydaniel/release-notes-go/internal/logger"
 	mw "github.com/devbydaniel/release-notes-go/internal/middleware"
 	"github.com/devbydaniel/release-notes-go/internal/objstore"
+	"github.com/devbydaniel/release-notes-go/static"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
 )
 
-var log = logger.Get()
+var (
+	log        = logger.Get()
+	fsysStatic = http.FS(static.Assets)
+)
 
 func main() {
 	log.Info().Msg("Starting application")
@@ -174,7 +179,7 @@ func main() {
 	})
 
 	// STATIC
-	r.Get("/static/*", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))).ServeHTTP)
+	r.Get("/static/*", http.StripPrefix("/static/", http.FileServer(fsysStatic)).ServeHTTP)
 	r.Get("/img/*", handler.HandleObjStore)
 
 	// OTHER
