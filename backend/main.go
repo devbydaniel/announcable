@@ -28,6 +28,8 @@ func main() {
 	initEnv()
 	log.Info().Msg("Environment loaded")
 
+	files, _ := static.Assets.ReadDir(".")
+	log.Info().Interface("files", files).Msg("Available static files")
 	db := initDb()
 	defer database.Close(db)
 	objStore := initObjStore()
