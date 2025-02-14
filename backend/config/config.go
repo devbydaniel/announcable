@@ -50,7 +50,7 @@ func New() *config {
 			Port:     getEnvAsInt("POSTGRES_PORT"),
 			User:     getEnv("POSTGRES_USER"),
 			Password: getEnv("POSTGRES_PASSWORD"),
-			Name:     getEnv("POSTGRES_DB"),
+			Name:     getEnv("POSTGRES_NAME"),
 		},
 		ObjStorage: objStorageConfig{
 			AccessKey: getEnv("MINIO_ACCESS_KEY"),
