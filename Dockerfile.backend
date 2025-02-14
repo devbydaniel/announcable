@@ -26,8 +26,5 @@ COPY --from=builder /app/main .
 # Copy env
 COPY .env .
 
-# Expose the port your app runs on
-EXPOSE 8080
-
 # Run the binary
 CMD ["./main"]

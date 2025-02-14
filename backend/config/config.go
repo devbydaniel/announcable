@@ -34,6 +34,7 @@ type emailConfig struct {
 
 type config struct {
 	BaseURL    string
+	Port       int
 	Postgres   postgresConfig
 	ObjStorage objStorageConfig
 	PgAdmin    pgAdminConfig
@@ -43,6 +44,7 @@ type config struct {
 func New() *config {
 	return &config{
 		BaseURL: getEnv("BASE_URL"),
+		Port:    getEnvAsInt("PORT"),
 		Postgres: postgresConfig{
 			Host:     getEnv("POSTGRES_HOST"),
 			Port:     getEnvAsInt("POSTGRES_PORT"),

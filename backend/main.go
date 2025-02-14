@@ -4,7 +4,9 @@ import (
 	"context"
 	"net/http"
 	"os"
+	"strconv"
 
+	"github.com/devbydaniel/release-notes-go/config"
 	"github.com/devbydaniel/release-notes-go/internal/database"
 	"github.com/devbydaniel/release-notes-go/internal/domain/rbac"
 	"github.com/devbydaniel/release-notes-go/internal/handler"
@@ -21,6 +23,7 @@ import (
 var (
 	log        = logger.Get()
 	fsysStatic = http.FS(static.Assets)
+	cfg        = config.New()
 )
 
 func main() {
@@ -28,8 +31,6 @@ func main() {
 	initEnv()
 	log.Info().Msg("Environment loaded")
 
-	files, _ := static.Assets.ReadDir(".")
-	log.Info().Interface("files", files).Msg("Available static files")
 	db := initDb()
 	defer database.Close(db)
 	objStore := initObjStore()
@@ -189,7 +190,8 @@ func main() {
 
 	// SERVE
 
-	http.ListenAndServe(":3000", r)
+	portStr := ":" + strconv.Itoa(cfg.Port)
+	http.ListenAndServe(portStr, r)
 }
 
 func initEnv() {
