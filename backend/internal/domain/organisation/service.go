@@ -21,12 +21,16 @@ func NewService(r repository) *service {
 }
 
 func (s *service) CreateOrgWithAdmin(name string, user *user.User) (*OrganisationUser, error) {
-	log.Trace().Str("name", name).Str("user", user.Email).Msg("CreateWithAdmin")
+	log.Trace().Str("name", name).Str("user", user.Email).Msg("CreateOrgWithAdmin")
 	org, err := New(name)
 	if err != nil {
 		return nil, err
 	}
+	if err := s.repo.CreateOrg(org); err != nil {
+		return nil, err
+	}
 	ou := Connect(org, user, rbac.RoleAdmin)
+	log.Debug().Interface("ou", ou).Msg("OrganisationUser")
 
 	if err := s.repo.SaveOrgUser(ou, nil); err != nil {
 		return nil, err

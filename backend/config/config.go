@@ -25,14 +25,15 @@ type pgAdminConfig struct {
 	Port     int
 }
 type emailConfig struct {
-	DefaultFrom string
-	Server      string
-	Port        int
-	User        string
-	Password    string
+	FromAddress       string
+	McServer          string
+	McPort            int
+	PostmarkServerUrl string
+	PostmarkToken     string
 }
 
 type config struct {
+	Env        string
 	BaseURL    string
 	Port       int
 	Postgres   postgresConfig
@@ -43,6 +44,7 @@ type config struct {
 
 func New() *config {
 	return &config{
+		Env:     getEnv("ENV"),
 		BaseURL: getEnv("BASE_URL"),
 		Port:    getEnvAsInt("PORT"),
 		Postgres: postgresConfig{
@@ -65,11 +67,11 @@ func New() *config {
 			Port:     getEnvAsInt("PGADMIN_PORT"),
 		},
 		Email: emailConfig{
-			DefaultFrom: getEnv("EMAIL_DEFAULT_FROM"),
-			Server:      getEnv("EMAIL_SERVER"),
-			Port:        getEnvAsInt("EMAIL_PORT"),
-			User:        getEnv("EMAIL_USER"),
-			Password:    getEnv("EMAIL_PASSWORD"),
+			FromAddress:       getEnv("EMAIL_FROM_ADDRESS"),
+			McServer:          getEnv("MAILCATCHER_SERVER"),
+			McPort:            getEnvAsInt("MAILCATCHER_PORT"),
+			PostmarkServerUrl: getEnv("POSTMARK_SERVER_URL"),
+			PostmarkToken:     getEnv("POSTMARK_TOKEN"),
 		},
 	}
 }

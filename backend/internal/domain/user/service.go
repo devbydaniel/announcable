@@ -25,7 +25,7 @@ func (s *service) Create(email, pw string, emailVerified bool) (*User, error) {
 		return nil, err
 	}
 	user := User{Email: email, Password: hashedPassword, EmailVerified: emailVerified}
-	if err := s.repo.Save(&user); err != nil {
+	if err := s.repo.Create(&user); err != nil {
 		return nil, err
 	}
 	return &user, nil

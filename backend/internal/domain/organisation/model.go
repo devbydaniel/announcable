@@ -19,16 +19,16 @@ type Organisation struct {
 
 type OrganisationUser struct {
 	database.BaseModel `gorm:"embedded"`
-	OrganisationID     uuid.UUID `gorm:"type:uuid;primaryKey"`
+	OrganisationID     uuid.UUID
 	Organisation       Organisation
-	UserID             uuid.UUID `gorm:"type:uuid;primaryKey"`
+	UserID             uuid.UUID
 	User               user.User
 	Role               rbac.Role `gorm:"type:varchar(255)"`
 }
 
 type OrganisationInvite struct {
 	database.BaseModel `gorm:"embedded"`
-	OrganisationID     uuid.UUID `gorm:"type:uuid;primaryKey"`
+	OrganisationID     uuid.UUID
 	Organisation       Organisation
 	Email              string    `gorm:"type:varchar(255)"`
 	ExternalID         string    `gorm:"type:varchar(255)"`

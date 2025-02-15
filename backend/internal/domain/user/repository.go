@@ -14,7 +14,7 @@ func NewRepository(db *database.DB) *repository {
 	return &repository{db: db}
 }
 
-func (r *repository) Save(u *User) error {
+func (r *repository) Create(u *User) error {
 	log.Trace().Msg("Save")
 	if err := r.db.Client.Create(u).Error; err != nil {
 		log.Error().Err(err).Msg("")

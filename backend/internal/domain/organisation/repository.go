@@ -15,6 +15,11 @@ func NewRepository(db *database.DB) *repository {
 	return &repository{db: db}
 }
 
+func (r *repository) CreateOrg(org *Organisation) error {
+	log.Trace().Msg("CreateOrg")
+	return r.db.Client.Create(org).Error
+}
+
 func (r *repository) FindOrg(orgId uuid.UUID) (*Organisation, error) {
 	log.Trace().Str("orgId", orgId.String()).Msg("FindOrgById")
 	var org Organisation
@@ -50,7 +55,6 @@ func (r *repository) SaveOrgUser(ou *OrganisationUser, tx *gorm.DB) error {
 	} else {
 		client = r.db.Client
 	}
-
 	return client.Create(ou).Error
 }
 
