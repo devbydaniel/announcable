@@ -109,6 +109,12 @@ func (o *ObjStore) GetImageUrl(bucket, path string) (string, error) {
 		log.Error().Err(err).Msg("Error getting image url")
 		return "", err
 	}
+	if cfg.Env == "production" {
+		// in production, we can directly use the Hetzner ObjStore URL
+		return url.String(), nil
+	}
+	// in development, we need to proxy the URL through the API
+	// because Minio doesn't support different URLs for signing and accessing
 	urlProxy := strings.Replace(url.String(), "http://objstorage:9000", "/img", 1)
 	return urlProxy, nil
 }

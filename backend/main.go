@@ -199,7 +199,11 @@ func main() {
 	// STATIC
 	fs := http.FileServer(http.FS(static.Assets))
 	r.Get("/static/*", http.StripPrefix("/static/", fs).ServeHTTP)
-	r.Get("/img/*", handler.HandleObjStore)
+	if cfg.Env != "production" {
+		// proxy to obj storage since Minio doesn't support different
+		// urls for signing and accessing
+		r.Get("/img/*", handler.HandleObjStore)
+	}
 
 	// OTHER
 
