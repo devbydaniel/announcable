@@ -10,6 +10,7 @@ services:
     volumes:
       - ./backend/:/project-package/
       - .env:/project-package/.env
+
   mail:
     image: schickling/mailcatcher
     ports:

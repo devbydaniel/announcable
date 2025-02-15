@@ -31,7 +31,7 @@ services:
       - "traefik.http.services.app.loadbalancer.server.port=${PORT}"
     build:
       context: .
-      dockerfile: Dockerfile.backend
+      dockerfile: Dockerfile
     deploy:
       mode: replicated
       replicas: 2

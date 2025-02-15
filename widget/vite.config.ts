@@ -33,7 +33,7 @@ export default defineConfig({
     rollupOptions: {
       external: [], // This ensures React is included in the bundle
     },
-    outDir: "../backend/static/widget",
+    outDir: "dist",
     emptyOutDir: true,
   },
   define: {
