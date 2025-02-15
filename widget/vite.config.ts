@@ -26,12 +26,15 @@ export default defineConfig({
   build: {
     lib: {
       entry: "src/main.tsx",
+      formats: ["umd"],
       name: "ReleaseBeaconWidget",
-      fileName: (format) => `release-beacon-widget.${format}.js`,
+      fileName: () => `widget.js`,
     },
     rollupOptions: {
       external: [], // This ensures React is included in the bundle
     },
+    outDir: "../backend/static/widget",
+    emptyOutDir: true,
   },
   define: {
     "process.env": {},

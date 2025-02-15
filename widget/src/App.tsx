@@ -18,10 +18,11 @@ import useWidgetToggle from "./hooks/useWidgetToggle";
 import useAnchorsRef from "./hooks/useAnchorsRef";
 
 interface Props {
+  backendUrl: string;
   init: WidgetInit;
 }
 
-export default function App({ init }: Props) {
+export default function App({ init, backendUrl }: Props) {
   const { isOpen, setIsOpen, lastOpened } = useWidgetToggle({
     querySelector: init.anchor_query_selector,
   });
@@ -34,13 +35,13 @@ export default function App({ init }: Props) {
     data: releaseNotes,
     isLoading: releaseNotesAreLoading,
     error: releaseNotesError,
-  } = useReleaseNotes({ orgId: init.org_id });
+  } = useReleaseNotes({ orgId: init.org_id, backendUrl });
 
   const {
     data: widgetConfig,
     isLoading: widgetConfigIsLoading,
     error: widgetConfigError,
-  } = useWidgetConfig({ orgId: init.org_id });
+  } = useWidgetConfig({ orgId: init.org_id, backendUrl });
 
   const isReadyToMount =
     !releaseNotesAreLoading &&
@@ -123,6 +124,7 @@ export default function App({ init }: Props) {
                       config={widgetConfig!}
                       key={i}
                       releaseNote={item}
+                      backendUrl={backendUrl}
                     />
                   ))}
                 </ReleaseNotesList>

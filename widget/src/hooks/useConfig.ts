@@ -1,12 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import type { WidgetConfig } from "@/lib/types";
-import config from "@/lib/config";
 
 interface Props {
   orgId: string;
+  backendUrl: string;
 }
-export default function useWidgetConfig({ orgId }: Props) {
-  const url = `${config.backendUrl}/widget-config/${orgId}`;
+export default function useWidgetConfig({ orgId, backendUrl }: Props) {
+  const url = `${backendUrl}/api/widget-config/${orgId}`;
   const { data, isLoading, error } = useQuery({
     queryKey: ["widget-config", orgId],
     queryFn: async () => {

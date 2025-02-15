@@ -145,6 +145,7 @@ func main() {
 
 	// API
 
+	// !! this route path is hardcoded in the widget script
 	r.Route("/api", func(r chi.Router) {
 		// Basic CORS
 		r.Use(cors.Handler(cors.Options{
@@ -162,13 +163,29 @@ func main() {
 		r.Get("/img/*", handler.HandleObjStore)
 	})
 
+	// WIDGET SCRIPT
+
+	r.Route("/w", func(r chi.Router) {
+		// Basic CORS
+		r.Use(cors.Handler(cors.Options{
+			// AllowedOrigins:   []string{"https://foo.com"}, // Use this to allow specific origin hosts
+			AllowedOrigins:   []string{"*"},
+			AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+			AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+			ExposedHeaders:   []string{"Link"},
+			AllowCredentials: false,
+			MaxAge:           300, // Maximum value not ignored by any of major browsers
+		}))
+		r.Get("/", handler.HandleWidgetjsServe)
+	})
+
 	// RELEASE NOTES WEBSITE
 
+	// !! this route path is hardcoded in the widget script
 	r.Route("/s", func(r chi.Router) {
 		r.Use(cors.Handler(cors.Options{
 			// AllowedOrigins:   []string{"https://foo.com"}, // Use this to allow specific origin hosts
-			AllowedOrigins: []string{"*"},
-			// AllowOriginFunc:  func(r *http.Request, origin string) bool { return true },
+			AllowedOrigins:   []string{"*"},
 			AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 			AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 			ExposedHeaders:   []string{"Link"},

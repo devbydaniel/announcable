@@ -53,18 +53,21 @@ func (r *repository) Get(orgId string) (*WidgetConfig, error) {
 	log.Trace().Str("orgId", orgId).Msg("Get")
 	var cfg WidgetConfig
 	defaultCfg := WidgetConfig{
-		Title:                "Release Notes",
-		Description:          "Stay up to date with our latest releases",
-		WidgetBorderRadius:   12,
-		WidgetBorderColor:    "#000000",
-		WidgetBorderWidth:    1,
-		WidgetBgColor:        "#f8f9fa",
-		WidgetTextColor:      "#000000",
-		WidgetType:           "modal",
-		ReleaseNoteBgColor:   "#ffffff",
-		ReleaseNoteTextColor: "#000000",
-		ReleaseNoteCtaText:   "Read more",
-		OrganisationID:       uuid.MustParse(orgId),
+		Title:                   "Release Notes",
+		Description:             "Stay up to date with our latest releases",
+		WidgetBorderRadius:      12,
+		WidgetBorderColor:       "#000000",
+		WidgetBorderWidth:       1,
+		WidgetBgColor:           "#f8f9fa",
+		WidgetTextColor:         "#000000",
+		WidgetType:              "modal",
+		ReleaseNoteBorderWidth:  0,
+		ReleaseNoteBorderRadius: 8,
+		ReleaseNoteBorderColor:  "#000000",
+		ReleaseNoteBgColor:      "#ffffff",
+		ReleaseNoteTextColor:    "#000000",
+		ReleaseNoteCtaText:      "Read more",
+		OrganisationID:          uuid.MustParse(orgId),
 	}
 
 	if err := r.db.Client.Model(&WidgetConfig{}).Where("organisation_id = ?", uuid.MustParse(orgId)).First(&cfg).Error; err != nil {
