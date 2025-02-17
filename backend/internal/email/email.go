@@ -99,7 +99,7 @@ func sendTemplate(templateAlias string, to string, templateModel interface{}) er
 		return fmt.Errorf("error marshaling JSON: %w", err)
 	}
 
-	req, err := http.NewRequest("POST", cfg.Email.PostmarkServerUrl+"/email/withTemplate", bytes.NewBuffer(jsonData))
+	req, err := http.NewRequest("POST", cfg.Email.PostmarkServerUrl+"/withTemplate", bytes.NewBuffer(jsonData))
 	if err != nil {
 		return fmt.Errorf("error creating request: %w", err)
 	}
