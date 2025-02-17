@@ -72,21 +72,11 @@ func (h *Handler) HandleReleaseNotesServe(w http.ResponseWriter, r *http.Request
 		} else {
 			releaseDate = ""
 		}
-		var imgSrcAbs string
-		if rn.ImageUrl != "" {
-			var protocol string
-			if strings.HasPrefix(cfg.BaseURL, "localhost") {
-				protocol = "http://"
-			} else {
-				protocol = "https://"
-			}
-			imgSrcAbs = protocol + cfg.BaseURL + "/api" + rn.ImageUrl
-		}
 		res.Data = append(res.Data, serveReleaseNotesWidgetResponseBodyReleaseNotes{
 			ID:                 rn.ID.String(),
 			Title:              rn.Title,
 			Date:               releaseDate,
-			ImageSrc:           imgSrcAbs,
+			ImageSrc:           rn.ImageUrl,
 			Text:               rn.DescriptionShort,
 			LastUpdateOn:       rn.UpdatedAt.String(),
 			CtaLabelOverride:   rn.CtaLabelOverride,
