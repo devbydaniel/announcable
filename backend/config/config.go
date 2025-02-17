@@ -5,6 +5,14 @@ import (
 	"strconv"
 )
 
+type productInfo struct {
+	ProductName    string
+	CompanyName    string
+	CompanyAddress string
+	SupportEmail   string
+	PersonalName   string
+}
+
 type postgresConfig struct {
 	Host     string
 	Port     int
@@ -12,6 +20,7 @@ type postgresConfig struct {
 	Password string
 	Name     string
 }
+
 type objStorageConfig struct {
 	AccessKey string
 	SecretKey string
@@ -19,11 +28,13 @@ type objStorageConfig struct {
 	Region    string
 	UseSSL    bool
 }
+
 type pgAdminConfig struct {
 	Email    string
 	Password string
 	Port     int
 }
+
 type emailConfig struct {
 	FromAddress       string
 	McServer          string
@@ -33,13 +44,14 @@ type emailConfig struct {
 }
 
 type config struct {
-	Env        string
-	BaseURL    string
-	Port       int
-	Postgres   postgresConfig
-	ObjStorage objStorageConfig
-	PgAdmin    pgAdminConfig
-	Email      emailConfig
+	Env         string
+	BaseURL     string
+	Port        int
+	Postgres    postgresConfig
+	ObjStorage  objStorageConfig
+	PgAdmin     pgAdminConfig
+	Email       emailConfig
+	ProductInfo productInfo
 }
 
 func New() *config {
@@ -72,6 +84,11 @@ func New() *config {
 			McPort:            getEnvAsInt("MAILCATCHER_PORT"),
 			PostmarkServerUrl: getEnv("POSTMARK_SERVER_URL"),
 			PostmarkToken:     getEnv("POSTMARK_TOKEN"),
+		},
+		ProductInfo: productInfo{
+			ProductName:    "Release Notes",
+			CompanyName:    "Release Notes Inc.",
+			CompanyAddress: "1234 Elm St, Springfield, IL 62701",
 		},
 	}
 }

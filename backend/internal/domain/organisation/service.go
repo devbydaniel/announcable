@@ -61,6 +61,10 @@ func (s *service) RemoveFromOrg(orgUserId uuid.UUID) error {
 
 func (s *service) InviteUser(orgId uuid.UUID, emailAddr string, role rbac.Role) (string, error) {
 	log.Trace().Str("orgId", orgId.String()).Str("email", emailAddr).Msg("InviteUser")
+	org, err := s.repo.FindOrg(orgId)
+	if err != nil {
+		return "", err
+	}
 	token := random.CreateRandomToken()
 	expiredAt := time.Now().Add(time.Hour * 24).UnixMilli()
 	invite := OrganisationInvite{
@@ -76,12 +80,12 @@ func (s *service) InviteUser(orgId uuid.UUID, emailAddr string, role rbac.Role) 
 
 	baseUrl := config.New().BaseURL
 	inviteAcceptUrl := baseUrl + "/invite-accept/" + token
-	emailConfig := email.Config{
-		To:      emailAddr,
-		Subject: "You have been invited to join an organisation",
-		Body:    "You have been invited to join an organisation. Click here to accept the invite: " + inviteAcceptUrl,
+	emailConfig := email.UserInviteConfig{
+		To:               emailAddr,
+		OrganisationName: org.Name,
+		ActionURL:        inviteAcceptUrl,
 	}
-	if err := email.Send(&emailConfig); err != nil {
+	if err := email.SendUserInvite(&emailConfig); err != nil {
 		return "", err
 	}
 

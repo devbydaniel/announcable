@@ -58,15 +58,13 @@ func (s *service) Delete(id uuid.UUID) error {
 func (s *service) SendVerifcationEmail(u *User, token string) error {
 	log.Trace().Str("email", u.Email).Msg("SendVerifcationEmail")
 	baseUrl := config.New().BaseURL
-	body := fmt.Sprintf("Click here to verify your email: %s/verify-email?token=%s", baseUrl, token)
-
-	config := email.Config{
-		To:      u.Email,
-		Subject: "Verify your email",
-		Body:    body,
+	verifyUrl := fmt.Sprintf("%s/verify-email?token=%s", baseUrl, token)
+	config := email.EmailConfirmConfig{
+		To:        u.Email,
+		ActionURL: verifyUrl,
 	}
 
-	if err := email.Send(&config); err != nil {
+	if err := email.SendEmailConfirm(&config); err != nil {
 		log.Error().Err(err).Msg("Failed to send email")
 		return err
 	}
@@ -81,15 +79,13 @@ func (s *service) VerifyEmail(id uuid.UUID) error {
 func (s *service) SendPwResetEmail(u *User, token string) error {
 	log.Trace().Str("email", u.Email).Msg("SendPwResetEmail")
 	baseUrl := config.New().BaseURL
-	body := fmt.Sprintf("Click here to reset your password: %s/reset-pw/%s", baseUrl, token)
-
-	config := email.Config{
-		To:      u.Email,
-		Subject: "Reset your password",
-		Body:    body,
+	url := fmt.Sprintf("%s/reset-pw/%s", baseUrl, token)
+	config := email.PasswordResetConfig{
+		To:        u.Email,
+		ActionURL: url,
 	}
 
-	if err := email.Send(&config); err != nil {
+	if err := email.SendPasswordReset(&config); err != nil {
 		log.Error().Err(err).Msg("Failed to send email")
 		return err
 	}
