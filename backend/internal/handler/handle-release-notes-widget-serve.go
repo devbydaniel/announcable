@@ -3,6 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/devbydaniel/release-notes-go/internal/domain/organisation"
@@ -32,6 +33,26 @@ func (h *Handler) HandleReleaseNotesServe(w http.ResponseWriter, r *http.Request
 	h.log.Trace().Msg("HandleReleaseNotesServe")
 	organisationService := organisation.NewService(*organisation.NewRepository(h.DB))
 	releaseNotesService := releasenotes.NewService(*releasenotes.NewRepository(h.DB, h.ObjStore))
+	page := r.URL.Query().Get("page")
+	if page == "" {
+		page = "1"
+	}
+	pageSize := r.URL.Query().Get("pageSize")
+	if pageSize == "" {
+		pageSize = "10"
+	}
+	pageInt, err := strconv.Atoi(page)
+	if err != nil {
+		h.log.Error().Err(err).Msg("Error parsing page")
+		http.Error(w, "Error getting release notes", http.StatusBadRequest)
+		return
+	}
+	pageSizeInt, err := strconv.Atoi(pageSize)
+	if err != nil {
+		h.log.Error().Err(err).Msg("Error parsing pageSize")
+		http.Error(w, "Error getting release notes", http.StatusBadRequest)
+		return
+	}
 	externalOrgId := chi.URLParam(r, "orgId")
 	if externalOrgId == "" {
 		h.log.Error().Msg("Org ID not found in URL")
@@ -45,16 +66,16 @@ func (h *Handler) HandleReleaseNotesServe(w http.ResponseWriter, r *http.Request
 		http.Error(w, "Error getting widget config", http.StatusInternalServerError)
 		return
 	}
-	releaseNotes, err := releaseNotesService.GetAllWithImgUrl(org.ID.String())
+	releaseNotes, err := releaseNotesService.GetAllWithImgUrl(org.ID.String(), pageInt, pageSizeInt)
 	if err != nil {
 		h.log.Error().Err(err).Msg("Error getting release notes")
 		http.Error(w, "Error getting release notes", http.StatusInternalServerError)
 		return
 	}
-	h.log.Debug().Int("releaseNotes", len(releaseNotes)).Msg("Number of release notes")
+	h.log.Debug().Int("releaseNotes", len(releaseNotes.Items)).Msg("Number of release notes")
 
 	var res serveReleaseNotesWidgetResponseBody
-	for _, rn := range releaseNotes {
+	for _, rn := range releaseNotes.Items {
 		if rn.IsPublished == false {
 			continue
 		}

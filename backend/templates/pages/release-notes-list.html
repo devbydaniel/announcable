@@ -41,6 +41,34 @@
           {{ end }}
         </tbody>
       </table>
+      <div class="pagination">
+        <a
+          href="{{ if $.PrevPageLink }}
+            {{ $.PrevPageLink }}
+          {{ else }}
+            javascript:void(0)
+          {{ end }}"
+          class="button button--ghost {{ if not $.PrevPageLink }}
+            button--disabled
+          {{ end }} pagination__item"
+          {{ if not $.PrevPageLink }}aria-disabled="true"{{ end }}
+        >
+          <i data-feather="chevron-left" width="16" height="16"></i> Prev
+        </a>
+        <a
+          href="{{ if $.NextPageLink }}
+            {{ $.NextPageLink }}
+          {{ else }}
+            javascript:void(0)
+          {{ end }}"
+          class="button button--ghost {{ if not $.NextPageLink }}
+            button--disabled
+          {{ end }} pagination__item"
+          {{ if not $.NextPageLink }}aria-disabled="true"{{ end }}
+        >
+          Next <i data-feather="chevron-right" width="16" height="16"></i>
+        </a>
+      </div>
     </div>
   {{ else }}
     <div class="card empty-state">

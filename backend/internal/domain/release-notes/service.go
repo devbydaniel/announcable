@@ -61,15 +61,15 @@ func (s *service) Create(rn *ReleaseNote, imgInput *ImageInput) (uuid.UUID, erro
 	return id, nil
 }
 
-func (s *service) GetAll(orgId string) ([]*ReleaseNote, error) {
+func (s *service) GetAll(orgId string, page, pageSize int) (*PaginatedReleaseNotes, error) {
 	log.Trace().Str("orgId", orgId).Msg("GetAll")
-	rns, err := s.repo.FindAll(orgId)
+	rns, err := s.repo.FindAll(orgId, page, pageSize, nil)
 	if err != nil {
 		log.Error().Err(err).Msg("Error finding release notes by organisation ID")
 		return nil, err
 	}
 	// adjust release date format
-	for _, rn := range rns {
+	for _, rn := range rns.Items {
 		if rn.ReleaseDate != nil {
 			rd := (*rn.ReleaseDate)[:10]
 			rn.ReleaseDate = &rd
@@ -78,15 +78,15 @@ func (s *service) GetAll(orgId string) ([]*ReleaseNote, error) {
 	return rns, nil
 }
 
-func (s *service) GetAllWithImgUrl(orgId string) ([]*ReleaseNote, error) {
+func (s *service) GetAllWithImgUrl(orgId string, page, pageSize int) (*PaginatedReleaseNotes, error) {
 	log.Trace().Str("orgId", orgId).Msg("GetAllWithImgUrl")
-	rns, err := s.repo.FindAll(orgId)
+	rns, err := s.repo.FindAll(orgId, page, pageSize, nil)
 	if err != nil {
 		log.Error().Err(err).Msg("Error finding release notes by organisation ID")
 		return nil, err
 	}
 	// adjust release date format and get image
-	for _, rn := range rns {
+	for _, rn := range rns.Items {
 		if rn.ReleaseDate != nil {
 			rd := (*rn.ReleaseDate)[:10]
 			rn.ReleaseDate = &rd
@@ -100,31 +100,28 @@ func (s *service) GetAllWithImgUrl(orgId string) ([]*ReleaseNote, error) {
 	return rns, nil
 }
 
-func (s *service) GetAllPublished(orgId string) ([]*ReleaseNote, error) {
+func (s *service) GetAllPublished(orgId string, page, pageSize int) (*PaginatedReleaseNotes, error) {
 	log.Trace().Str("orgId", orgId).Msg("GetAllPublished")
-	rns, err := s.repo.FindAll(orgId)
+	filter := map[string]interface{}{"IsPublished": true}
+	rns, err := s.repo.FindAll(orgId, page, pageSize, filter)
 	if err != nil {
 		log.Error().Err(err).Msg("Error finding release notes by organisation ID")
 		return nil, err
 	}
 
-	publishedRns := make([]*ReleaseNote, 0)
-	for _, rn := range rns {
-		if rn.IsPublished {
-			if rn.ReleaseDate != nil {
-				rd := (*rn.ReleaseDate)[:10]
-				rn.ReleaseDate = &rd
-				imgUrl, err := s.repo.GetImageUrl(createPath(orgId, rn.ID.String(), imgProcessConfig.Format))
-				if err != nil {
-					log.Error().Err(err).Msg("Error getting image URL")
-				}
-				rn.ImageUrl = imgUrl
+	for _, rn := range rns.Items {
+		if rn.ReleaseDate != nil {
+			rd := (*rn.ReleaseDate)[:10]
+			rn.ReleaseDate = &rd
+			imgUrl, err := s.repo.GetImageUrl(createPath(orgId, rn.ID.String(), imgProcessConfig.Format))
+			if err != nil {
+				log.Error().Err(err).Msg("Error getting image URL")
 			}
-			publishedRns = append(publishedRns, rn)
+			rn.ImageUrl = imgUrl
 		}
 	}
 
-	return publishedRns, nil
+	return rns, nil
 }
 
 func (s *service) GetOne(id, orgId string) (*ReleaseNote, error) {

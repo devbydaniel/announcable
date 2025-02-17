@@ -36,6 +36,7 @@ type serveWidgetConfigResponseBody struct {
 
 func (h *Handler) HandleWidgetConfigServe(w http.ResponseWriter, r *http.Request) {
 	h.log.Trace().Msg("HandleWidgetConfigServe")
+	cfg := config.New()
 	widgetConfigService := widgetconfigs.NewService(*widgetconfigs.NewRepository(h.DB))
 	organisationService := organisation.NewService(*organisation.NewRepository(h.DB))
 
@@ -60,7 +61,11 @@ func (h *Handler) HandleWidgetConfigServe(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	baseUrl := config.New().BaseURL + "/s/" + externalOrgId // TODO
+	protocol := "http://"
+	if cfg.Env == "production" {
+		protocol = "https://"
+	}
+	baseUrl := protocol + cfg.BaseURL + "/s/" + externalOrgId // TODO
 	if widgetConfig.ReleasePageBaseUrl != nil {
 		baseUrl = *widgetConfig.ReleasePageBaseUrl
 	}

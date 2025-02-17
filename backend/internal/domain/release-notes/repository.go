@@ -2,6 +2,7 @@ package releasenotes
 
 import (
 	"io"
+	"math"
 
 	"github.com/devbydaniel/release-notes-go/internal/database"
 	"github.com/devbydaniel/release-notes-go/internal/objstore"
@@ -76,15 +77,61 @@ func (r *repository) UpdateWithNil(id uuid.UUID, data map[string]interface{}) er
 	return nil
 }
 
-func (r *repository) FindAll(orgId string) ([]*ReleaseNote, error) {
-	log.Trace().Str("orgId", orgId).Msg("FindByOrganisationId")
-	var rns []*ReleaseNote
+type PaginatedReleaseNotes struct {
+	Items      []*ReleaseNote
+	TotalCount int64
+	TotalPages int
+	Page       int
+	PageSize   int
+}
 
-	if err := r.db.Client.Find(&rns, "organisation_id = ?", orgId).Error; err != nil {
+func (r *repository) FindAll(orgId string, page, pageSize int, filters map[string]interface{}) (*PaginatedReleaseNotes, error) {
+	log.Trace().Str("orgId", orgId).Int("page", page).Int("pageSize", pageSize).Msg("FindByOrganisationId")
+	if page < 1 {
+		page = 1
+	}
+	if pageSize < 1 {
+		pageSize = 10
+	}
+	if pageSize > 100 {
+		pageSize = 100
+	}
+
+	// Base query conditions
+	query := r.db.Client.Model(&ReleaseNote{}).Where("organisation_id = ?", orgId)
+
+	if len(filters) > 0 {
+		// Apply additional filters
+		for key, value := range filters {
+			query = query.Where(key+" = ?", value)
+		}
+	}
+
+	var totalCount int64
+	if err := query.Count(&totalCount).Error; err != nil {
+		log.Error().Err(err).Msg("Error counting release notes")
+		return nil, err
+	}
+
+	totalPages := int(math.Ceil(float64(totalCount) / float64(pageSize)))
+	if page > totalPages && totalPages > 0 {
+		page = totalPages
+	}
+
+	var rns []*ReleaseNote
+	offset := (page - 1) * pageSize
+	if err := query.Offset(offset).Limit(pageSize).Order("release_date desc").Find(&rns).Error; err != nil {
 		log.Error().Err(err).Msg("Error finding release notes by organisation id")
 		return nil, err
 	}
-	return rns, nil
+
+	return &PaginatedReleaseNotes{
+		Items:      rns,
+		TotalCount: totalCount,
+		TotalPages: totalPages,
+		Page:       page,
+		PageSize:   pageSize,
+	}, nil
 }
 
 func (r *repository) FindOne(id uuid.UUID) (*ReleaseNote, error) {

@@ -14,3 +14,15 @@ tbody .table__tr {
   align-items: center;
   justify-content: center;
 }
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--gap-xs);
+  padding: var(--gap-sm);
+}
+
+.pagination__item {
+  font-size: var(--font-size-sm);
+}
