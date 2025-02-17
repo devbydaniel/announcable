@@ -35,7 +35,7 @@
       <div class="card__footer">
         <button
           class="button button--square button--sm button--ghost"
-          hx-patch="/widget/external-id"
+          hx-patch="/widget-config/external-id"
           hx-swap="none"
           hx-confirm="You will need to update the widget configuration in your product before the widget can display release notes again."
           @htmx:response-error.camel="onSubmitError"
@@ -61,11 +61,11 @@
           )"
       x-ref="landingPageCard"
     >
-      <h2 class="card__title">Landing Page</h2>
+      <h2 class="card__title">Release Page</h2>
       <div class="card__content">
         <form
           id="custom-url-form"
-          hx-patch="/widget/base-url"
+          hx-patch="/widget-config/base-url"
           hx-swap="none"
           @htmx:response-error.camel="onSubmitError"
           @custom:submit-success="onSubmitSuccess"
@@ -79,7 +79,7 @@
                 x-model="useCustomURL"
               />
               <label for="use_custom_url"
-                >I want to disable the default landing page and build my
+                >I want to disable the default release page and build my
                 own</label
               >
             </div>

@@ -117,21 +117,21 @@ func main() {
 	r.With(
 		mwHandler.Authenticate,
 		mwHandler.Authorize(rbac.PermissionManageReleaseNote),
-	).Route("/widget", func(r chi.Router) {
+	).Route("/widget-config", func(r chi.Router) {
 		r.Get("/", handler.HandleWidgetPage)
 		r.Patch("/", handler.HandleWidgetUpdate)
 		r.Patch("/external-id", handler.HandleOrgExternalIdRegenerate)
-		r.Patch("/base-url", handler.HandleLpBaseUrlUpdate)
+		r.Patch("/base-url", handler.HandleReleasePageBaseUrlUpdate)
 	})
 
-	// LANDING PAGE CONFIG
+	// RELEASE PAGE CONFIG
 
 	r.With(
 		mwHandler.Authenticate,
 		mwHandler.Authorize(rbac.PermissionManageReleaseNote),
-	).Route("/lp-config", func(r chi.Router) {
-		r.Get("/", handler.HandleLpConfigPage)
-		r.Patch("/", handler.HandleLpConfigUpdate)
+	).Route("/release-page-config", func(r chi.Router) {
+		r.Get("/", handler.HandleReleasePageConfigPage)
+		r.Patch("/", handler.HandleReleasePageConfigUpdate)
 	})
 
 	// SETTINGS
@@ -165,7 +165,7 @@ func main() {
 
 	// WIDGET SCRIPT
 
-	r.Route("/w", func(r chi.Router) {
+	r.Route("/widget", func(r chi.Router) {
 		// Basic CORS
 		r.Use(cors.Handler(cors.Options{
 			// AllowedOrigins:   []string{"https://foo.com"}, // Use this to allow specific origin hosts
@@ -179,7 +179,7 @@ func main() {
 		r.Get("/", handler.HandleWidgetjsServe)
 	})
 
-	// RELEASE NOTES WEBSITE
+	// RELEASE PAGE
 
 	// !! this route path is hardcoded in the widget script
 	r.Route("/s", func(r chi.Router) {
@@ -193,7 +193,7 @@ func main() {
 			MaxAge:           300, // Maximum value not ignored by any of major browsers
 
 		}))
-		r.Get("/{orgId}", handler.HandleReleaseNotesWebsite)
+		r.Get("/{orgId}", handler.HandleReleasePage)
 	})
 
 	// STATIC

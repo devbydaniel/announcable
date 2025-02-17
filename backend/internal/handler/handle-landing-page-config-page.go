@@ -3,14 +3,14 @@ package handler
 import (
 	"net/http"
 
-	lpconfigs "github.com/devbydaniel/release-notes-go/internal/domain/landing-page-configs"
+	releasepageconfig "github.com/devbydaniel/release-notes-go/internal/domain/release-page-configs"
 	mw "github.com/devbydaniel/release-notes-go/internal/middleware"
 	"github.com/devbydaniel/release-notes-go/templates"
 )
 
 type landingPageData struct {
 	Title string
-	Cfg   *lpconfigs.LpConfig
+	Cfg   *releasepageconfig.ReleasePageConfig
 }
 
 var landingPageTmpl = templates.Construct(
@@ -20,9 +20,9 @@ var landingPageTmpl = templates.Construct(
 	"pages/landing-page-config.html",
 )
 
-func (h *Handler) HandleLpConfigPage(w http.ResponseWriter, r *http.Request) {
-	h.log.Trace().Msg("HandleLandingPage")
-	lpService := lpconfigs.NewService(*lpconfigs.NewRepository(h.DB, h.ObjStore))
+func (h *Handler) HandleReleasePageConfigPage(w http.ResponseWriter, r *http.Request) {
+	h.log.Trace().Msg("HandleReleasePageConfigPage")
+	lpService := releasepageconfig.NewService(*releasepageconfig.NewRepository(h.DB, h.ObjStore))
 	orgId, ok := r.Context().Value(mw.OrgIDKey).(string)
 	if !ok {
 		h.log.Error().Msg("Organisation ID not found in context")
@@ -37,7 +37,7 @@ func (h *Handler) HandleLpConfigPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := landingPageData{
-		Title: "Landing Page Config",
+		Title: "Release Page Config",
 		Cfg:   cfg,
 	}
 	if err := landingPageTmpl.ExecuteTemplate(w, "root", data); err != nil {

@@ -26,14 +26,10 @@ export default function ModalWidget({
       isOpen={isOpen}
       onClose={onClose}
       actions={[
-        <Button
-          size="icon"
-          variant="ghost"
-          onClick={() => {
-            window.open(config.release_page_baseurl || "#", "_blank");
-          }}
-        >
-          <ExternalLinkIcon className="w-4 h-4" />
+        <Button size="icon" variant="ghost" asChild>
+          <a href={config.release_page_baseurl} target="_blank">
+            <ExternalLinkIcon className="w-4 h-4" />
+          </a>
         </Button>,
         <Button size="icon" variant="ghost" onClick={onClose}>
           <XIcon className="w-4 h-4" />

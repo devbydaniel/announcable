@@ -3,7 +3,7 @@ package handler
 import (
 	"net/http"
 
-	lpconfigs "github.com/devbydaniel/release-notes-go/internal/domain/landing-page-configs"
+	releasepageconfig "github.com/devbydaniel/release-notes-go/internal/domain/release-page-configs"
 	"github.com/devbydaniel/release-notes-go/internal/imgUtil"
 	mw "github.com/devbydaniel/release-notes-go/internal/middleware"
 	"github.com/go-playground/validator"
@@ -22,10 +22,10 @@ type lpConfigUpdateForm struct {
 	TextColorMuted    string `schema:"text_color_muted" validate:"required"`
 }
 
-func (h *Handler) HandleLpConfigUpdate(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) HandleReleasePageConfigUpdate(w http.ResponseWriter, r *http.Request) {
 	h.log.Trace().Msg("HandleLpConfigUpdate")
 	ctx := r.Context()
-	lpConfigService := lpconfigs.NewService(*lpconfigs.NewRepository(h.DB, h.ObjStore))
+	lpConfigService := releasepageconfig.NewService(*releasepageconfig.NewRepository(h.DB, h.ObjStore))
 
 	orgId := ctx.Value(mw.OrgIDKey).(string)
 	if orgId == "" {
@@ -63,7 +63,7 @@ func (h *Handler) HandleLpConfigUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// prepare models
-	var imgInput *lpconfigs.ImageInput
+	var imgInput *releasepageconfig.ImageInput
 	if img != nil {
 		ok := imgUtil.VerifyImageType(img)
 		if !ok {
@@ -71,13 +71,13 @@ func (h *Handler) HandleLpConfigUpdate(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Error updating release note", http.StatusBadRequest)
 			return
 		}
-		imgInput = &lpconfigs.ImageInput{
+		imgInput = &releasepageconfig.ImageInput{
 			ShoudDeleteImage: false,
 			ImgData:          img,
 			Format:           imgHeader.Header.Get("Content-Type"),
 		}
 	} else {
-		imgInput = &lpconfigs.ImageInput{
+		imgInput = &releasepageconfig.ImageInput{
 			ShoudDeleteImage: updateDTO.ShouldDeleteImage,
 			ImgData:          nil,
 			Format:           "",
@@ -85,7 +85,7 @@ func (h *Handler) HandleLpConfigUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 	h.log.Debug().Interface("imgInput", imgInput).Msg("ImageInput")
 
-	lpConfig := &lpconfigs.LpConfig{
+	lpConfig := &releasepageconfig.ReleasePageConfig{
 		OrganisationID: uuid.MustParse(orgId),
 		BrandPosition:  updateDTO.BrandPosition,
 		Title:          updateDTO.Title,

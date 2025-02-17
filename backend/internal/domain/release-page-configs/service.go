@@ -1,4 +1,4 @@
-package lpconfigs
+package releasepageconfig
 
 import (
 	"github.com/devbydaniel/release-notes-go/internal/imgUtil"
@@ -24,7 +24,7 @@ func NewService(r repository) *service {
 	return &service{repo: r}
 }
 
-func (s *service) Create(cfg *LpConfig, imgInput *ImageInput) (uuid.UUID, error) {
+func (s *service) Create(cfg *ReleasePageConfig, imgInput *ImageInput) (uuid.UUID, error) {
 	log.Trace().Msg("Create")
 
 	// Start a transaction
@@ -56,7 +56,7 @@ func (s *service) Create(cfg *LpConfig, imgInput *ImageInput) (uuid.UUID, error)
 	return cfg.ID, nil
 }
 
-func (s *service) Get(orgId string) (*LpConfig, error) {
+func (s *service) Get(orgId string) (*ReleasePageConfig, error) {
 	log.Trace().Str("orgId", orgId).Msg("Get")
 	cfg, err := s.repo.Get(orgId)
 	if err != nil {
@@ -72,7 +72,7 @@ func (s *service) Get(orgId string) (*LpConfig, error) {
 	return cfg, nil
 }
 
-func (s *service) Update(orgId string, cfg *LpConfig, imgInput *ImageInput) error {
+func (s *service) Update(orgId string, cfg *ReleasePageConfig, imgInput *ImageInput) error {
 	log.Trace().Msg("Update")
 
 	// Start a transaction

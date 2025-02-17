@@ -13,14 +13,14 @@ type widgetUpdateForm struct {
 	Title                   string `schema:"title" validate:"required"`
 	Description             string `schema:"description" validate:"required"`
 	WidgetType              string `schema:"widget_type" validate:"required"`
-	WidgetBorderRadius      int    `schema:"widget_border_radius" validate:"required"`
+	WidgetBorderRadius      int    `schema:"widget_border_radius" validate:"gte=0"`
 	WidgetBorderColor       string `schema:"widget_border_color" validate:"required"`
-	WidgetBorderWidth       int    `schema:"widget_border_width" validate:"required"`
+	WidgetBorderWidth       int    `schema:"widget_border_width" validate:"gte=0"`
 	WidgetBgColor           string `schema:"widget_background_color" validate:"required"`
 	WidgetTextColor         string `schema:"widget_text_color" validate:"required"`
-	ReleaseNoteBorderRadius int    `schema:"release_note_border_radius" validate:"required"`
+	ReleaseNoteBorderRadius int    `schema:"release_note_border_radius" validate:"gte=0"`
 	ReleaseNoteBorderColor  string `schema:"release_note_border_color" validate:"required"`
-	ReleaseNoteBorderWidth  int    `schema:"release_note_border_width" validate:"required"`
+	ReleaseNoteBorderWidth  int    `schema:"release_note_border_width" validate:"gte=0"`
 	ReleaseNoteBgColor      string `schema:"release_note_background_color" validate:"required"`
 	ReleaseNoteTextColor    string `schema:"release_note_text_color" validate:"required"`
 	ReleaseNoteCtaText      string `schema:"release_note_cta_text" validate:"required"`
@@ -62,7 +62,7 @@ func (h *Handler) HandleWidgetUpdate(w http.ResponseWriter, r *http.Request) {
 	validate := validator.New()
 	if err := validate.Struct(updateDTO); err != nil {
 		h.log.Error().Err(err).Msg("Validation error")
-		http.Error(w, "Error updating widget config", http.StatusBadRequest)
+		http.Error(w, "Bad request", http.StatusBadRequest)
 		return
 	}
 

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/devbydaniel/release-notes-go/config"
 	"github.com/devbydaniel/release-notes-go/internal/domain/organisation"
 	widgetconfigs "github.com/devbydaniel/release-notes-go/internal/domain/widget-configs"
 	"github.com/go-chi/chi/v5"
@@ -59,7 +60,7 @@ func (h *Handler) HandleWidgetConfigServe(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	var baseUrl string
+	baseUrl := config.New().BaseURL + "/s/" + externalOrgId // TODO
 	if widgetConfig.ReleasePageBaseUrl != nil {
 		baseUrl = *widgetConfig.ReleasePageBaseUrl
 	}

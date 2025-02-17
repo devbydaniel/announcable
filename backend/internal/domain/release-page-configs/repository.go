@@ -1,4 +1,4 @@
-package lpconfigs
+package releasepageconfig
 
 import (
 	"errors"
@@ -21,7 +21,7 @@ func NewRepository(db *database.DB, objStore *objstore.ObjStore) *repository {
 	return &repository{db: db, objStore: objStore, bucket: objstore.LandingPageBucket.String()}
 }
 
-func (r *repository) Create(cfg *LpConfig, tx *gorm.DB) error {
+func (r *repository) Create(cfg *ReleasePageConfig, tx *gorm.DB) error {
 	log.Trace().Msg("Create")
 
 	var client *gorm.DB
@@ -39,7 +39,7 @@ func (r *repository) Create(cfg *LpConfig, tx *gorm.DB) error {
 	return nil
 }
 
-func (r *repository) Update(orgId string, cfg *LpConfig, tx *gorm.DB) error {
+func (r *repository) Update(orgId string, cfg *ReleasePageConfig, tx *gorm.DB) error {
 	log.Trace().Msg("Update")
 	var client *gorm.DB
 	if tx != nil {
@@ -48,7 +48,7 @@ func (r *repository) Update(orgId string, cfg *LpConfig, tx *gorm.DB) error {
 		client = r.db.Client
 	}
 
-	if err := client.Model(&LpConfig{}).Where("organisation_id = ?", uuid.MustParse(orgId)).Updates(cfg).Error; err != nil {
+	if err := client.Model(&ReleasePageConfig{}).Where("organisation_id = ?", uuid.MustParse(orgId)).Updates(cfg).Error; err != nil {
 		log.Error().Err(err).Msg("Error updating landing page config")
 		return err
 	}
@@ -56,10 +56,10 @@ func (r *repository) Update(orgId string, cfg *LpConfig, tx *gorm.DB) error {
 	return nil
 }
 
-func (r *repository) Get(orgId string) (*LpConfig, error) {
+func (r *repository) Get(orgId string) (*ReleasePageConfig, error) {
 	log.Trace().Str("orgId", orgId).Msg("Get")
-	var cfg LpConfig
-	defaultCfg := LpConfig{
+	var cfg ReleasePageConfig
+	defaultCfg := ReleasePageConfig{
 		Title:          "Release Notes",
 		Description:    "Stay up to date with our latest releases",
 		BgColor:        "#f8f9fa",
@@ -69,7 +69,7 @@ func (r *repository) Get(orgId string) (*LpConfig, error) {
 		OrganisationID: uuid.MustParse(orgId),
 	}
 
-	if err := r.db.Client.Model(&LpConfig{}).Where("organisation_id = ?", uuid.MustParse(orgId)).First(&cfg).Error; err != nil {
+	if err := r.db.Client.Model(&ReleasePageConfig{}).Where("organisation_id = ?", uuid.MustParse(orgId)).First(&cfg).Error; err != nil {
 		if errors.Is(err, r.db.ErrRecordNotFound) {
 			log.Debug().Msg("landing page config not found, creating...")
 			r.Create(&defaultCfg, nil)

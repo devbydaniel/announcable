@@ -37,7 +37,7 @@ func (h *Handler) HandleWidgetPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := widgetPageData{
-		Title: "Widget",
+		Title: "Widget Config",
 		Cfg:   cfg,
 	}
 	if err := widgetTmpl.ExecuteTemplate(w, "root", data); err != nil {

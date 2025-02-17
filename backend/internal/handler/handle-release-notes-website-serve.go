@@ -3,25 +3,25 @@ package handler
 import (
 	"net/http"
 
-	lpconfigs "github.com/devbydaniel/release-notes-go/internal/domain/landing-page-configs"
 	"github.com/devbydaniel/release-notes-go/internal/domain/organisation"
 	releasenotes "github.com/devbydaniel/release-notes-go/internal/domain/release-notes"
+	releasepageconfig "github.com/devbydaniel/release-notes-go/internal/domain/release-page-configs"
 	"github.com/devbydaniel/release-notes-go/templates"
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 )
 
 type releaseNotesWebsiteData struct {
-	Cfg *lpconfigs.LpConfig
+	Cfg *releasepageconfig.ReleasePageConfig
 	Rns []*releasenotes.ReleaseNote
 }
 
 var releaseNotesWebsiteTmpl = templates.Construct("release-notes-website", "pages/release-notes-website.html")
 
-func (h *Handler) HandleReleaseNotesWebsite(w http.ResponseWriter, r *http.Request) {
-	h.log.Trace().Msg("HandleReleaseNotesWebsite")
+func (h *Handler) HandleReleasePage(w http.ResponseWriter, r *http.Request) {
+	h.log.Trace().Msg("HandleReleasePage")
 	organisationService := organisation.NewService(*organisation.NewRepository(h.DB))
-	lpconfigService := lpconfigs.NewService(*lpconfigs.NewRepository(h.DB, h.ObjStore))
+	lpconfigService := releasepageconfig.NewService(*releasepageconfig.NewRepository(h.DB, h.ObjStore))
 	rnService := releasenotes.NewService(*releasenotes.NewRepository(h.DB, h.ObjStore))
 
 	externalOrgId := chi.URLParam(r, "orgId")

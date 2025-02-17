@@ -1,4 +1,4 @@
-package lpconfigs
+package releasepageconfig
 
 import "github.com/devbydaniel/release-notes-go/internal/logger"
 

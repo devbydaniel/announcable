@@ -1,4 +1,4 @@
-package lpconfigs
+package releasepageconfig
 
 import (
 	"io"
@@ -8,7 +8,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type LpConfig struct {
+type ReleasePageConfig struct {
 	database.BaseModel `gorm:"embedded"`
 	OrganisationID     uuid.UUID `gorm:"type:uuid;primaryKey"`
 	Organisation       organisation.Organisation

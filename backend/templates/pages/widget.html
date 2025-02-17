@@ -52,7 +52,7 @@
   <div class="config-panel">
     <form
       x-data="form"
-      hx-patch="/widget"
+      hx-patch="/widget-config"
       hx-swap="none"
       @htmx:response-error.camel="onSubmitError"
       @custom:submit-success="onSubmitSuccess"

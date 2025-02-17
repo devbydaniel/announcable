@@ -124,7 +124,6 @@ export default function App({ init, backendUrl }: Props) {
                       config={widgetConfig!}
                       key={i}
                       releaseNote={item}
-                      backendUrl={backendUrl}
                     />
                   ))}
                 </ReleaseNotesList>

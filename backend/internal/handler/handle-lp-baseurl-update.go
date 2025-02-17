@@ -13,8 +13,8 @@ type lpBaseUrlUpdateForm struct {
 	CustomUrl    string `schema:"custom_url"`
 }
 
-func (h *Handler) HandleLpBaseUrlUpdate(w http.ResponseWriter, r *http.Request) {
-	h.log.Trace().Msg("HandleLpBaseUrlUpdate")
+func (h *Handler) HandleReleasePageBaseUrlUpdate(w http.ResponseWriter, r *http.Request) {
+	h.log.Trace().Msg("HandleReleasePageBaseUrlUpdate")
 	ctx := r.Context()
 	widgetService := widgetconfigs.NewService(*widgetconfigs.NewRepository(h.DB))
 

@@ -26,20 +26,16 @@ export function ReleaseNotesList({ children }: ReleaseNotesListProps) {
 interface ReleaseNoteEntryProps {
   config: WidgetConfig;
   releaseNote: ReleaseNote;
-  backendUrl: string;
 }
 
 export function ReleaseNoteEntry({
   config,
   releaseNote,
-  backendUrl,
 }: ReleaseNoteEntryProps) {
   const ctaLabel = releaseNote.cta_label_override
     ? releaseNote.cta_label_override
     : config.cta_text;
-  const baseUrl = config.release_page_baseurl
-    ? config.release_page_baseurl
-    : backendUrl + "/s/" + config.org_id;
+  const baseUrl = config.release_page_baseurl;
   const ctaHref =
     releaseNote.cta_href_override || `${baseUrl}#${releaseNote.id}`;
   return (

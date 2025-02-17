@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS lp_configs (
+CREATE TABLE IF NOT EXISTS release_page_configs (
 	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 	organisation_id UUID NOT NULL,
 	title VARCHAR(255) NOT NULL,
@@ -18,4 +18,4 @@ CREATE TABLE IF NOT EXISTS lp_configs (
 
 );
 
-CREATE INDEX IF NOT EXISTS idx_lp_configs_org_id on lp_configs(organisation_id);
+CREATE INDEX IF NOT EXISTS idx_release_page_configs_org_id on release_page_configs(organisation_id);

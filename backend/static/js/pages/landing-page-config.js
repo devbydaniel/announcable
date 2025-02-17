@@ -11,7 +11,7 @@ document.addEventListener("alpine:init", () => {
       toastError(event.detail.xhr.response);
     },
     onSubmitSuccess: function () {
-      toastSuccess("Landing page config updated");
+      toastSuccess("Release page config updated");
     },
 
     title: {
