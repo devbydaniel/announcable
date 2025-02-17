@@ -26,6 +26,19 @@ type ReleaseNote struct {
 	LastUpdatedBy      uuid.UUID          `gorm:"type:uuid"`
 }
 
+type PaginatedReleaseNotes struct {
+	Items      []*ReleaseNote
+	TotalCount int64
+	TotalPages int
+	Page       int
+	PageSize   int
+}
+
+type ReleaseNoteStatus struct {
+	UpdatedAt          string
+	AttentionMechanism string
+}
+
 type AttentionMechanism string
 
 func (am AttentionMechanism) String() string {

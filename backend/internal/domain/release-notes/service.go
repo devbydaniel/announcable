@@ -100,6 +100,11 @@ func (s *service) GetAllWithImgUrl(orgId string, page, pageSize int) (*Paginated
 	return rns, nil
 }
 
+func (s *service) GetStatus(orgId string) ([]*ReleaseNoteStatus, error) {
+	log.Trace().Str("orgId", orgId).Msg("GetStatus")
+	return s.repo.GetStatus(orgId)
+}
+
 func (s *service) GetAllPublished(orgId string, page, pageSize int) (*PaginatedReleaseNotes, error) {
 	log.Trace().Str("orgId", orgId).Msg("GetAllPublished")
 	filter := map[string]interface{}{"IsPublished": true}

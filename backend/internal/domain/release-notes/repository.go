@@ -77,12 +77,14 @@ func (r *repository) UpdateWithNil(id uuid.UUID, data map[string]interface{}) er
 	return nil
 }
 
-type PaginatedReleaseNotes struct {
-	Items      []*ReleaseNote
-	TotalCount int64
-	TotalPages int
-	Page       int
-	PageSize   int
+func (r *repository) GetStatus(orgId string) ([]*ReleaseNoteStatus, error) {
+	log.Trace().Str("orgId", orgId).Msg("GetStatus")
+	var statuses []*ReleaseNoteStatus
+	if err := r.db.Client.Model(&ReleaseNote{}).Select("updated_at, attention_mechanism").Where("organisation_id = ?", orgId).Find(&statuses).Error; err != nil {
+		log.Error().Err(err).Msg("Error getting release note statuses")
+		return nil, err
+	}
+	return statuses, nil
 }
 
 func (r *repository) FindAll(orgId string, page, pageSize int, filters map[string]interface{}) (*PaginatedReleaseNotes, error) {

@@ -159,6 +159,7 @@ func main() {
 			MaxAge:           300, // Maximum value not ignored by any of major browsers
 		}))
 		r.Get("/release-notes/{orgId}", handler.HandleReleaseNotesServe)
+		r.Get("/release-notes/{orgId}/status", handler.HandleReleaseNotesStatusServe)
 		r.Get("/widget-config/{orgId}", handler.HandleWidgetConfigServe)
 		r.Get("/img/*", handler.HandleObjStore)
 	})

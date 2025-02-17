@@ -10,18 +10,19 @@ import {
 import { Indicator, AnchorIndicator } from "./components/ui/indicator";
 import withSkeleton from "./components/hoc/withSkeleton";
 import type { WidgetInit } from "./lib/types";
-import type { ReleaseNote } from "./lib/types";
 import useReleaseNotes from "./hooks/useReleaseNotes";
 import useWidgetConfig from "./hooks/useConfig";
 import { useEffect } from "react";
 import useWidgetToggle from "./hooks/useWidgetToggle";
 import useAnchorsRef from "./hooks/useAnchorsRef";
+import useReleaseNoteStatus, {
+  ReleaseNoteStatus,
+} from "./hooks/useReleaseNoteStatus";
 
 interface Props {
   backendUrl: string;
   init: WidgetInit;
 }
-
 export default function App({ init, backendUrl }: Props) {
   const { isOpen, setIsOpen, lastOpened } = useWidgetToggle({
     querySelector: init.anchor_query_selector,
@@ -31,6 +32,76 @@ export default function App({ init, backendUrl }: Props) {
     querySelector: init.anchor_query_selector,
   });
 
+  const { data: releaseNoteStatus } = useReleaseNoteStatus({
+    orgId: init.org_id,
+    backendUrl,
+  });
+
+  const hasUnseenValue = hasUnseenReleaseNotes({
+    lastOpened,
+    releaseNoteStatus,
+  });
+
+  const shouldDisplayIndicator =
+    anchorsRef && !init.hide_indicator && hasUnseenValue;
+
+  useEffect(() => {
+    anchorsRef?.forEach((ref) => {
+      updateIndicatorDataset(ref, hasUnseenValue);
+    });
+  }, [hasUnseenValue, anchorsRef]);
+
+  useEffect(() => {
+    if (shouldInstantOpen({ lastOpened, releaseNoteStatus }) && !isOpen) {
+      setIsOpen(true);
+      anchorsRef?.forEach((ref) => {
+        updateInstantOpenDataset(ref, true);
+      });
+    }
+  }, [lastOpened, isOpen, setIsOpen]);
+
+  return (
+    <>
+      {shouldDisplayIndicator &&
+        Array.from(anchorsRef).map((ref, i) => (
+          <AnchorIndicator key={i} anchorElement={ref} />
+        ))}
+      {!init.anchor_query_selector && (
+        <Button
+          className="fixed z-50 bottom-4 right-4"
+          variant={isOpen ? "default" : "outline"}
+          size="icon"
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          {hasUnseenValue && <Indicator className="absolute top-0 right-0" />}
+          <Gift className="w-4 h-4" />
+        </Button>
+      )}
+      {isOpen && (
+        <WidgetContent
+          init={init}
+          backendUrl={backendUrl}
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+        />
+      )}
+    </>
+  );
+}
+
+interface WidgetContentProps {
+  init: WidgetInit;
+  backendUrl: string;
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+function WidgetContent({
+  init,
+  backendUrl,
+  isOpen,
+  onClose,
+}: WidgetContentProps) {
   const {
     data: releaseNotes,
     isLoading: releaseNotesAreLoading,
@@ -49,17 +120,6 @@ export default function App({ init, backendUrl }: Props) {
     !releaseNotesError &&
     !widgetConfigError;
 
-  const hasUnseenReleaseNotesValue = hasUnseenReleaseNotes({
-    lastOpened,
-    releaseNotes,
-  });
-
-  const shouldDisplayIndicator =
-    anchorsRef &&
-    !init.hide_indicator &&
-    hasUnseenReleaseNotesValue &&
-    isReadyToMount;
-
   useEffect(() => {
     if (releaseNotesError) {
       console.error(releaseNotesError);
@@ -72,90 +132,56 @@ export default function App({ init, backendUrl }: Props) {
     }
   }, [widgetConfigError]);
 
-  useEffect(() => {
-    anchorsRef?.forEach((ref) => {
-      updateIndicatorDataset(ref, hasUnseenReleaseNotesValue);
-    });
-  }, [hasUnseenReleaseNotesValue, anchorsRef]);
-
-  useEffect(() => {
-    if (shouldInstantOpen({ lastOpened, releaseNotes }) && !isOpen) {
-      setIsOpen(true);
-      anchorsRef?.forEach((ref) => {
-        updateInstantOpenDataset(ref, true);
-      });
-    }
-  }, [lastOpened, releaseNotes, setIsOpen]);
+  if (!isReadyToMount) return null;
 
   return (
-    <>
-      {shouldDisplayIndicator &&
-        Array.from(anchorsRef).map((ref, i) => (
-          <AnchorIndicator key={i} anchorElement={ref} />
-        ))}
-      {!init.anchor_query_selector && isReadyToMount && (
-        <Button
-          className="fixed z-50 bottom-4 right-4"
-          variant={isOpen ? "default" : "outline"}
-          size="icon"
-          onClick={() => setIsOpen(!isOpen)}
-        >
-          {hasUnseenReleaseNotes({ lastOpened, releaseNotes }) && (
-            <Indicator className="absolute top-0 right-0" />
-          )}
-          <Gift className="w-4 h-4" />
-        </Button>
-      )}
-      {isOpen && isReadyToMount && (
-        <div className="relative">
-          <Widget
-            config={widgetConfig!}
-            init={init}
-            isOpen={isOpen}
-            onClose={() => setIsOpen(false)}
-          >
-            {releaseNotesError || widgetConfigError ? (
-              <ErrorPanel />
-            ) : (
-              withSkeleton(() => (
-                <ReleaseNotesList>
-                  {releaseNotes!.map((item, i) => (
-                    <ReleaseNoteEntry
-                      config={widgetConfig!}
-                      key={i}
-                      releaseNote={item}
-                    />
-                  ))}
-                </ReleaseNotesList>
-              ))({
-                skeleton: (
-                  <ReleaseNotesList>
-                    {Array.from({ length: 3 }).map((_, i) => (
-                      <Skeleton key={i} className="h-24" />
-                    ))}
-                  </ReleaseNotesList>
-                ),
-                isLoading: releaseNotesAreLoading,
-              })
-            )}
-          </Widget>
-        </div>
-      )}
-    </>
+    <div className="relative">
+      <Widget
+        config={widgetConfig!}
+        init={init}
+        isOpen={isOpen}
+        onClose={onClose}
+      >
+        {releaseNotesError || widgetConfigError ? (
+          <ErrorPanel />
+        ) : (
+          withSkeleton(() => (
+            <ReleaseNotesList>
+              {releaseNotes!.map((item, i) => (
+                <ReleaseNoteEntry
+                  config={widgetConfig!}
+                  key={i}
+                  releaseNote={item}
+                />
+              ))}
+            </ReleaseNotesList>
+          ))({
+            skeleton: (
+              <ReleaseNotesList>
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <Skeleton key={i} className="h-24" />
+                ))}
+              </ReleaseNotesList>
+            ),
+            isLoading: releaseNotesAreLoading,
+          })
+        )}
+      </Widget>
+    </div>
   );
 }
 
 function hasUnseenReleaseNotes({
   lastOpened,
-  releaseNotes,
+  releaseNoteStatus,
 }: {
   lastOpened?: string | null;
-  releaseNotes?: ReleaseNote[];
+  releaseNoteStatus?: ReleaseNoteStatus[];
 }) {
-  if (!releaseNotes) return false;
+  if (!releaseNoteStatus) return false;
   if (!lastOpened) return true;
   const lastOpenedDate = new Date(parseInt(lastOpened));
-  return releaseNotes.some(
+  return releaseNoteStatus.some(
     (note) =>
       note.last_update_on && new Date(note.last_update_on) > lastOpenedDate,
   );
@@ -172,15 +198,15 @@ function updateIndicatorDataset(
 
 function shouldInstantOpen({
   lastOpened,
-  releaseNotes,
+  releaseNoteStatus,
 }: {
   lastOpened?: string | null;
-  releaseNotes?: ReleaseNote[];
+  releaseNoteStatus?: ReleaseNoteStatus[];
 }) {
-  if (!releaseNotes) return false;
+  if (!releaseNoteStatus) return false;
   if (!lastOpened) return true;
   const lastOpenedDate = new Date(parseInt(lastOpened));
-  return releaseNotes.some(
+  return releaseNoteStatus.some(
     (note) =>
       note.attention_mechanism === "instant_open" &&
       new Date(note.last_update_on) > lastOpenedDate,
