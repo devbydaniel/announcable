@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/devbydaniel/release-notes-go/config"
 	"github.com/devbydaniel/release-notes-go/internal/domain/organisation"
 	releasenotes "github.com/devbydaniel/release-notes-go/internal/domain/release-notes"
 	"github.com/go-chi/chi/v5"
