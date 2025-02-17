@@ -3,7 +3,6 @@ package handler
 import (
 	"encoding/json"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/devbydaniel/release-notes-go/config"
@@ -32,7 +31,6 @@ type serveReleaseNotesWidgetResponseBody struct {
 
 func (h *Handler) HandleReleaseNotesServe(w http.ResponseWriter, r *http.Request) {
 	h.log.Trace().Msg("HandleReleaseNotesServe")
-	cfg := config.New()
 	organisationService := organisation.NewService(*organisation.NewRepository(h.DB))
 	releaseNotesService := releasenotes.NewService(*releasenotes.NewRepository(h.DB, h.ObjStore))
 	externalOrgId := chi.URLParam(r, "orgId")
