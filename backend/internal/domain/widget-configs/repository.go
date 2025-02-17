@@ -79,6 +79,5 @@ func (r *repository) Get(orgId string) (*WidgetConfig, error) {
 		log.Error().Err(err).Msg("Error finding widget config by organisation id")
 		return nil, err
 	}
-	log.Debug().Interface("cfg", cfg).Msg("Widget config found")
 	return &cfg, nil
 }

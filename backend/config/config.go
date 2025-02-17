@@ -89,6 +89,8 @@ func New() *config {
 			ProductName:    "Release Notes",
 			CompanyName:    "Release Notes Inc.",
 			CompanyAddress: "1234 Elm St, Springfield, IL 62701",
+			SupportEmail:   "support@test.de",
+			PersonalName:   "Daniel",
 		},
 	}
 }

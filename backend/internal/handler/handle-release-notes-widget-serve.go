@@ -104,7 +104,6 @@ func (h *Handler) HandleReleaseNotesServe(w http.ResponseWriter, r *http.Request
 		})
 	}
 
-	h.log.Debug().Interface("res", res).Msg("Response")
 	h.log.Debug().Int("dataLength", len(res.Data)).Msg("Response data length")
 
 	w.Header().Set("Content-Type", "application/json")
