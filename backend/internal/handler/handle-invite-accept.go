@@ -72,13 +72,16 @@ func (h *Handler) HandleInviteAccept(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = userService.GetByEmail(invite.Email)
-	if err != nil {
-		if errors.Is(err, h.DB.ErrRecordNotFound) {
-		} else {
-			http.Error(w, "Error processing request", http.StatusInternalServerError)
-			return
-		}
+	existingUser, err := userService.GetByEmail(invite.Email)
+	if err != nil && !errors.Is(err, h.DB.ErrRecordNotFound) {
+		h.log.Error().Err(err).Msg("Error checking existing user")
+		http.Error(w, "Error processing request", http.StatusInternalServerError)
+		return
+	}
+	if existingUser != nil {
+		h.log.Debug().Msg("User already exists")
+		http.Error(w, "User already exists", http.StatusConflict)
+		return
 	}
 
 	user, err := userService.Create(invite.Email, acceptDTO.Password, true)
