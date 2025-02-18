@@ -20,10 +20,9 @@ import useReleaseNoteStatus, {
 } from "./hooks/useReleaseNoteStatus";
 
 interface Props {
-  backendUrl: string;
   init: WidgetInit;
 }
-export default function App({ init, backendUrl }: Props) {
+export default function App({ init }: Props) {
   const { isOpen, setIsOpen, lastOpened } = useWidgetToggle({
     querySelector: init.anchor_query_selector,
   });
@@ -34,7 +33,6 @@ export default function App({ init, backendUrl }: Props) {
 
   const { data: releaseNoteStatus } = useReleaseNoteStatus({
     orgId: init.org_id,
-    backendUrl,
   });
 
   const hasUnseenValue = hasUnseenReleaseNotes({
@@ -80,7 +78,6 @@ export default function App({ init, backendUrl }: Props) {
       {isOpen && (
         <WidgetContent
           init={init}
-          backendUrl={backendUrl}
           isOpen={isOpen}
           onClose={() => setIsOpen(false)}
         />
@@ -91,28 +88,22 @@ export default function App({ init, backendUrl }: Props) {
 
 interface WidgetContentProps {
   init: WidgetInit;
-  backendUrl: string;
   isOpen: boolean;
   onClose: () => void;
 }
 
-function WidgetContent({
-  init,
-  backendUrl,
-  isOpen,
-  onClose,
-}: WidgetContentProps) {
+function WidgetContent({ init, isOpen, onClose }: WidgetContentProps) {
   const {
     data: releaseNotes,
     isLoading: releaseNotesAreLoading,
     error: releaseNotesError,
-  } = useReleaseNotes({ orgId: init.org_id, backendUrl });
+  } = useReleaseNotes({ orgId: init.org_id });
 
   const {
     data: widgetConfig,
     isLoading: widgetConfigIsLoading,
     error: widgetConfigError,
-  } = useWidgetConfig({ orgId: init.org_id, backendUrl });
+  } = useWidgetConfig({ orgId: init.org_id });
 
   const isReadyToMount =
     !releaseNotesAreLoading &&

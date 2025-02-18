@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { type ReleaseNote } from "@/lib/types";
+import { backendUrl } from "@/lib/config";
 
 interface Props {
   orgId: string;
-  backendUrl: string;
 }
-export default function useReleaseNotes({ orgId, backendUrl }: Props) {
+export default function useReleaseNotes({ orgId }: Props) {
   const url = `${backendUrl}/api/release-notes/${orgId}`;
   const { data, isLoading, error } = useQuery({
     queryKey: ["release-notes", orgId],

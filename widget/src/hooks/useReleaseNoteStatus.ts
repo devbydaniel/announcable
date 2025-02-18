@@ -1,17 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
+import { backendUrl } from "@/lib/config";
 
 export interface ReleaseNoteStatus {
   last_update_on: string;
   attention_mechanism?: string;
 }
 
-export default function useReleaseNoteStatus({
-  orgId,
-  backendUrl,
-}: {
-  orgId: string;
-  backendUrl: string;
-}) {
+export default function useReleaseNoteStatus({ orgId }: { orgId: string }) {
   return useQuery({
     queryKey: ["releaseNoteStatus", orgId],
     queryFn: async () => {

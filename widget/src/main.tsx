@@ -32,17 +32,11 @@ function initialize(init: WidgetInit) {
   reactContainer.className = "release-beacon-widget";
   shadowRoot.appendChild(reactContainer);
 
-  // Extract the backend url from the src attribute of the script tag
-  const script = document.currentScript as HTMLScriptElement;
-  const scriptSrc = script.src;
-  const scriptSrcParts = scriptSrc?.split("/");
-  const backendUrl = scriptSrcParts?.slice(0, -1).join("/");
-
   const root = ReactDOM.createRoot(reactContainer);
   root.render(
     <React.StrictMode>
       <Providers>
-        <App init={init} backendUrl={backendUrl} />
+        <App init={init} />
       </Providers>
     </React.StrictMode>,
   );
