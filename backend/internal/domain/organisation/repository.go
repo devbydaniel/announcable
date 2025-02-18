@@ -87,7 +87,7 @@ func (r *repository) FindOrgUsers(orgId uuid.UUID) ([]*OrganisationUser, error) 
 		log.Error().Err(err).Msg("Error finding organisation users by organisation id")
 		return nil, err
 	}
-	log.Debug().Interface("ous", ous).Msg("Organisation users found")
+	log.Debug().Msg("Organisation users found")
 	return ous, nil
 }
 

@@ -75,11 +75,10 @@ func (h *Handler) HandleInviteAccept(w http.ResponseWriter, r *http.Request) {
 	_, err = userService.GetByEmail(invite.Email)
 	if err != nil {
 		if errors.Is(err, h.DB.ErrRecordNotFound) {
-			http.Error(w, "Email address is already taken", http.StatusBadRequest)
+		} else {
+			http.Error(w, "Error processing request", http.StatusInternalServerError)
 			return
 		}
-		http.Error(w, "Error processing request", http.StatusInternalServerError)
-		return
 	}
 
 	user, err := userService.Create(invite.Email, acceptDTO.Password, true)
