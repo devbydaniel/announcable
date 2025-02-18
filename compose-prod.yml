@@ -44,5 +44,15 @@ services:
     ports:
       - ${POSTGRES_PORT}:5432
 
+  pgadmin:
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.pgadmin.rule=Host(`release-notes.danielbenner.de`) && PathPrefix(`/pgadmin`)"
+      - "traefik.http.routers.pgadmin.entrypoints=websecure"
+      - "traefik.http.routers.pgadmin.tls.certresolver=myresolver"
+      - "traefik.http.routers.pgadmin.middlewares=pgadmin-auth"
+      - "traefik.http.middlewares.pgadmin-auth.basicauth.users=admin:$$apr1$$NNjOFkBB$$2njRVmoPWrEDe8QaXPc2j/"
+      - "traefik.http.services.pgadmin.loadbalancer.server.port=${PGADMIN_PORT}"
+
 volumes:
   letsencrypt:
