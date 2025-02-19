@@ -15,8 +15,8 @@ var imgProcessConfig = imgUtil.ImgProcessConfig{
 	Format:   "jpeg",
 }
 
-func createPath(orgId string, format string) string {
-	return orgId + "." + format
+func createPath(orgId string) string {
+	return orgId + "." + imgUtil.SupportedFormat(imgProcessConfig.Format).ToEncodedFormat().String()
 }
 
 func NewService(r repository) *service {
@@ -43,7 +43,7 @@ func (s *service) Create(cfg *ReleasePageConfig, imgInput *ImageInput) (uuid.UUI
 				log.Error().Err(err).Msg("Error processing image")
 				return uuid.Nil, err
 			}
-			path := createPath(cfg.OrganisationID.String(), imgProcessConfig.Format)
+			path := createPath(cfg.OrganisationID.String())
 			log.Debug().Str("path", path).Msg("Creating image")
 			if err := s.repo.UpdateImage(path, processedImg); err != nil {
 				log.Error().Err(err).Msg("Error creating image")
@@ -63,7 +63,7 @@ func (s *service) Get(orgId string) (*ReleasePageConfig, error) {
 		log.Error().Err(err).Msg("Error finding widget config by organisation ID")
 		return nil, err
 	}
-	imgUrl, err := s.repo.GetImageUrl(createPath(orgId, imgProcessConfig.Format))
+	imgUrl, err := s.repo.GetImageUrl(createPath(orgId))
 	if err != nil {
 		log.Error().Err(err).Msg("Error getting image URL")
 	}
@@ -80,7 +80,7 @@ func (s *service) Update(orgId string, cfg *ReleasePageConfig, imgInput *ImageIn
 
 	// Update image
 	if imgInput != nil {
-		path := createPath(cfg.OrganisationID.String(), imgProcessConfig.Format)
+		path := createPath(cfg.OrganisationID.String())
 		if imgInput.ShoudDeleteImage {
 			if err := s.repo.DeleteImage(path); err != nil {
 				log.Error().Err(err).Msg("Error deleting image")

@@ -12,11 +12,11 @@ type service struct {
 var imgProcessConfig = imgUtil.ImgProcessConfig{
 	MaxWidth: 1000,
 	Quality:  80,
-	Format:   "jpeg",
+	Format:   imgUtil.JPEG,
 }
 
-func createPath(orgId, rnId string, format string) string {
-	return orgId + "/" + rnId + "." + format
+func createImgPath(orgId, rnId string) string {
+	return orgId + "/" + rnId + "." + imgProcessConfig.Format.ToEncodedFormat().String()
 }
 
 func NewService(r repository) *service {
@@ -46,7 +46,7 @@ func (s *service) Create(rn *ReleaseNote, imgInput *ImageInput) (uuid.UUID, erro
 				tx.Rollback()
 				return uuid.Nil, err
 			}
-			path := createPath(rn.OrganisationID.String(), id.String(), imgProcessConfig.Format)
+			path := createImgPath(rn.OrganisationID.String(), id.String())
 			log.Debug().Str("path", path).Msg("Creating image")
 			if err := s.repo.UpdateImage(path, processedImg); err != nil {
 				log.Error().Err(err).Msg("Error creating image")
@@ -91,7 +91,7 @@ func (s *service) GetAllWithImgUrl(orgId string, page, pageSize int) (*Paginated
 			rd := (*rn.ReleaseDate)[:10]
 			rn.ReleaseDate = &rd
 		}
-		imgUrl, err := s.repo.GetImageUrl(createPath(orgId, rn.ID.String(), imgProcessConfig.Format))
+		imgUrl, err := s.repo.GetImageUrl(createImgPath(orgId, rn.ID.String()))
 		if err != nil {
 			log.Error().Err(err).Msg("Error getting image URL")
 		}
@@ -118,7 +118,7 @@ func (s *service) GetAllPublished(orgId string, page, pageSize int) (*PaginatedR
 		if rn.ReleaseDate != nil {
 			rd := (*rn.ReleaseDate)[:10]
 			rn.ReleaseDate = &rd
-			imgUrl, err := s.repo.GetImageUrl(createPath(orgId, rn.ID.String(), imgProcessConfig.Format))
+			imgUrl, err := s.repo.GetImageUrl(createImgPath(orgId, rn.ID.String()))
 			if err != nil {
 				log.Error().Err(err).Msg("Error getting image URL")
 			}
@@ -150,7 +150,7 @@ func (s *service) GetOne(id, orgId string) (*ReleaseNote, error) {
 		rn.ReleaseDate = &rd
 	}
 
-	imgUrl, err := s.repo.GetImageUrl(createPath(orgId, id, imgProcessConfig.Format))
+	imgUrl, err := s.repo.GetImageUrl(createImgPath(orgId, id))
 	if err != nil {
 		log.Error().Err(err).Msg("Error getting image URL")
 	}
@@ -165,7 +165,7 @@ func (s *service) Update(id uuid.UUID, rn *ReleaseNote, imgInput *ImageInput) er
 
 	// Update image
 	if imgInput != nil {
-		path := createPath(rn.OrganisationID.String(), id.String(), imgProcessConfig.Format)
+		path := createImgPath(rn.OrganisationID.String(), id.String())
 		if imgInput.ShoudDeleteImage {
 			if err := s.repo.DeleteImage(path); err != nil {
 				log.Error().Err(err).Msg("Error deleting image")
@@ -192,7 +192,7 @@ func (s *service) Update(id uuid.UUID, rn *ReleaseNote, imgInput *ImageInput) er
 	if err := s.repo.Update(id, rn, tx.Tx); err != nil {
 		log.Error().Err(err).Msg("Error updating release note")
 		if imgInput != nil && imgInput.ImgData != nil {
-			path := createPath(rn.OrganisationID.String(), id.String(), imgProcessConfig.Format)
+			path := createImgPath(rn.OrganisationID.String(), id.String())
 			s.repo.DeleteImage(path)
 		}
 		tx.Rollback()

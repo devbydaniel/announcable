@@ -5,7 +5,7 @@ import (
 	"errors"
 	"image"
 	_ "image/gif"
-	"image/jpeg"
+	_ "image/jpeg"
 	_ "image/png"
 	"io"
 	"mime/multipart"
@@ -13,15 +13,49 @@ import (
 	"strings"
 
 	"github.com/devbydaniel/release-notes-go/internal/logger"
+	"github.com/kolesa-team/go-webp/encoder"
+	"github.com/kolesa-team/go-webp/webp"
 	"github.com/nfnt/resize"
 )
 
 var log = logger.Get()
 
+type SupportedFormat string
+
+func (f SupportedFormat) String() string {
+	return string(f)
+}
+
+const (
+	JPEG SupportedFormat = "jpeg"
+	PNG  SupportedFormat = "png"
+)
+
+type EncodedFormat string
+
+func (f EncodedFormat) String() string {
+	return string(f)
+}
+
+const (
+	WebP EncodedFormat = "webp"
+)
+
+func (f SupportedFormat) ToEncodedFormat() EncodedFormat {
+	switch f {
+	case JPEG:
+		return WebP
+	case PNG:
+		return WebP
+	default:
+		return ""
+	}
+}
+
 type ImgProcessConfig struct {
 	MaxWidth uint
 	Quality  int
-	Format   string
+	Format   SupportedFormat
 }
 
 func VerifyImageType(img multipart.File) bool {
@@ -66,15 +100,21 @@ func ProcessImage(img image.Image, maxWidth uint, quality int) (image.Image, err
 	return img, nil
 }
 
-func Encode(img image.Image, format string) (*io.Reader, error) {
+func Encode(img image.Image, format SupportedFormat) (*io.Reader, error) {
 	log.Trace().Msg("Encode")
 	// Encode the image
 	imgBuf := new(bytes.Buffer)
-	switch format {
-	case "jpeg":
-		if err := jpeg.Encode(imgBuf, img, nil); err != nil {
+	targetFormat := format.ToEncodedFormat()
+	switch targetFormat {
+	case WebP:
+		options, err := encoder.NewLossyEncoderOptions(encoder.PresetDefault, 75)
+		if err != nil {
 			return nil, err
 		}
+		if err := webp.Encode(imgBuf, img, options); err != nil {
+			return nil, err
+		}
+		log.Debug().Msg("Image encoded as WebP")
 	default:
 		return nil, errors.New("unsupported image format")
 	}

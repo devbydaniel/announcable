@@ -10,6 +10,12 @@ services:
     volumes:
       - ./backend/:/project-package/
       - .env:/project-package/.env
+    entrypoint: >
+      /bin/sh -c "
+      apt-get update &&
+      apt-get install -y libwebp-dev &&
+      air
+      "
 
   mail:
     image: schickling/mailcatcher

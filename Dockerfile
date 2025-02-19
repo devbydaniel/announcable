@@ -37,6 +37,9 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o main .
 
 FROM alpine:3.17
 
+# Dependency of the go-webp library
+RUN apk add --no-cache libwebp-dev
+
 WORKDIR /app
 
 # Copy the binary from builder
