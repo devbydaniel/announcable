@@ -25,7 +25,7 @@ type lpConfigUpdateForm struct {
 func (h *Handler) HandleReleasePageConfigUpdate(w http.ResponseWriter, r *http.Request) {
 	h.log.Trace().Msg("HandleLpConfigUpdate")
 	ctx := r.Context()
-	lpConfigService := releasepageconfig.NewService(*releasepageconfig.NewRepository(h.DB, h.ObjStore))
+	releasePageConfigService := releasepageconfig.NewService(*releasepageconfig.NewRepository(h.DB, h.ObjStore))
 
 	orgId := ctx.Value(mw.OrgIDKey).(string)
 	if orgId == "" {
@@ -96,7 +96,7 @@ func (h *Handler) HandleReleasePageConfigUpdate(w http.ResponseWriter, r *http.R
 	}
 	h.log.Debug().Interface("lpconfig", lpConfig).Msg("Landing page config to update")
 
-	if err := lpConfigService.Update(orgId, lpConfig, imgInput); err != nil {
+	if err := releasePageConfigService.Update(uuid.MustParse(orgId), lpConfig, imgInput); err != nil {
 		h.log.Error().Err(err).Msg("Error updating landing page config")
 		http.Error(w, "Error updating landing page config", http.StatusInternalServerError)
 		return

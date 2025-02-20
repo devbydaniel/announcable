@@ -6,6 +6,7 @@ import (
 	releasepageconfig "github.com/devbydaniel/release-notes-go/internal/domain/release-page-configs"
 	mw "github.com/devbydaniel/release-notes-go/internal/middleware"
 	"github.com/devbydaniel/release-notes-go/templates"
+	"github.com/google/uuid"
 )
 
 type landingPageData struct {
@@ -22,7 +23,7 @@ var landingPageTmpl = templates.Construct(
 
 func (h *Handler) HandleReleasePageConfigPage(w http.ResponseWriter, r *http.Request) {
 	h.log.Trace().Msg("HandleReleasePageConfigPage")
-	lpService := releasepageconfig.NewService(*releasepageconfig.NewRepository(h.DB, h.ObjStore))
+	releasePageConfigService := releasepageconfig.NewService(*releasepageconfig.NewRepository(h.DB, h.ObjStore))
 	orgId, ok := r.Context().Value(mw.OrgIDKey).(string)
 	if !ok {
 		h.log.Error().Msg("Organisation ID not found in context")
@@ -30,8 +31,8 @@ func (h *Handler) HandleReleasePageConfigPage(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	// get landing page config
-	cfg, err := lpService.Get(orgId)
+	// get release page config
+	cfg, err := releasePageConfigService.Get(uuid.MustParse(orgId))
 	if err != nil {
 		http.Error(w, "Error getting widget config", http.StatusInternalServerError)
 	}

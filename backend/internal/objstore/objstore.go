@@ -132,7 +132,7 @@ func (o *ObjStore) UpdateImage(bucket, path string, img *io.Reader) error {
 }
 
 func (o *ObjStore) DeleteImage(bucket, path string) error {
-	log.Trace().Msg("DeleteImage")
+	log.Trace().Str("path", path).Str("bucket", bucket).Msg("DeleteImage")
 	ctx := context.Background()
 	err := o.Client.RemoveObject(ctx, bucket, path, minio.RemoveObjectOptions{})
 	if err != nil {

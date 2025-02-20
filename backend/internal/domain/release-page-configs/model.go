@@ -13,6 +13,7 @@ type ReleasePageConfig struct {
 	OrganisationID     uuid.UUID `gorm:"type:uuid;primaryKey"`
 	Organisation       organisation.Organisation
 	ImageUrl           string `gorm:"-"` // only returned in GetReleaseNoteByID
+	ImagePath          string `gorm:"type:varchar(255)"`
 	Title              string `gorm:"type:varchar(255)"`
 	Description        string `gorm:"type:text"`
 	BgColor            string `gorm:"type:varchar(255)"`

@@ -3,6 +3,7 @@ package imgUtil
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"image"
 	_ "image/gif"
 	_ "image/jpeg"
@@ -55,7 +56,6 @@ func (f SupportedFormat) ToEncodedFormat() EncodedFormat {
 type ImgProcessConfig struct {
 	MaxWidth uint
 	Quality  int
-	Format   SupportedFormat
 }
 
 func VerifyImageType(img multipart.File) bool {
@@ -85,11 +85,13 @@ func Decode(file io.Reader) (image.Image, string, error) {
 	if err != nil {
 		return nil, "", err
 	}
+	log.Debug().Str("format", format).Msg("Image decoded")
 	return img, format, nil
 }
 
 func ProcessImage(img image.Image, maxWidth uint, quality int) (image.Image, error) {
 	log.Trace().Msg("ProcessImage")
+
 	// Resize the image if it's too wide
 	bounds := img.Bounds()
 	width := uint(bounds.Dx())
@@ -123,25 +125,40 @@ func Encode(img image.Image, format SupportedFormat) (*io.Reader, error) {
 	return &ioReader, nil
 }
 
-func DecodeProcessEncode(img io.Reader, config *ImgProcessConfig) (*io.Reader, error) {
+func DecodeProcessEncode(img io.Reader, config *ImgProcessConfig) (*io.Reader, EncodedFormat, error) {
 	log.Trace().Msg("DecodeProcessEncode")
 	// Decode the image
-	imgDecoded, _, err := Decode(img)
+	imgDecoded, format, err := Decode(img)
 	if err != nil {
-		return nil, err
+		return nil, "", err
+	}
+
+	// check if format is supported
+	if !isFormatSupported(format) {
+		return nil, "", fmt.Errorf("unsupported image format: %s", format)
 	}
 
 	// Process the image
 	imgProcessed, err := ProcessImage(imgDecoded, config.MaxWidth, config.Quality)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	// Encode the image
-	imgEncoded, err := Encode(imgProcessed, config.Format)
+	imgEncoded, err := Encode(imgProcessed, SupportedFormat(format))
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
-	return imgEncoded, nil
+	return imgEncoded, SupportedFormat(format).ToEncodedFormat(), nil
+}
+
+func isFormatSupported(format string) bool {
+	log.Trace().Str("format", format).Msg("isFormatSupported")
+	switch SupportedFormat(format) {
+	case JPEG, PNG:
+		return true
+	default:
+		return false
+	}
 }

@@ -66,9 +66,14 @@ func (r *repository) Update(id uuid.UUID, rn *ReleaseNote, tx *gorm.DB) error {
 	return nil
 }
 
-func (r *repository) UpdateWithNil(id uuid.UUID, data map[string]interface{}) error {
+func (r *repository) UpdateWithNil(id uuid.UUID, data map[string]interface{}, tx *gorm.DB) error {
 	log.Trace().Msg("UpdatePartial")
-	client := r.db.Client
+	var client *gorm.DB
+	if tx != nil {
+		client = tx
+	} else {
+		client = r.db.Client
+	}
 	if err := client.Model(&ReleaseNote{}).Where("id = ?", id).Updates(data).Error; err != nil {
 		log.Error().Err(err).Msg("Error updating release note")
 		return err
@@ -166,12 +171,33 @@ func (r *repository) GetImageUrl(path string) (string, error) {
 	return r.objStore.GetImageUrl(r.bucket, path)
 }
 
-func (r *repository) UpdateImage(path string, img *io.Reader) error {
+func (r *repository) UpdateImage(id uuid.UUID, img *io.Reader, path string, tx *gorm.DB) error {
 	log.Trace().Msg("UpdateImage")
-	return r.objStore.UpdateImage(r.bucket, path, img)
+	if err := r.UpdateWithNil(id, map[string]interface{}{"ImagePath": path}, tx); err != nil {
+		log.Error().Err(err).Msg("Error updating release note")
+		return err
+	}
+	if err := r.objStore.UpdateImage(r.bucket, path, img); err != nil {
+		log.Error().Err(err).Msg("Error updating image")
+		return err
+	}
+	return nil
 }
 
-func (r *repository) DeleteImage(path string) error {
+func (r *repository) DeleteImage(id uuid.UUID, tx *gorm.DB) error {
 	log.Trace().Msg("DeleteImage")
-	return r.objStore.DeleteImage(r.bucket, path)
+	rn, err := r.FindOne(id)
+	if err != nil {
+		log.Error().Err(err).Msg("Error finding release note")
+		return err
+	}
+	if err := r.objStore.DeleteImage(r.bucket, rn.ImagePath); err != nil {
+		log.Error().Err(err).Msg("Error deleting image")
+		return err
+	}
+	if err := r.UpdateWithNil(id, map[string]interface{}{"ImagePath": nil}, tx); err != nil {
+		log.Error().Err(err).Msg("Error updating release note")
+		return err
+	}
+	return nil
 }

@@ -39,7 +39,7 @@ func (r *repository) Create(cfg *ReleasePageConfig, tx *gorm.DB) error {
 	return nil
 }
 
-func (r *repository) Update(orgId string, cfg *ReleasePageConfig, tx *gorm.DB) error {
+func (r *repository) Update(orgId uuid.UUID, cfg *ReleasePageConfig, tx *gorm.DB) error {
 	log.Trace().Msg("Update")
 	var client *gorm.DB
 	if tx != nil {
@@ -48,7 +48,7 @@ func (r *repository) Update(orgId string, cfg *ReleasePageConfig, tx *gorm.DB) e
 		client = r.db.Client
 	}
 
-	if err := client.Model(&ReleasePageConfig{}).Where("organisation_id = ?", uuid.MustParse(orgId)).Updates(cfg).Error; err != nil {
+	if err := client.Model(&ReleasePageConfig{}).Where("organisation_id = ?", orgId).Updates(cfg).Error; err != nil {
 		log.Error().Err(err).Msg("Error updating landing page config")
 		return err
 	}
@@ -56,8 +56,25 @@ func (r *repository) Update(orgId string, cfg *ReleasePageConfig, tx *gorm.DB) e
 	return nil
 }
 
-func (r *repository) Get(orgId string) (*ReleasePageConfig, error) {
-	log.Trace().Str("orgId", orgId).Msg("Get")
+func (r *repository) UpdateWithNil(orgId uuid.UUID, fields map[string]interface{}, tx *gorm.DB) error {
+	log.Trace().Msg("UpdateWithNil")
+	var client *gorm.DB
+	if tx != nil {
+		client = tx
+	} else {
+		client = r.db.Client
+	}
+
+	if err := client.Model(&ReleasePageConfig{}).Where("organisation_id = ?", orgId).Updates(fields).Error; err != nil {
+		log.Error().Err(err).Msg("Error updating landing page config")
+		return err
+	}
+	log.Debug().Interface("fields", fields).Msg("landing page config updated")
+	return nil
+}
+
+func (r *repository) Get(orgId uuid.UUID) (*ReleasePageConfig, error) {
+	log.Trace().Str("orgId", orgId.String()).Msg("Get")
 	var cfg ReleasePageConfig
 	defaultCfg := ReleasePageConfig{
 		Title:          "Release Notes",
@@ -66,10 +83,10 @@ func (r *repository) Get(orgId string) (*ReleasePageConfig, error) {
 		TextColor:      "#000000",
 		TextColorMuted: "#6c757d",
 		BrandPosition:  string(BrandPositionTop),
-		OrganisationID: uuid.MustParse(orgId),
+		OrganisationID: orgId,
 	}
 
-	if err := r.db.Client.Model(&ReleasePageConfig{}).Where("organisation_id = ?", uuid.MustParse(orgId)).First(&cfg).Error; err != nil {
+	if err := r.db.Client.Model(&ReleasePageConfig{}).Where("organisation_id = ?", orgId).First(&cfg).Error; err != nil {
 		if errors.Is(err, r.db.ErrRecordNotFound) {
 			log.Debug().Msg("landing page config not found, creating...")
 			r.Create(&defaultCfg, nil)
@@ -91,7 +108,20 @@ func (r *repository) UpdateImage(path string, img *io.Reader) error {
 	return r.objStore.UpdateImage(r.bucket, path, img)
 }
 
-func (r *repository) DeleteImage(path string) error {
+func (r *repository) DeleteImage(orgId uuid.UUID) error {
 	log.Trace().Msg("DeleteImage")
-	return r.objStore.DeleteImage(r.bucket, path)
+	cfg, err := r.Get(orgId)
+	if err != nil {
+		log.Error().Err(err).Msg("Error finding landing page config")
+		return err
+	}
+	if err := r.objStore.DeleteImage(r.bucket, cfg.ImagePath); err != nil {
+		log.Error().Err(err).Msg("Error deleting image")
+		return err
+	}
+	if err := r.UpdateWithNil(orgId, map[string]interface{}{"ImagePath": nil}, nil); err != nil {
+		log.Error().Err(err).Msg("Error updating landing page config")
+		return err
+	}
+	return nil
 }

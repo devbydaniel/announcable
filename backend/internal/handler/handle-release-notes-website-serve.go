@@ -22,7 +22,7 @@ var releaseNotesWebsiteTmpl = templates.Construct("release-notes-website", "page
 func (h *Handler) HandleReleasePage(w http.ResponseWriter, r *http.Request) {
 	h.log.Trace().Msg("HandleReleasePage")
 	organisationService := organisation.NewService(*organisation.NewRepository(h.DB))
-	lpconfigService := releasepageconfig.NewService(*releasepageconfig.NewRepository(h.DB, h.ObjStore))
+	releasePageConfigService := releasepageconfig.NewService(*releasepageconfig.NewRepository(h.DB, h.ObjStore))
 	rnService := releasenotes.NewService(*releasenotes.NewRepository(h.DB, h.ObjStore))
 
 	page := r.URL.Query().Get("page")
@@ -60,7 +60,7 @@ func (h *Handler) HandleReleasePage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	config, err := lpconfigService.Get(org.ID.String())
+	config, err := releasePageConfigService.Get(org.ID)
 	if err != nil {
 		h.log.Error().Err(err).Msg("Error getting widget config")
 		http.Error(w, "Error getting widget config", http.StatusInternalServerError)

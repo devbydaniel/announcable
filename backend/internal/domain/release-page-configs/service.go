@@ -12,11 +12,10 @@ type service struct {
 var imgProcessConfig = imgUtil.ImgProcessConfig{
 	MaxWidth: 1000,
 	Quality:  80,
-	Format:   "jpeg",
 }
 
-func createPath(orgId string) string {
-	return orgId + "." + imgUtil.SupportedFormat(imgProcessConfig.Format).ToEncodedFormat().String()
+func createPath(orgId, format string) string {
+	return orgId + "." + format
 }
 
 func NewService(r repository) *service {
@@ -30,40 +29,40 @@ func (s *service) Create(cfg *ReleasePageConfig, imgInput *ImageInput) (uuid.UUI
 	// Start a transaction
 	tx := s.repo.db.StartTransaction()
 
-	if err := s.repo.Create(cfg, tx.Tx); err != nil {
-		log.Error().Err(err).Msg("Error creating widget config")
-		return uuid.Nil, err
-	}
-
 	// Create image
 	if imgInput != nil {
 		if imgInput.ImgData != nil {
-			processedImg, err := imgUtil.DecodeProcessEncode(imgInput.ImgData, &imgProcessConfig)
+			processedImg, format, err := imgUtil.DecodeProcessEncode(imgInput.ImgData, &imgProcessConfig)
 			if err != nil {
 				log.Error().Err(err).Msg("Error processing image")
 				return uuid.Nil, err
 			}
-			path := createPath(cfg.OrganisationID.String())
+			path := createPath(cfg.OrganisationID.String(), format.String())
 			log.Debug().Str("path", path).Msg("Creating image")
 			if err := s.repo.UpdateImage(path, processedImg); err != nil {
 				log.Error().Err(err).Msg("Error creating image")
 				tx.Rollback()
 				return uuid.Nil, err
 			}
+			cfg.ImagePath = path
 		}
 	}
 
+	if err := s.repo.Create(cfg, tx.Tx); err != nil {
+		log.Error().Err(err).Msg("Error creating widget config")
+		return uuid.Nil, err
+	}
 	return cfg.ID, nil
 }
 
-func (s *service) Get(orgId string) (*ReleasePageConfig, error) {
-	log.Trace().Str("orgId", orgId).Msg("Get")
+func (s *service) Get(orgId uuid.UUID) (*ReleasePageConfig, error) {
+	log.Trace().Str("orgId", orgId.String()).Msg("Get")
 	cfg, err := s.repo.Get(orgId)
 	if err != nil {
 		log.Error().Err(err).Msg("Error finding widget config by organisation ID")
 		return nil, err
 	}
-	imgUrl, err := s.repo.GetImageUrl(createPath(orgId))
+	imgUrl, err := s.repo.GetImageUrl(cfg.ImagePath)
 	if err != nil {
 		log.Error().Err(err).Msg("Error getting image URL")
 	}
@@ -72,7 +71,7 @@ func (s *service) Get(orgId string) (*ReleasePageConfig, error) {
 	return cfg, nil
 }
 
-func (s *service) Update(orgId string, cfg *ReleasePageConfig, imgInput *ImageInput) error {
+func (s *service) Update(orgId uuid.UUID, cfg *ReleasePageConfig, imgInput *ImageInput) error {
 	log.Trace().Msg("Update")
 
 	// Start a transaction
@@ -80,26 +79,32 @@ func (s *service) Update(orgId string, cfg *ReleasePageConfig, imgInput *ImageIn
 
 	// Update image
 	if imgInput != nil {
-		path := createPath(cfg.OrganisationID.String())
 		if imgInput.ShoudDeleteImage {
-			if err := s.repo.DeleteImage(path); err != nil {
+			if err := s.repo.DeleteImage(orgId); err != nil {
 				log.Error().Err(err).Msg("Error deleting image")
 				tx.Rollback()
 				return err
 			}
+			if err := s.repo.UpdateWithNil(orgId, map[string]interface{}{"ImagePath": nil}, tx.Tx); err != nil {
+				log.Error().Err(err).Msg("Error updating image path")
+				tx.Rollback()
+				return err
+			}
 		} else if imgInput.ImgData != nil {
-			processedImg, err := imgUtil.DecodeProcessEncode(imgInput.ImgData, &imgProcessConfig)
+			processedImg, format, err := imgUtil.DecodeProcessEncode(imgInput.ImgData, &imgProcessConfig)
 			if err != nil {
 				log.Error().Err(err).Msg("Error processing image")
 				tx.Rollback()
 				return err
 			}
+			path := createPath(cfg.OrganisationID.String(), format.String())
 			log.Debug().Str("path", path).Msg("Updating image")
 			if err := s.repo.UpdateImage(path, processedImg); err != nil {
 				log.Error().Err(err).Msg("Error updating image")
 				tx.Rollback()
 				return err
 			}
+			cfg.ImagePath = path
 		}
 	}
 

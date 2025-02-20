@@ -17,6 +17,7 @@ type ReleaseNote struct {
 	DescriptionShort   string             `gorm:"type:text"`
 	DescriptionLong    string             `gorm:"type:text"`
 	ReleaseDate        *string            `gorm:"type:date;default:null"`
+	ImagePath          string             `gorm:"type:varchar(255)"`
 	IsPublished        bool               `gorm:"type:bool;default:false"`
 	CtaLabelOverride   string             `gorm:"type:varchar(255)"`
 	CtaUrlOverride     string             `gorm:"type:varchar(255)"`
