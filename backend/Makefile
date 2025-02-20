@@ -8,7 +8,21 @@ migrations-new:
 	migrate create -ext sql -dir ${MIGRATION_DIR} -seq $(name)
 
 migrations-up:
+	migrate -database ${POSTGRES_URL} -path ${MIGRATION_DIR} up 1
+
+migrations-up-all:
 	migrate -database ${POSTGRES_URL} -path ${MIGRATION_DIR} up
 
 migrations-down:
+	migrate -database ${POSTGRES_URL} -path ${MIGRATION_DIR} down 1
+
+migration-down-all:
 	migrate -database ${POSTGRES_URL} -path ${MIGRATION_DIR} down
+
+migrations-unfuck:
+	@echo "Getting current version..."
+	@V=$$(migrate -database ${POSTGRES_URL} -path ${MIGRATION_DIR} version); \
+	echo "Forcing to version $$V..."; \
+	migrate -database ${POSTGRES_URL} -path ${MIGRATION_DIR} force $$V; \
+	echo "Rolling back one migration..."; \
+	migrate -database ${POSTGRES_URL} -path ${MIGRATION_DIR} down 1
