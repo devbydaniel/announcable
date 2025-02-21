@@ -15,6 +15,10 @@ declare global {
 }
 
 function initialize(init: WidgetInit) {
+  if (!init.org_id) {
+    console.error("org_id is required to initialize release notes widget");
+    return;
+  }
   const widgetRoot = document.createElement("div");
   widgetRoot.id = "release-beacon-widget-root";
   document.body.appendChild(widgetRoot);
