@@ -17,6 +17,9 @@ FROM golang:1.23-alpine AS backend-builder
 
 WORKDIR /app
 
+# Add C dependencies needed for go-webp
+RUN apk add --no-cache gcc musl-dev libwebp-dev
+
 # Copy go mod and sum files
 COPY backend/go.mod backend/go.sum ./
 
@@ -31,7 +34,7 @@ RUN mkdir -p static/widget
 COPY --from=widget-builder /widget/dist/widget.js static/widget/
 
 # Build the application
-RUN CGO_ENABLED=0 GOOS=linux go build -o main .
+RUN GOOS=linux go build -o main .
 
 #### Final stage
 
