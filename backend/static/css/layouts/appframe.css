@@ -14,7 +14,7 @@
 }
 
 .app__main {
-  background: var(--color-base);
+  background: var(--color-mantle);
   flex-grow: 1;
   overflow-x: hidden;
   overflow-y: auto;

@@ -84,9 +84,9 @@ func (s *service) GetAll(orgId string, page, pageSize int) (*PaginatedReleaseNot
 	return rns, nil
 }
 
-func (s *service) GetAllWithImgUrl(orgId string, page, pageSize int) (*PaginatedReleaseNotes, error) {
+func (s *service) GetAllWithImgUrl(orgId string, page, pageSize int, filters map[string]interface{}) (*PaginatedReleaseNotes, error) {
 	log.Trace().Str("orgId", orgId).Msg("GetAllWithImgUrl")
-	rns, err := s.repo.FindAll(orgId, page, pageSize, nil)
+	rns, err := s.repo.FindAll(orgId, page, pageSize, filters)
 	if err != nil {
 		log.Error().Err(err).Msg("Error finding release notes by organisation ID")
 		return nil, err

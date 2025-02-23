@@ -39,6 +39,7 @@
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
+  background-color: var(--color-base);
 }
 
 .file-input__preview__delete {

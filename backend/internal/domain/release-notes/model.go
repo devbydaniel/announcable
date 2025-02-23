@@ -25,6 +25,8 @@ type ReleaseNote struct {
 	AttentionMechanism AttentionMechanism `gorm:"type:varchar(255)"`
 	CreatedBy          uuid.UUID          `gorm:"type:uuid"`
 	LastUpdatedBy      uuid.UUID          `gorm:"type:uuid"`
+	HideOnWidget       bool               `gorm:"type:bool;default:false"`
+	HideOnReleasePage  bool               `gorm:"type:bool;default:false"`
 }
 
 type PaginatedReleaseNotes struct {

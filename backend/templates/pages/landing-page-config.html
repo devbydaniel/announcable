@@ -23,9 +23,10 @@
 {{ define "main" }}
   <div
     class="lp-container"
-    x-data="lpContainer('{{ .Cfg.Title }}', '{{ .Cfg.Description }}', '{{ .Cfg.BgColor }}', '{{ .Cfg.TextColor }}', '{{ .Cfg.TextColorMuted }}', '{{ .Cfg.BrandPosition }}')"
+    x-data="lpContainer('{{ .SafeTitle }}', '{{ .SafeDescription }}', '{{ .Cfg.BgColor }}', '{{ .Cfg.TextColor }}', '{{ .Cfg.TextColorMuted }}', '{{ .Cfg.BrandPosition }}', '{{ .SafeBackLinkLabel }}')"
   >
     <div class="lp" x-bind="lp">
+      <div class="lp__go-back" x-bind="backLink"></div>
       <div class="lp__top">
         <div class="skeleton lp__brand" x-bind="brand" x-ref="left"></div>
       </div>
@@ -218,7 +219,8 @@
             value="{{ .Cfg.TextColor }}"
           />
         </div>
-        <div class="form__group form__group--no-mb">
+
+        <div class="form__group">
           <label class="form__label" for="text_color_muted"
             >Text Color Muted</label
           >
@@ -229,6 +231,29 @@
             name="text_color_muted"
             x-bind="textColorMuted"
             value="{{ .Cfg.TextColorMuted }}"
+          />
+        </div>
+
+        <div class="form__group">
+          <label class="form__label" for="title">Back Link Label</label>
+          <input
+            class="form__input"
+            type="text"
+            id="back_link_label"
+            name="back_link_label"
+            x-bind="backLinkLabel"
+            value="{{ .Cfg.BackLinkLabel }}"
+          />
+        </div>
+
+        <div class="form__group form__group--no-mb">
+          <label class="form__label" for="title">Back Link URL</label>
+          <input
+            class="form__input"
+            type="text"
+            id="back_link_url"
+            name="back_link_url"
+            value="{{ .Cfg.BackLinkUrl }}"
           />
         </div>
       </div>

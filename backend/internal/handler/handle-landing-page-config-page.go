@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"html"
 	"net/http"
 
 	releasepageconfig "github.com/devbydaniel/release-notes-go/internal/domain/release-page-configs"
@@ -10,8 +11,11 @@ import (
 )
 
 type landingPageData struct {
-	Title string
-	Cfg   *releasepageconfig.ReleasePageConfig
+	Title             string
+	Cfg               *releasepageconfig.ReleasePageConfig
+	SafeTitle         string
+	SafeDescription   string
+	SafeBackLinkLabel string
 }
 
 var landingPageTmpl = templates.Construct(
@@ -38,8 +42,11 @@ func (h *Handler) HandleReleasePageConfigPage(w http.ResponseWriter, r *http.Req
 	}
 
 	data := landingPageData{
-		Title: "Release Page Config",
-		Cfg:   cfg,
+		Title:             "Release Page Config",
+		Cfg:               cfg,
+		SafeTitle:         html.EscapeString(cfg.Title),
+		SafeDescription:   html.EscapeString(cfg.Description),
+		SafeBackLinkLabel: html.EscapeString(cfg.BackLinkLabel),
 	}
 	if err := landingPageTmpl.ExecuteTemplate(w, "root", data); err != nil {
 		h.log.Error().Err(err).Msg("Error rendering page")

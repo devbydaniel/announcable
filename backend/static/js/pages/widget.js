@@ -144,7 +144,7 @@ document.addEventListener("alpine:init", () => {
           this.$el.style.color = this.$event.detail.value;
         },
         ["x-init"]() {
-          this.$el.innerText = title;
+          this.$el.innerText = decodeHtml(title);
           this.$el.style.color = widgetTextColor;
         },
       },
@@ -156,7 +156,7 @@ document.addEventListener("alpine:init", () => {
           this.$el.style.color = this.$event.detail.value;
         },
         ["x-init"]() {
-          this.$el.innerText = description || "";
+          this.$el.innerText = decodeHtml(description) || "";
           this.$el.style.color = widgetTextColor;
         },
       },
@@ -218,10 +218,16 @@ document.addEventListener("alpine:init", () => {
           this.$el.style.color = this.$event.detail.value;
         },
         ["x-init"]() {
-          this.$el.innerText = cta;
+          this.$el.innerText = decodeHtml(cta);
           this.$el.style.color = releaseNoteTextColor;
         },
       },
     }),
   );
 });
+
+function decodeHtml(html) {
+  const txt = document.createElement("textarea");
+  txt.innerHTML = html;
+  return txt.value;
+}

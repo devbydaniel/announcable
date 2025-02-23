@@ -2,7 +2,7 @@
   position: absolute;
   inset: 0;
   padding: var(--gap-sm);
-  background: var(--color-mantle);
+  background: var(--color-base);
   border-right: var(--border-width) solid var(--border-color);
   display: flex;
   flex-direction: column;
@@ -12,6 +12,8 @@
   font-weight: var(--font-weight-md);
   margin-bottom: var(--gap-sm);
   font-size: var(--font-size-sm);
+  display: inline-flex;
+  gap: var(--gap-sm);
 }
 .nav__list {
   list-style: none;

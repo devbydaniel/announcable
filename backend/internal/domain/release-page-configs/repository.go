@@ -48,7 +48,7 @@ func (r *repository) Update(orgId uuid.UUID, cfg *ReleasePageConfig, tx *gorm.DB
 		client = r.db.Client
 	}
 
-	if err := client.Model(&ReleasePageConfig{}).Where("organisation_id = ?", orgId).Updates(cfg).Error; err != nil {
+	if err := client.Model(&ReleasePageConfig{}).Where("organisation_id = ?", orgId).Select("Title", "Description", "BgColor", "TextColor", "TextColorMuted", "BrandPosition", "BackLinkLabel", "BackLinkUrl").Updates(cfg).Error; err != nil {
 		log.Error().Err(err).Msg("Error updating landing page config")
 		return err
 	}

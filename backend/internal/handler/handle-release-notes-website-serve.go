@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/devbydaniel/release-notes-go/internal/domain/organisation"
 	releasenotes "github.com/devbydaniel/release-notes-go/internal/domain/release-notes"
@@ -67,11 +68,31 @@ func (h *Handler) HandleReleasePage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rns, err := rnService.GetAllWithImgUrl(org.ID.String(), pageInt, pageSizeInt)
+	filters := map[string]interface{}{
+		"is_published":         true,
+		"hide_on_release_page": false,
+	}
+	rns, err := rnService.GetAllWithImgUrl(org.ID.String(), pageInt, pageSizeInt, filters)
 	if err != nil {
 		h.log.Error().Err(err).Msg("Error getting release notes")
 		http.Error(w, "Error getting release notes", http.StatusInternalServerError)
 		return
+	}
+
+	// format release date
+	for _, rn := range rns.Items {
+		if rn.ReleaseDate != nil {
+			releaseDate, err := time.Parse("2006-01-02", *rn.ReleaseDate)
+			if err != nil {
+				h.log.Error().Err(err).Msg("Error parsing release date")
+				continue
+			}
+			rd := releaseDate.Format("02.01.2006")
+			rn.ReleaseDate = &rd
+		} else {
+			rd := ""
+			rn.ReleaseDate = &rd
+		}
 	}
 
 	data := releaseNotesWebsiteData{

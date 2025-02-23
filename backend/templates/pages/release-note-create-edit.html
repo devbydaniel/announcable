@@ -256,7 +256,7 @@
             </div>
           </div>
         </div>
-        <div class="form__group form__group--no-mb">
+        <div class="form__group">
           <div class="form__label">Attention mechanism</div>
           <div class="form__group__list">
             <div class="checkbox">
@@ -270,7 +270,7 @@
                   checked
                 {{ end }}
               />
-              <label class="checkbox__label" for="hide_cta"
+              <label class="checkbox__label" for="show_indicator"
                 >Show indicator on trigger element</label
               >
             </div>
@@ -287,6 +287,39 @@
               />
               <label class="checkbox__label" for="instant_open"
                 >Instantly open widget on page load</label
+              >
+            </div>
+          </div>
+        </div>
+        <div class="form__group form__group--no-mb">
+          <div class="form__label">Visibility</div>
+          <div class="form__group__list">
+            <div class="checkbox">
+              <input
+                class="checkbox__input"
+                type="checkbox"
+                id="hide_on_widget"
+                name="hide_on_widget"
+                {{ if or (not .Rn) (.Rn.HideOnWidget) }}
+                  checked
+                {{ end }}
+              />
+              <label class="checkbox__label" for="hide_on_widget"
+                >Hide on widget</label
+              >
+            </div>
+            <div class="checkbox">
+              <input
+                class="checkbox__input"
+                type="checkbox"
+                id="hide_on_release_page"
+                name="hide_on_release_page"
+                {{ if or (not .Rn) (.Rn.HideOnReleasePage) }}
+                  checked
+                {{ end }}
+              />
+              <label class="checkbox__label" for="instant_open"
+                >Hide on release page</label
               >
             </div>
           </div>

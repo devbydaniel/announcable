@@ -28,6 +28,8 @@ type releaseNoteCreateForm struct {
 	CtaUrlOverride      string `schema:"cta_url_override"`
 	HideCta             bool   `schema:"hide_cta"`
 	AttentionMechanism  string `schema:"attention_mechanism"`
+	HideOnWidget        bool   `schema:"hide_on_widget"`
+	HideOnReleasePage   bool   `schema:"hide_on_release_page"`
 }
 
 func (h *Handler) HandleReleaseNoteCreate(w http.ResponseWriter, r *http.Request) {
@@ -104,6 +106,8 @@ func (h *Handler) HandleReleaseNoteCreate(w http.ResponseWriter, r *http.Request
 		HideCta:            createDTO.HideCta,
 		AttentionMechanism: releasenotes.AttentionMechanism(createDTO.AttentionMechanism),
 		LastUpdatedBy:      uuid.MustParse(userId),
+		HideOnWidget:       createDTO.HideOnWidget,
+		HideOnReleasePage:  createDTO.HideOnReleasePage,
 	}
 	if createDTO.TextWebsiteOverride == "on" {
 		releaseNote.DescriptionLong = createDTO.DescriptionLong

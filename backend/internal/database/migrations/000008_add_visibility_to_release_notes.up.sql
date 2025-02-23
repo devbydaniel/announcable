@@ -1,0 +1,3 @@
+ALTER TABLE release_notes
+ADD COLUMN hide_on_widget BOOLEAN DEFAULT FALSE,
+ADD COLUMN hide_on_release_page BOOLEAN DEFAULT FALSE;

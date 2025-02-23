@@ -18,6 +18,13 @@
   height: var(--gap-lg);
 }
 
+.lp__go-back {
+  position: absolute;
+  top: var(--gap-md);
+  right: var(--gap-md);
+  font-size: var(--font-size-sm);
+}
+
 .lp__brand {
   height: var(--gap-md);
   width: 6em;
@@ -91,7 +98,7 @@
 }
 
 .config-panel {
-  background-color: var(--color-mantle);
+  background-color: var(--color-base);
   border-left: var(--border-width) solid var(--border-color);
   width: 20em;
   height: 100vh;

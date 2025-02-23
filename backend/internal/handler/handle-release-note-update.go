@@ -26,6 +26,8 @@ type releaseNoteUpdateForm struct {
 	OverrideCtaUrl      bool   `schema:"override_cta_url"`
 	CtaUrlOverride      string `schema:"cta_url_override"`
 	AttentionMechanism  string `schema:"attention_mechanism"`
+	HideOnWidget        string `schema:"hide_on_widget"`
+	HideOnReleasePage   string `schema:"hide_on_release_page"`
 }
 
 func (h *Handler) HandleReleaseNoteUpdate(w http.ResponseWriter, r *http.Request) {
@@ -103,6 +105,7 @@ func (h *Handler) HandleReleaseNoteUpdate(w http.ResponseWriter, r *http.Request
 		}
 	}
 	h.log.Debug().Interface("imgInput", imgInput).Msg("ImageInput")
+	h.log.Debug().Interface("updateDTO", updateDTO).Msg("updateDTO")
 
 	releaseNote := &releasenotes.ReleaseNote{
 		OrganisationID:     uuid.MustParse(orgId),
@@ -111,6 +114,8 @@ func (h *Handler) HandleReleaseNoteUpdate(w http.ResponseWriter, r *http.Request
 		HideCta:            updateDTO.HideCta,
 		AttentionMechanism: releasenotes.AttentionMechanism(updateDTO.AttentionMechanism),
 		LastUpdatedBy:      uuid.MustParse(userId),
+		HideOnWidget:       updateDTO.HideOnWidget == "on",
+		HideOnReleasePage:  updateDTO.HideOnReleasePage == "on",
 	}
 	if updateDTO.TextWebsiteOverride == "on" {
 		releaseNote.DescriptionLong = updateDTO.DescriptionLong

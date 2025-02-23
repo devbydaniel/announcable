@@ -2,15 +2,16 @@
   z-index: 50;
   display: flex;
   justify-content: space-between;
+  align-items: center;
   position: sticky;
   top: 0;
-  padding: var(--gap-sm) var(--gap-xl);
+  padding: var(--gap-md) var(--gap-xl);
   background-color: rgba(255, 255, 255, 0);
   backdrop-filter: blur(10px);
 }
 .header__img {
-  max-width: 8em;
-  max-height: 4em;
+  max-width: 12em;
+  max-height: 6em;
 }
 
 .content {

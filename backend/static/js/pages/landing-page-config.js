@@ -4,6 +4,7 @@ const bgColorChangeEventName = "bg-color-change";
 const textColorChangeEventName = "text-color-change";
 const textColorMutedChangeEventName = "text-color-muted-change";
 const brandPositionChangeEventName = "brand-position-change";
+const backLinkLabelChangeEventName = "back-link-label-change";
 
 document.addEventListener("alpine:init", () => {
   Alpine.data("form", () => ({
@@ -56,6 +57,13 @@ document.addEventListener("alpine:init", () => {
         });
       },
     },
+    backLinkLabel: {
+      ["@input"]() {
+        this.$dispatch(backLinkLabelChangeEventName, {
+          value: this.$event.target.value,
+        });
+      },
+    },
   }));
 
   Alpine.data(
@@ -67,6 +75,7 @@ document.addEventListener("alpine:init", () => {
       textColor,
       textColorMuted,
       brandPosition,
+      backLinkLabel,
     ) => ({
       title: {
         [`@${titleChangeEventName}.window`]() {
@@ -89,6 +98,15 @@ document.addEventListener("alpine:init", () => {
         },
         ["x-init"]() {
           this.$el.innerText = description || "";
+          this.$el.style.color = textColorMuted;
+        },
+      },
+      backLink: {
+        [`@${backLinkLabelChangeEventName}.window`]() {
+          this.$el.innerText = this.$event.detail.value;
+        },
+        ["x-init"]() {
+          this.$el.innerText = decodeHtml(backLinkLabel);
           this.$el.style.color = textColorMuted;
         },
       },
@@ -149,3 +167,9 @@ document.addEventListener("alpine:init", () => {
     }),
   );
 });
+
+function decodeHtml(html) {
+  const txt = document.createElement("textarea");
+  txt.innerHTML = html;
+  return txt.value;
+}

@@ -20,6 +20,8 @@ type lpConfigUpdateForm struct {
 	BgColor           string `schema:"bg_color" validate:"required"`
 	TextColor         string `schema:"text_color" validate:"required"`
 	TextColorMuted    string `schema:"text_color_muted" validate:"required"`
+	BackLinkLabel     string `schema:"back_link_label"`
+	BackLinkUrl       string `schema:"back_link_url"`
 }
 
 func (h *Handler) HandleReleasePageConfigUpdate(w http.ResponseWriter, r *http.Request) {
@@ -93,6 +95,8 @@ func (h *Handler) HandleReleasePageConfigUpdate(w http.ResponseWriter, r *http.R
 		BgColor:        updateDTO.BgColor,
 		TextColor:      updateDTO.TextColor,
 		TextColorMuted: updateDTO.TextColorMuted,
+		BackLinkLabel:  updateDTO.BackLinkLabel,
+		BackLinkUrl:    updateDTO.BackLinkUrl,
 	}
 	h.log.Debug().Interface("lpconfig", lpConfig).Msg("Landing page config to update")
 

@@ -66,7 +66,11 @@ func (h *Handler) HandleReleaseNotesServe(w http.ResponseWriter, r *http.Request
 		http.Error(w, "Error getting widget config", http.StatusInternalServerError)
 		return
 	}
-	releaseNotes, err := releaseNotesService.GetAllWithImgUrl(org.ID.String(), pageInt, pageSizeInt)
+	filters := map[string]interface{}{
+		"is_published":   true,
+		"hide_on_widget": false,
+	}
+	releaseNotes, err := releaseNotesService.GetAllWithImgUrl(org.ID.String(), pageInt, pageSizeInt, filters)
 	if err != nil {
 		h.log.Error().Err(err).Msg("Error getting release notes")
 		http.Error(w, "Error getting release notes", http.StatusInternalServerError)

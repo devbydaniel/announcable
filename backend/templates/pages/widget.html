@@ -21,7 +21,7 @@
 {{ define "main" }}
   <div
     class="release-note"
-    x-data="widget('{{ .Cfg.Title }}', '{{ .Cfg.Description }}', '{{ .Cfg.ReleaseNoteCtaText }}', '{{ .Cfg.WidgetBorderRadius }}', '{{ .Cfg.WidgetBorderColor }}', '{{ .Cfg.WidgetBorderWidth }}', '{{ .Cfg.WidgetBgColor }}', '{{ .Cfg.WidgetTextColor }}', '{{ .Cfg.ReleaseNoteBorderRadius }}', '{{ .Cfg.ReleaseNoteBorderColor }}', '{{ .Cfg.ReleaseNoteBorderWidth }}', '{{ .Cfg.ReleaseNoteBgColor }}', '{{ .Cfg.ReleaseNoteTextColor }}')"
+    x-data="widget('{{ .SafeTitle }}', '{{ .SafeDescription }}', '{{ .SafeReleaseNoteCtaText }}', '{{ .Cfg.WidgetBorderRadius }}', '{{ .Cfg.WidgetBorderColor }}', '{{ .Cfg.WidgetBorderWidth }}', '{{ .Cfg.WidgetBgColor }}', '{{ .Cfg.WidgetTextColor }}', '{{ .Cfg.ReleaseNoteBorderRadius }}', '{{ .Cfg.ReleaseNoteBorderColor }}', '{{ .Cfg.ReleaseNoteBorderWidth }}', '{{ .Cfg.ReleaseNoteBgColor }}', '{{ .Cfg.ReleaseNoteTextColor }}')"
   >
     <div class="release-note__widget" x-bind="widget">
       <div class="release-note__widget__header">

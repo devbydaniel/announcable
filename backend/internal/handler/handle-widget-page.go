@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"html"
 	"net/http"
 
 	widgetconfigs "github.com/devbydaniel/release-notes-go/internal/domain/widget-configs"
@@ -9,8 +10,11 @@ import (
 )
 
 type widgetPageData struct {
-	Title string
-	Cfg   *widgetconfigs.WidgetConfig
+	Title                  string
+	Cfg                    *widgetconfigs.WidgetConfig
+	SafeTitle              string
+	SafeDescription        string
+	SafeReleaseNoteCtaText string
 }
 
 var widgetTmpl = templates.Construct(
@@ -37,8 +41,11 @@ func (h *Handler) HandleWidgetPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := widgetPageData{
-		Title: "Widget Config",
-		Cfg:   cfg,
+		Title:                  "Widget Config",
+		Cfg:                    cfg,
+		SafeTitle:              html.EscapeString(cfg.Title),
+		SafeDescription:        html.EscapeString(cfg.Description),
+		SafeReleaseNoteCtaText: html.EscapeString(cfg.ReleaseNoteCtaText),
 	}
 	if err := widgetTmpl.ExecuteTemplate(w, "root", data); err != nil {
 		h.log.Error().Err(err).Msg("Error rendering page")

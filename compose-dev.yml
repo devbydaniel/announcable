@@ -13,8 +13,9 @@ services:
     entrypoint: >
       /bin/sh -c "
       apt-get update &&
-      apt-get install -y libwebp-dev &&
-      air
+      apt-get install -y libwebp-dev build-essential &&
+      go install github.com/a-h/templ/cmd/templ@latest &&
+      air -d
       "
 
   mail:

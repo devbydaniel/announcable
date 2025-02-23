@@ -20,6 +20,8 @@ type ReleasePageConfig struct {
 	TextColor          string `gorm:"type:varchar(255)"`
 	TextColorMuted     string `gorm:"type:varchar(255)"`
 	BrandPosition      string `gorm:"type:varchar(255)"`
+	BackLinkLabel      string `gorm:"type:varchar(255)"`
+	BackLinkUrl        string `gorm:"type:varchar(255)"`
 }
 
 type BrandPosition string

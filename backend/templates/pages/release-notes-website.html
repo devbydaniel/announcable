@@ -20,6 +20,15 @@
             src="{{ $.Cfg.ImageUrl }}"
             alt="Brand logo"
           />
+          {{ with (and $.Cfg.BackLinkUrl $.Cfg.BackLinkLabel) }}
+            <a
+              href="{{ . }}"
+              class="header__back-link"
+              style="color: {{ $.Cfg.TextColor }}"
+            >
+              {{ $.Cfg.BackLinkLabel }}
+            </a>
+          {{ end }}
         </header>
       {{ end }}
       <main class="content">

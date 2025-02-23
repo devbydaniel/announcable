@@ -55,7 +55,7 @@
 }
 
 .config-panel {
-  background-color: var(--color-mantle);
+  background-color: var(--color-base);
   border-left: var(--border-width) solid var(--border-color);
   width: 20em;
   height: 100vh;
