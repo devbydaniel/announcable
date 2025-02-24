@@ -96,6 +96,7 @@ func createBuckets(client *minio.Client, ctx context.Context) error {
 }
 
 func (o *ObjStore) GetImageUrl(bucket, path string) (string, error) {
+	cfg := config.New()
 	ctx := context.Background()
 	// check if object exists
 	_, err := o.Client.StatObject(ctx, bucket, path, minio.StatObjectOptions{})
@@ -115,7 +116,7 @@ func (o *ObjStore) GetImageUrl(bucket, path string) (string, error) {
 	}
 	// in development, we need to proxy the URL through the API
 	// because Minio doesn't support different URLs for signing and accessing
-	urlProxy := strings.Replace(url.String(), "http://objstorage:9000", "/img", 1)
+	urlProxy := strings.Replace(url.String(), "http://objstorage:9000", "http://"+cfg.BaseURL+"/api/img", 1)
 	return urlProxy, nil
 }
 

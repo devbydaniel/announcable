@@ -109,34 +109,9 @@ func (s *service) GetAllWithImgUrl(orgId string, page, pageSize int, filters map
 	return rns, nil
 }
 
-func (s *service) GetStatus(orgId string) ([]*ReleaseNoteStatus, error) {
+func (s *service) GetStatus(orgId string, filters map[string]interface{}) ([]*ReleaseNoteStatus, error) {
 	log.Trace().Str("orgId", orgId).Msg("GetStatus")
-	return s.repo.GetStatus(orgId)
-}
-
-func (s *service) GetAllPublished(orgId string, page, pageSize int) (*PaginatedReleaseNotes, error) {
-	log.Trace().Str("orgId", orgId).Msg("GetAllPublished")
-	filter := map[string]interface{}{"IsPublished": true}
-	rns, err := s.repo.FindAll(orgId, page, pageSize, filter)
-	if err != nil {
-		log.Error().Err(err).Msg("Error finding release notes by organisation ID")
-		return nil, err
-	}
-	for _, rn := range rns.Items {
-		if rn.ReleaseDate != nil {
-			rd := (*rn.ReleaseDate)[:10]
-			rn.ReleaseDate = &rd
-		}
-		if rn.ImagePath != "" {
-			imgUrl, err := s.repo.GetImageUrl(rn.ImagePath)
-			if err != nil {
-				log.Error().Err(err).Msg("Error getting image URL")
-			} else {
-				rn.ImageUrl = imgUrl
-			}
-		}
-	}
-	return rns, nil
+	return s.repo.GetStatus(orgId, filters)
 }
 
 func (s *service) GetOne(id, orgId string) (*ReleaseNote, error) {

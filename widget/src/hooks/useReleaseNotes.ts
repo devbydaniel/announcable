@@ -6,7 +6,7 @@ interface Props {
   orgId: string;
 }
 export default function useReleaseNotes({ orgId }: Props) {
-  const url = `${backendUrl}/api/release-notes/${orgId}`;
+  const url = `${backendUrl}/api/release-notes/${orgId}?for=widget`;
   const { data, isLoading, error } = useQuery({
     queryKey: ["release-notes", orgId],
     queryFn: async () => {
@@ -17,7 +17,7 @@ export default function useReleaseNotes({ orgId }: Props) {
         },
       });
       const { data } = await res.json();
-      return data as ReleaseNote[];
+      return (data || []) as ReleaseNote[];
     },
   });
 

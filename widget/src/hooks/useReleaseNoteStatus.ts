@@ -11,7 +11,7 @@ export default function useReleaseNoteStatus({ orgId }: { orgId: string }) {
     queryKey: ["releaseNoteStatus", orgId],
     queryFn: async () => {
       const response = await fetch(
-        `${backendUrl}/api/release-notes/${orgId}/status`,
+        `${backendUrl}/api/release-notes/${orgId}/status?for=widget`,
       );
       if (!response.ok) {
         throw new Error("Failed to fetch release note status");

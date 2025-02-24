@@ -33,6 +33,9 @@ func (h *Handler) HandleReleaseNotesServe(w http.ResponseWriter, r *http.Request
 	h.log.Trace().Msg("HandleReleaseNotesServe")
 	organisationService := organisation.NewService(*organisation.NewRepository(h.DB))
 	releaseNotesService := releasenotes.NewService(*releasenotes.NewRepository(h.DB, h.ObjStore))
+	forWidgetOrWebsite := r.URL.Query().Get("for")
+	h.log.Debug().Str("for", forWidgetOrWebsite).Msg("For widget or website")
+	h.log.Debug().Msg("Getting page and pageSize")
 	page := r.URL.Query().Get("page")
 	if page == "" {
 		page = "1"
@@ -67,9 +70,15 @@ func (h *Handler) HandleReleaseNotesServe(w http.ResponseWriter, r *http.Request
 		return
 	}
 	filters := map[string]interface{}{
-		"is_published":   true,
-		"hide_on_widget": false,
+		"is_published": true,
 	}
+	if forWidgetOrWebsite == "widget" {
+		filters["hide_on_widget"] = false
+	}
+	if forWidgetOrWebsite == "website" {
+		filters["hide_on_release_page"] = false
+	}
+
 	releaseNotes, err := releaseNotesService.GetAllWithImgUrl(org.ID.String(), pageInt, pageSizeInt, filters)
 	if err != nil {
 		h.log.Error().Err(err).Msg("Error getting release notes")
@@ -94,6 +103,7 @@ func (h *Handler) HandleReleaseNotesServe(w http.ResponseWriter, r *http.Request
 		} else {
 			releaseDate = ""
 		}
+		h.log.Debug().Str("releaseDate", releaseDate).Msg("Release date")
 		res.Data = append(res.Data, serveReleaseNotesWidgetResponseBodyReleaseNotes{
 			ID:                 rn.ID.String(),
 			Title:              rn.Title,

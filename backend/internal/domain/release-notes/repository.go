@@ -82,10 +82,23 @@ func (r *repository) UpdateWithNil(id uuid.UUID, data map[string]interface{}, tx
 	return nil
 }
 
-func (r *repository) GetStatus(orgId string) ([]*ReleaseNoteStatus, error) {
+func (r *repository) GetStatus(orgId string, filters map[string]interface{}) ([]*ReleaseNoteStatus, error) {
 	log.Trace().Str("orgId", orgId).Msg("GetStatus")
 	var statuses []*ReleaseNoteStatus
-	if err := r.db.Client.Model(&ReleaseNote{}).Select("updated_at, attention_mechanism").Where("organisation_id = ?", orgId).Find(&statuses).Error; err != nil {
+
+	// Base query conditions
+	query := r.db.Client.Model(&ReleaseNote{}).
+		Select("updated_at, attention_mechanism").
+		Where("organisation_id = ?", orgId).Where("is_published = ?", true)
+
+	// Apply additional filters if any
+	if len(filters) > 0 {
+		for key, value := range filters {
+			query = query.Where(key+" = ?", value)
+		}
+	}
+
+	if err := query.Find(&statuses).Error; err != nil {
 		log.Error().Err(err).Msg("Error getting release note statuses")
 		return nil, err
 	}
