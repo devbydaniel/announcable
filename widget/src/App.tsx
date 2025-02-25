@@ -12,7 +12,7 @@ import withSkeleton from "./components/hoc/withSkeleton";
 import type { WidgetInit } from "./lib/types";
 import useReleaseNotes from "./hooks/useReleaseNotes";
 import useWidgetConfig from "./hooks/useConfig";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import useWidgetToggle from "./hooks/useWidgetToggle";
 import useAnchorsRef from "./hooks/useAnchorsRef";
 import useReleaseNoteStatus, {
@@ -31,9 +31,14 @@ export default function App({ init }: Props) {
     querySelector: init.anchor_query_selector,
   });
 
-  const { data: releaseNoteStatus } = useReleaseNoteStatus({
-    orgId: init.org_id,
-  });
+  const queryParams = useMemo(
+    () => ({
+      orgId: init.org_id,
+    }),
+    [init.org_id],
+  );
+
+  const { data: releaseNoteStatus } = useReleaseNoteStatus(queryParams);
 
   const hasUnseenValue = hasUnseenReleaseNotes({
     lastOpened,

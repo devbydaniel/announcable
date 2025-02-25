@@ -19,7 +19,9 @@ export default function useReleaseNoteStatus({ orgId }: { orgId: string }) {
       const json = await response.json();
       return (json.data || []) as ReleaseNoteStatus[];
     },
-    // Refresh every 5 minutes
-    refetchInterval: 5 * 60 * 1000,
+    staleTime: Infinity,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
   });
 }
