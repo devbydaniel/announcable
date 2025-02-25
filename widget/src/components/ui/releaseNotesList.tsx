@@ -8,6 +8,7 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import type { ReleaseNote } from "@/lib/types";
+import { Skeleton } from "./skeleton";
 
 interface ReleaseNotesListProps {
   children: React.ReactNode;
@@ -82,6 +83,92 @@ export function ReleaseNoteEntry({
               </a>
             </div>
           )}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+export function ReleaseNoteSkeleton(props: { config: WidgetConfig }) {
+  const { config } = props;
+  const skeletonBgColor = config.widget_bg_color;
+  const skeletonBorderRadius = config.release_note_border_radius;
+  return (
+    <Card
+      style={{
+        borderRadius: config.release_note_border_radius,
+        borderColor: config.release_note_border_color,
+        borderWidth: config.release_note_border_width,
+        color: config.release_note_font_color,
+        backgroundColor: config.release_note_bg_color,
+      }}
+    >
+      <CardHeader className="pb-4">
+        <div className="space-y-2">
+          <Skeleton
+            className={`h-7 w-3/4`}
+            style={{
+              backgroundColor: skeletonBgColor,
+              borderRadius: skeletonBorderRadius,
+            }}
+          />
+          <Skeleton
+            className={`h-4 w-1/4`}
+            style={{
+              backgroundColor: skeletonBgColor,
+              borderRadius: skeletonBorderRadius,
+            }}
+          />
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="w-full flex flex-col gap-4">
+          <Skeleton
+            className={`h-48 w-full `}
+            style={{
+              backgroundColor: skeletonBgColor,
+              borderRadius: skeletonBorderRadius,
+            }}
+          />
+          <div className="space-y-2">
+            <Skeleton
+              className={`h-4 w-full`}
+              style={{
+                backgroundColor: skeletonBgColor,
+                borderRadius: skeletonBorderRadius,
+              }}
+            />
+            <Skeleton
+              className={`h-4 w-full`}
+              style={{
+                backgroundColor: skeletonBgColor,
+                borderRadius: skeletonBorderRadius,
+              }}
+            />
+            <Skeleton
+              className={`h-4 w-full`}
+              style={{
+                backgroundColor: skeletonBgColor,
+                borderRadius: skeletonBorderRadius,
+              }}
+            />
+            <Skeleton
+              className={`h-4 w-3/4`}
+              style={{
+                backgroundColor: skeletonBgColor,
+                borderRadius: skeletonBorderRadius,
+              }}
+            />
+          </div>
+          <div className="w-full flex justify-center">
+            <Skeleton
+              className={`h-4 w-24`}
+              style={{
+                backgroundColor: skeletonBgColor,
+                borderRadius: skeletonBorderRadius,
+              }}
+            />
+          </div>
         </div>
       </CardContent>
     </Card>

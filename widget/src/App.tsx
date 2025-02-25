@@ -1,14 +1,13 @@
 import { Button } from "./components/ui/button";
 import { Gift } from "lucide-react";
 import Widget from "./components/widget";
-import { Skeleton } from "./components/ui/skeleton";
 import { ErrorPanel } from "./components/ui/errorPanel";
 import {
   ReleaseNotesList,
   ReleaseNoteEntry,
+  ReleaseNoteSkeleton,
 } from "./components/ui/releaseNotesList";
 import { Indicator, AnchorIndicator } from "./components/ui/indicator";
-import withSkeleton from "./components/hoc/withSkeleton";
 import type { WidgetInit } from "./lib/types";
 import useReleaseNotes from "./hooks/useReleaseNotes";
 import useWidgetConfig from "./hooks/useConfig";
@@ -111,10 +110,7 @@ function WidgetContent({ init, isOpen, onClose }: WidgetContentProps) {
   } = useWidgetConfig({ orgId: init.org_id });
 
   const isReadyToMount =
-    !releaseNotesAreLoading &&
-    !widgetConfigIsLoading &&
-    !releaseNotesError &&
-    !widgetConfigError;
+    !widgetConfigIsLoading && !releaseNotesError && !widgetConfigError;
 
   useEffect(() => {
     if (releaseNotesError) {
@@ -141,26 +137,19 @@ function WidgetContent({ init, isOpen, onClose }: WidgetContentProps) {
         {releaseNotesError || widgetConfigError ? (
           <ErrorPanel />
         ) : (
-          withSkeleton(() => (
-            <ReleaseNotesList>
-              {releaseNotes!.map((item, i) => (
+          <ReleaseNotesList>
+            {releaseNotesAreLoading ? (
+              <ReleaseNoteSkeleton config={widgetConfig!} />
+            ) : (
+              releaseNotes!.map((releaseNote) => (
                 <ReleaseNoteEntry
+                  key={releaseNote.id}
                   config={widgetConfig!}
-                  key={i}
-                  releaseNote={item}
+                  releaseNote={releaseNote}
                 />
-              ))}
-            </ReleaseNotesList>
-          ))({
-            skeleton: (
-              <ReleaseNotesList>
-                {Array.from({ length: 3 }).map((_, i) => (
-                  <Skeleton key={i} className="h-24" />
-                ))}
-              </ReleaseNotesList>
-            ),
-            isLoading: releaseNotesAreLoading,
-          })
+              ))
+            )}
+          </ReleaseNotesList>
         )}
       </Widget>
     </div>

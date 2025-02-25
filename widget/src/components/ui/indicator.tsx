@@ -28,7 +28,6 @@ export function AnchorIndicator({
   const indicatorRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     if (anchorElement) {
-      console.log("ANCHOR", anchorElement);
       const indicator = document.createElement("div");
       // set style of the indicator
       // through style property because of shadow DOM
