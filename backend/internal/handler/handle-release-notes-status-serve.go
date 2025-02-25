@@ -20,7 +20,7 @@ type releaseNotesStatusResponseBody struct {
 }
 
 func (h *Handler) HandleReleaseNotesStatusServe(w http.ResponseWriter, r *http.Request) {
-	h.log.Trace().Msg("HandleReleaseNotesServe")
+	h.log.Trace().Msg("HandleReleaseNotesStatusServe")
 	organisationService := organisation.NewService(*organisation.NewRepository(h.DB))
 	releaseNotesService := releasenotes.NewService(*releasenotes.NewRepository(h.DB, h.ObjStore))
 	forWidgetOrWebsite := r.URL.Query().Get("for")
