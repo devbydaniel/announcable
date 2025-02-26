@@ -36,10 +36,11 @@ input,
 textarea {
   background: var(--color-surface0);
   color: var(--color-text);
+  line-height: var(--gap-lg);
 }
 
 textarea {
-  min-height: 5rem;
+  min-height: 8rem;
 }
 
 button {

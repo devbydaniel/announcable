@@ -15,20 +15,22 @@
     <body style="background-color: {{ .Cfg.BgColor }};">
       {{ with eq .Cfg.BrandPosition "left" }}
         <header class="header">
-          <img
-            class="header__img"
-            src="{{ $.Cfg.ImageUrl }}"
-            alt="Brand logo"
-          />
-          {{ with (and $.Cfg.BackLinkUrl $.Cfg.BackLinkLabel) }}
-            <a
-              href="{{ . }}"
-              class="header__back-link"
-              style="color: {{ $.Cfg.TextColor }}"
-            >
-              {{ $.Cfg.BackLinkLabel }}
-            </a>
-          {{ end }}
+          <div class="header__content">
+            <img
+              class="header__img"
+              src="{{ $.Cfg.ImageUrl }}"
+              alt="Brand logo"
+            />
+            {{ with (and $.Cfg.BackLinkUrl $.Cfg.BackLinkLabel) }}
+              <a
+                href="{{ $.Cfg.BackLinkUrl }}"
+                class="header__back-link"
+                style="color: {{ $.Cfg.TextColorMuted }}"
+              >
+                {{ $.Cfg.BackLinkLabel }}
+              </a>
+            {{ end }}
+          </div>
         </header>
       {{ end }}
       <main class="content">
@@ -108,7 +110,7 @@
         >
         <a
           style="color: {{ .Cfg.TextColorMuted }}"
-          href="/terms"
+          href="https://announcable.me/imprint"
           class="footer__link"
           >Imprint</a
         >

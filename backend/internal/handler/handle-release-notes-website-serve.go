@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"net/url"
 	"strconv"
 	"time"
 
@@ -22,6 +23,8 @@ var releaseNotesWebsiteTmpl = templates.Construct("release-notes-website", "page
 
 func (h *Handler) HandleReleasePage(w http.ResponseWriter, r *http.Request) {
 	h.log.Trace().Msg("HandleReleasePage")
+	backLinkLabel := r.URL.Query().Get("backLinkLabel")
+	backLinkUrl := r.URL.Query().Get("backLinkUrl")
 	organisationService := organisation.NewService(*organisation.NewRepository(h.DB))
 	releasePageConfigService := releasepageconfig.NewService(*releasepageconfig.NewRepository(h.DB, h.ObjStore))
 	rnService := releasenotes.NewService(*releasenotes.NewRepository(h.DB, h.ObjStore))
@@ -93,6 +96,14 @@ func (h *Handler) HandleReleasePage(w http.ResponseWriter, r *http.Request) {
 			rd := ""
 			rn.ReleaseDate = &rd
 		}
+	}
+
+	// adjust back link if there's query params
+	if backLinkUrl != "" {
+		config.BackLinkUrl = url.QueryEscape(backLinkUrl)
+	}
+	if backLinkLabel != "" {
+		config.BackLinkLabel = url.QueryEscape(backLinkLabel)
 	}
 
 	data := releaseNotesWebsiteData{
