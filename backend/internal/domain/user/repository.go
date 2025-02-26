@@ -76,15 +76,15 @@ func (r *repository) Delete(id uuid.UUID) error {
 	return nil
 }
 
-func (r *repository) ConfirmTosNow(id uuid.UUID) error {
+func (r *repository) ConfirmTosNow(id uuid.UUID) (string, error) {
 	log.Trace().Str("id", id.String()).Msg("ConfirmTos")
 	currentVersion := config.New().Legal.ToSVersion
 	tosConfim := &TosConfirm{UserID: id, Version: currentVersion, ConfirmedAt: time.Now()}
 	if err := r.db.Client.Create(tosConfim).Error; err != nil {
 		log.Error().Err(err).Msg("Error confirming ToS")
-		return err
+		return "", err
 	}
-	return nil
+	return currentVersion, nil
 }
 
 func (r *repository) GetLatestTosVersion(id uuid.UUID) (string, error) {
@@ -97,15 +97,15 @@ func (r *repository) GetLatestTosVersion(id uuid.UUID) (string, error) {
 	return tos.Version, nil
 }
 
-func (r *repository) ConfirmPrivacyPolicyNow(id uuid.UUID) error {
+func (r *repository) ConfirmPrivacyPolicyNow(id uuid.UUID) (string, error) {
 	log.Trace().Str("id", id.String()).Msg("PrivacyPolicyConfirm")
 	currentVersion := config.New().Legal.PPVersion
 	ppConfirm := &PrivacyPolicyConfirm{UserID: id, Version: currentVersion, ConfirmedAt: time.Now()}
 	if err := r.db.Client.Create(ppConfirm).Error; err != nil {
 		log.Error().Err(err).Msg("Error confirming Privacy Policy")
-		return err
+		return "", err
 	}
-	return nil
+	return currentVersion, nil
 }
 
 func (r *repository) GetLatestPrivacyPolicyVersion(id uuid.UUID) (string, error) {

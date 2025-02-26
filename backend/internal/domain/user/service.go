@@ -1,12 +1,14 @@
 package user
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/devbydaniel/release-notes-go/config"
 	"github.com/devbydaniel/release-notes-go/internal/email"
 	"github.com/devbydaniel/release-notes-go/internal/password"
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type service struct {
@@ -92,22 +94,34 @@ func (s *service) SendPwResetEmail(u *User, token string) error {
 	return nil
 }
 
-func (s *service) ConfirmTosNow(id uuid.UUID) error {
+func (s *service) ConfirmTosNow(id uuid.UUID) (string, error) {
 	log.Trace().Str("id", id.String()).Msg("ConfirmTos")
 	return s.repo.ConfirmTosNow(id)
 }
 
-func (s *service) ConfirmPrivacyPolicyNow(id uuid.UUID) error {
+func (s *service) ConfirmPrivacyPolicyNow(id uuid.UUID) (string, error) {
 	log.Trace().Str("id", id.String()).Msg("ConfirmPrivacyPolicy")
 	return s.repo.ConfirmPrivacyPolicyNow(id)
 }
 
 func (s *service) GetLatestTosVersion(id uuid.UUID) (string, error) {
 	log.Trace().Str("id", id.String()).Msg("GetLatestTosConfirm")
-	return s.repo.GetLatestTosVersion(id)
+	version, err := s.repo.GetLatestTosVersion(id)
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		log.Trace().Msg("ToS not found, creating...") // TODO: remove
+		return s.repo.ConfirmTosNow(id)
+	}
+	log.Debug().Str("version", version).Msg("GetLatestTosVersion")
+	return version, err
 }
 
 func (s *service) GetLatestPrivacyPolicyVersion(id uuid.UUID) (string, error) {
 	log.Trace().Str("id", id.String()).Msg("GetLatestPrivacyPolicyVersion")
-	return s.repo.GetLatestPrivacyPolicyVersion(id)
+	version, err := s.repo.GetLatestPrivacyPolicyVersion(id)
+	if errors.Is(err, s.repo.db.ErrRecordNotFound) {
+		log.Trace().Msg("Privacy Policy not found, creating...") // TODO: remove
+		return s.repo.ConfirmPrivacyPolicyNow(id)
+	}
+	log.Debug().Str("version", version).Msg("GetLatestPrivacyPolicyVersion")
+	return version, err
 }

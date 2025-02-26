@@ -87,13 +87,13 @@ func (h *Handler) HandleRegister(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error creating user", http.StatusInternalServerError)
 		return
 	}
-	if err := userService.ConfirmPrivacyPolicyNow(user.ID); err != nil {
+	if _, err := userService.ConfirmPrivacyPolicyNow(user.ID); err != nil {
 		h.log.Error().Err(err).Msg("Error creating user")
 		userService.Delete(user.ID)
 		http.Error(w, "Error confirming privacy policy", http.StatusInternalServerError)
 		return
 	}
-	if err := userService.ConfirmTosNow(user.ID); err != nil {
+	if _, err := userService.ConfirmTosNow(user.ID); err != nil {
 		h.log.Error().Err(err).Msg("Error creating user")
 		userService.Delete(user.ID)
 		http.Error(w, "Error confirming terms of service", http.StatusInternalServerError)
