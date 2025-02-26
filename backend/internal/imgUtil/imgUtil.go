@@ -109,14 +109,27 @@ func Encode(img image.Image, format SupportedFormat) (*io.Reader, error) {
 	targetFormat := format.ToEncodedFormat()
 	switch targetFormat {
 	case WebP:
-		options, err := encoder.NewLossyEncoderOptions(encoder.PresetDefault, 75)
-		if err != nil {
-			return nil, err
+		if format == PNG {
+			// Use lossless for PNG (which often has transparency)
+			options, err := encoder.NewLosslessEncoderOptions(encoder.PresetDefault, 6)
+			if err != nil {
+				return nil, err
+			}
+			if err := webp.Encode(imgBuf, img, options); err != nil {
+				return nil, err
+			}
+			log.Debug().Msg("PNG image encoded as lossless WebP")
+		} else {
+			// For JPEG (no transparency), use lossy with high quality
+			options, err := encoder.NewLossyEncoderOptions(encoder.PresetPhoto, 90)
+			if err != nil {
+				return nil, err
+			}
+			if err := webp.Encode(imgBuf, img, options); err != nil {
+				return nil, err
+			}
+			log.Debug().Msg("JPEG image encoded as lossy WebP")
 		}
-		if err := webp.Encode(imgBuf, img, options); err != nil {
-			return nil, err
-		}
-		log.Debug().Msg("Image encoded as WebP")
 	default:
 		return nil, errors.New("unsupported image format")
 	}
