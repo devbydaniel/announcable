@@ -190,7 +190,7 @@ func main() {
 			MaxAge:           300, // Maximum value not ignored by any of major browsers
 
 		}))
-		r.Get("/{orgId}", handler.HandleReleasePage)
+		r.Get("/{orgSlug}", handler.HandleReleasePage)
 	})
 
 	// STATIC

@@ -25,6 +25,13 @@
               disabled
               value="{{ .WidgetID }}"
             />
+            <button
+              type="button"
+              class="button button--square button--sm button--ghost"
+              onclick="navigator.clipboard.writeText('{{ .WidgetID }}'); toastSuccess('Copied to clipboard')"
+            >
+              <i data-feather="copy" width="16" height="16"></i>
+            </button>
           </div>
           <label for="widget_id" class="form__subtext"
             >This is your unique widget ID. Use this ID to embed the widget on
@@ -34,20 +41,14 @@
       </div>
       <div class="card__footer">
         <button
-          class="button button--square button--sm button--ghost"
+          class="button"
           hx-patch="/widget-config/external-id"
           hx-swap="none"
           hx-confirm="You will need to update the widget configuration in your product before the widget can display release notes again."
           @htmx:response-error.camel="onSubmitError"
           @custom:submit-success="onSubmitSuccess"
         >
-          <i data-feather="repeat" width="16" height="16"></i>
-        </button>
-        <button
-          class="button"
-          onclick="navigator.clipboard.writeText('{{ .WidgetID }}'); toastSuccess('Copied to clipboard')"
-        >
-          Copy to Clipboard
+          Regenerate
         </button>
       </div>
     </div>
@@ -70,6 +71,26 @@
           @htmx:response-error.camel="onSubmitError"
           @custom:submit-success="onSubmitSuccess"
         >
+          <div class="form__group" x-show="!useCustomURL" x-transition>
+            <label class="form__label">URL</label>
+            <div class="input-row">
+              <input
+                id="slug"
+                type="text"
+                class="form__input"
+                name=""
+                disabled
+                value="{{ .ReleasePageUrl }}"
+              />
+              <button
+                type="button"
+                class="button button--square button--sm button--ghost"
+                onclick="navigator.clipboard.writeText('{{ .ReleasePageUrl }}'); toastSuccess('Copied to clipboard')"
+              >
+                <i data-feather="copy" width="16" height="16"></i>
+              </button>
+            </div>
+          </div>
           <div class="form__group">
             <div class="form__radio">
               <input

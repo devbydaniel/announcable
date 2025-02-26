@@ -2,6 +2,7 @@
   <form
     hx-patch="/release-notes/{{ . }}/publish"
     hx-swap="outerHTML"
+    hx-confirm="Are you sure you want to publish this release note?"
     @htmx:response-error.camel="toastError('Error updating release note')"
   >
     <input hidden name="publish" value="true" />
@@ -10,7 +11,12 @@
 {{ end }}
 
 {{ define "hx-unpublish-rn-button" }}
-  <form hx-patch="/release-notes/{{ . }}/publish" hx-swap="outerHTML">
+  <form
+    hx-patch="/release-notes/{{ . }}/publish"
+    hx-swap="outerHTML"
+    hx-confirm="Are you sure you want to unpublish this release note?"
+    @htmx:response-error.camel="toastError('Error updating release note')"
+  >
     <input hidden name="publish" value="false" />
     <button class="button button--error" type="submit">Unpublish</button>
   </form>

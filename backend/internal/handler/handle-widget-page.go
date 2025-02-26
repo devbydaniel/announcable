@@ -1,12 +1,14 @@
 package handler
 
 import (
+	"errors"
 	"html"
 	"net/http"
 
 	widgetconfigs "github.com/devbydaniel/release-notes-go/internal/domain/widget-configs"
 	mw "github.com/devbydaniel/release-notes-go/internal/middleware"
 	"github.com/devbydaniel/release-notes-go/templates"
+	"github.com/google/uuid"
 )
 
 type widgetPageData struct {
@@ -35,9 +37,21 @@ func (h *Handler) HandleWidgetPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// get widget config
-	cfg, err := widgetService.Get(orgId)
+	var cfg *widgetconfigs.WidgetConfig
+	cfg, err := widgetService.Get(uuid.MustParse(orgId))
 	if err != nil {
-		http.Error(w, "Error getting widget config", http.StatusInternalServerError)
+		if errors.Is(err, h.DB.ErrRecordNotFound) {
+			// this should not happen, just in case...
+			h.log.Warn().Msg("Widget config not found, creating...")
+			cfg, err = widgetService.Init(uuid.MustParse(orgId))
+			if err != nil {
+				h.log.Error().Err(err).Msg("Error creating widget config")
+				http.Error(w, "Error creating widget config", http.StatusInternalServerError)
+				return
+			}
+		} else {
+			http.Error(w, "Error getting widget config", http.StatusInternalServerError)
+		}
 	}
 
 	data := widgetPageData{

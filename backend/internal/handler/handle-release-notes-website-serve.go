@@ -11,7 +11,6 @@ import (
 	releasepageconfig "github.com/devbydaniel/release-notes-go/internal/domain/release-page-configs"
 	"github.com/devbydaniel/release-notes-go/templates"
 	"github.com/go-chi/chi/v5"
-	"github.com/google/uuid"
 )
 
 type releaseNotesWebsiteData struct {
@@ -50,23 +49,23 @@ func (h *Handler) HandleReleasePage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	externalOrgId := chi.URLParam(r, "orgId")
-	if externalOrgId == "" {
-		h.log.Error().Msg("Org ID not found in URL")
+	orgSlug := chi.URLParam(r, "orgSlug")
+	if orgSlug == "" {
+		h.log.Error().Msg("Org slug not found in URL")
 		http.Error(w, "Error getting widget config", http.StatusBadRequest)
 		return
 	}
 
-	org, err := organisationService.GetOrgByExternalId(uuid.MustParse(externalOrgId))
+	config, err := releasePageConfigService.GetBySlug(orgSlug)
 	if err != nil {
-		h.log.Error().Err(err).Msg("Error getting org ID")
+		h.log.Error().Err(err).Msg("Error getting widget config")
 		http.Error(w, "Error getting widget config", http.StatusInternalServerError)
 		return
 	}
 
-	config, err := releasePageConfigService.Get(org.ID)
+	org, err := organisationService.GetOrg(config.OrganisationID)
 	if err != nil {
-		h.log.Error().Err(err).Msg("Error getting widget config")
+		h.log.Error().Err(err).Msg("Error getting org ID")
 		http.Error(w, "Error getting widget config", http.StatusInternalServerError)
 		return
 	}

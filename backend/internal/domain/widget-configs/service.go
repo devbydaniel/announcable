@@ -13,6 +13,37 @@ func NewService(r repository) *service {
 	return &service{repo: r}
 }
 
+func DefaultConfig(orgId uuid.UUID) *WidgetConfig {
+	log.Trace().Str("orgId", orgId.String()).Msg("DefaultConfig")
+	return &WidgetConfig{
+		OrganisationID:          orgId,
+		Title:                   "Release Notes",
+		Description:             "See what's new",
+		WidgetBorderRadius:      12,
+		WidgetBorderColor:       "#7c7f93",
+		WidgetBorderWidth:       1,
+		WidgetBgColor:           "#e6e9ef",
+		WidgetTextColor:         "#4c4f69",
+		WidgetType:              "modal",
+		ReleaseNoteBorderRadius: 12,
+		ReleaseNoteBorderColor:  "#7c7f93",
+		ReleaseNoteBorderWidth:  1,
+		ReleaseNoteBgColor:      "#eff1f5",
+		ReleaseNoteTextColor:    "#4c4f69",
+		ReleaseNoteCtaText:      "View Release Notes",
+	}
+}
+
+func (s *service) Init(orgId uuid.UUID) (*WidgetConfig, error) {
+	log.Trace().Str("orgId", orgId.String()).Msg("Init")
+	cfg := DefaultConfig(orgId)
+	if err := s.repo.Create(cfg); err != nil {
+		log.Error().Err(err).Msg("Error creating default widget config")
+		return cfg, err
+	}
+	return cfg, nil
+}
+
 func (s *service) Create(cfg *WidgetConfig) (uuid.UUID, error) {
 	log.Trace().Msg("Create")
 	if err := s.repo.Create(cfg); err != nil {
@@ -22,7 +53,7 @@ func (s *service) Create(cfg *WidgetConfig) (uuid.UUID, error) {
 	return cfg.ID, nil
 }
 
-func (s *service) UpdateBaseUrl(orgId string, baseUrl *string) error {
+func (s *service) UpdateBaseUrl(orgId uuid.UUID, baseUrl *string) error {
 	log.Trace().Msg("UpdateBaseUrl")
 	updateMap := map[string]interface{}{
 		"ReleasePageBaseUrl": baseUrl,
@@ -34,8 +65,8 @@ func (s *service) UpdateBaseUrl(orgId string, baseUrl *string) error {
 	return nil
 }
 
-func (s *service) Get(orgId string) (*WidgetConfig, error) {
-	log.Trace().Str("orgId", orgId).Msg("Get")
+func (s *service) Get(orgId uuid.UUID) (*WidgetConfig, error) {
+	log.Trace().Str("orgId", orgId.String()).Msg("Get")
 	cfg, err := s.repo.Get(orgId)
 	if err != nil {
 		log.Error().Err(err).Msg("Error finding widget config by organisation ID")
@@ -44,7 +75,7 @@ func (s *service) Get(orgId string) (*WidgetConfig, error) {
 	return cfg, nil
 }
 
-func (s *service) Update(orgId string, cfg *WidgetConfig) error {
+func (s *service) Update(orgId uuid.UUID, cfg *WidgetConfig) error {
 	log.Trace().Msg("Update")
 	if err := s.repo.Update(orgId, cfg); err != nil {
 		log.Error().Err(err).Msg("Error updating widget config")

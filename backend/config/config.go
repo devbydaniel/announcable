@@ -43,6 +43,11 @@ type emailConfig struct {
 	PostmarkToken     string
 }
 
+type legal struct {
+	ToSVersion string
+	PPVersion  string
+}
+
 type config struct {
 	Env         string
 	BaseURL     string
@@ -52,6 +57,7 @@ type config struct {
 	PgAdmin     pgAdminConfig
 	Email       emailConfig
 	ProductInfo productInfo
+	Legal       legal
 }
 
 func New() *config {
@@ -59,6 +65,10 @@ func New() *config {
 		Env:     getEnv("ENV"),
 		BaseURL: getEnv("BASE_URL"),
 		Port:    getEnvAsInt("PORT"),
+		Legal: legal{
+			ToSVersion: getEnv("TOS_VERSION"),
+			PPVersion:  getEnv("PP_VERSION"),
+		},
 		Postgres: postgresConfig{
 			Host:     getEnv("POSTGRES_HOST"),
 			Port:     getEnvAsInt("POSTGRES_PORT"),

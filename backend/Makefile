@@ -19,6 +19,9 @@ migrations-down:
 migration-down-all:
 	migrate -database ${POSTGRES_URL} -path ${MIGRATION_DIR} down
 
+migration-force:
+	migrate -database ${POSTGRES_URL} -path ${MIGRATION_DIR} force $(version)
+
 migrations-unfuck:
 	@echo "Getting current version..."
 	@V=$$(migrate -database ${POSTGRES_URL} -path ${MIGRATION_DIR} version); \

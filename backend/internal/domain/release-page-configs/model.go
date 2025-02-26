@@ -22,6 +22,7 @@ type ReleasePageConfig struct {
 	BrandPosition      string `gorm:"type:varchar(255)"`
 	BackLinkLabel      string `gorm:"type:varchar(255)"`
 	BackLinkUrl        string `gorm:"type:varchar(255)"`
+	Slug               string `gorm:"type:varchar(255)"`
 }
 
 type BrandPosition string
@@ -31,9 +32,8 @@ func (bp BrandPosition) String() string {
 }
 
 const (
-	BrandPositionTop   BrandPosition = "top"
-	BrandPositionLeft  BrandPosition = "left"
-	BrandPositionRight BrandPosition = "right"
+	BrandPositionTop  BrandPosition = "top"
+	BrandPositionLeft BrandPosition = "left"
 )
 
 type ImageInput struct {

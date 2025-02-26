@@ -1,7 +1,6 @@
 package releasepageconfig
 
 import (
-	"errors"
 	"io"
 
 	"github.com/devbydaniel/release-notes-go/internal/database"
@@ -76,23 +75,16 @@ func (r *repository) UpdateWithNil(orgId uuid.UUID, fields map[string]interface{
 func (r *repository) Get(orgId uuid.UUID) (*ReleasePageConfig, error) {
 	log.Trace().Str("orgId", orgId.String()).Msg("Get")
 	var cfg ReleasePageConfig
-	defaultCfg := ReleasePageConfig{
-		Title:          "Release Notes",
-		Description:    "Stay up to date with our latest releases",
-		BgColor:        "#f8f9fa",
-		TextColor:      "#000000",
-		TextColorMuted: "#6c757d",
-		BrandPosition:  string(BrandPositionTop),
-		OrganisationID: orgId,
-	}
-
 	if err := r.db.Client.Model(&ReleasePageConfig{}).Where("organisation_id = ?", orgId).First(&cfg).Error; err != nil {
-		if errors.Is(err, r.db.ErrRecordNotFound) {
-			log.Debug().Msg("landing page config not found, creating...")
-			r.Create(&defaultCfg, nil)
-			return &defaultCfg, nil
-		}
-		log.Error().Err(err).Msg("Error finding landing page config by organisation id")
+		return nil, err
+	}
+	return &cfg, nil
+}
+
+func (r *repository) GetBySlug(slug string) (*ReleasePageConfig, error) {
+	log.Trace().Str("slug", slug).Msg("GetBySlug")
+	var cfg ReleasePageConfig
+	if err := r.db.Client.Model(&ReleasePageConfig{}).Where("slug = ?", slug).First(&cfg).Error; err != nil {
 		return nil, err
 	}
 	return &cfg, nil

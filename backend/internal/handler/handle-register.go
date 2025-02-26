@@ -5,8 +5,10 @@ import (
 	"net/http"
 
 	"github.com/devbydaniel/release-notes-go/internal/domain/organisation"
+	releasepageconfig "github.com/devbydaniel/release-notes-go/internal/domain/release-page-configs"
 	"github.com/devbydaniel/release-notes-go/internal/domain/session"
 	"github.com/devbydaniel/release-notes-go/internal/domain/user"
+	widgetconfigs "github.com/devbydaniel/release-notes-go/internal/domain/widget-configs"
 	"github.com/devbydaniel/release-notes-go/internal/password"
 )
 
@@ -15,6 +17,7 @@ type registerForm struct {
 	Email           string
 	Password        string
 	ConfirmPassword string
+	Legal           string
 }
 
 func (h *Handler) HandleRegister(w http.ResponseWriter, r *http.Request) {
@@ -22,6 +25,8 @@ func (h *Handler) HandleRegister(w http.ResponseWriter, r *http.Request) {
 	userService := user.NewService(*user.NewRepository(h.DB))
 	orgService := organisation.NewService(*organisation.NewRepository(h.DB))
 	sessionService := session.NewService(*session.NewRepository(h.DB))
+	releasePageConfigService := releasepageconfig.NewService(*releasepageconfig.NewRepository(h.DB, h.ObjStore))
+	widgetConfigService := widgetconfigs.NewService(*widgetconfigs.NewRepository(h.DB))
 
 	if err := r.ParseForm(); err != nil {
 		h.log.Error().Err(err).Msg("Error parsing form")
@@ -34,8 +39,15 @@ func (h *Handler) HandleRegister(w http.ResponseWriter, r *http.Request) {
 		Email:           r.FormValue("email"),
 		Password:        r.FormValue("password"),
 		ConfirmPassword: r.FormValue("confirm"),
+		Legal:           r.FormValue("legal"),
 	}
 	h.log.Debug().Interface("req", req).Msg("Register request")
+
+	if err := orgService.IsValidOrgName(req.OrgName); err != nil {
+		h.log.Debug().Err(err).Msg("Invalid org name")
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
 	if err := password.IsValidPassword(req.Password); err != nil {
 		h.log.Debug().Err(err).Msg("Invalid password")
@@ -49,6 +61,13 @@ func (h *Handler) HandleRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if req.Legal != "on" {
+		h.log.Debug().Msg("Legal not accepted")
+		http.Error(w, "Legal terms not accepted", http.StatusBadRequest)
+		return
+	}
+
+	// check if user already exists
 	existing, err := userService.GetByEmail(req.Email)
 	if err != nil && !errors.Is(err, h.DB.ErrRecordNotFound) {
 		h.log.Debug().Err(err).Msg("Error creating user")
@@ -56,21 +75,47 @@ func (h *Handler) HandleRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if existing != nil {
+		h.log.Debug().Msg("User already exists")
 		http.Error(w, "User already exists", http.StatusBadRequest)
 		return
 	}
 
+	// create user and confirm privacy policy and tos
 	user, err := userService.Create(req.Email, req.Password, false)
 	if err != nil {
+		h.log.Error().Err(err).Msg("Error creating user")
 		http.Error(w, "Error creating user", http.StatusInternalServerError)
 		return
 	}
+	if err := userService.ConfirmPrivacyPolicyNow(user.ID); err != nil {
+		h.log.Error().Err(err).Msg("Error creating user")
+		userService.Delete(user.ID)
+		http.Error(w, "Error confirming privacy policy", http.StatusInternalServerError)
+		return
+	}
+	if err := userService.ConfirmTosNow(user.ID); err != nil {
+		h.log.Error().Err(err).Msg("Error creating user")
+		userService.Delete(user.ID)
+		http.Error(w, "Error confirming terms of service", http.StatusInternalServerError)
+		return
+	}
 
-	_, err = orgService.CreateOrgWithAdmin(req.OrgName, user)
+	// create org with user as admin
+	ou, err := orgService.CreateOrgWithAdmin(req.OrgName, user)
 	if err != nil {
 		userService.Delete(user.ID)
 		http.Error(w, "Error creating organisation", http.StatusInternalServerError)
 		return
+	}
+
+	// create release page config
+	if _, err := releasePageConfigService.Init(ou.Organisation.ID, ou.Organisation.Name); err != nil {
+		h.log.Warn().Err(err).Msg("Error creating release page config")
+	}
+
+	// create widget config
+	if _, err := widgetConfigService.Init(ou.Organisation.ID); err != nil {
+		h.log.Warn().Err(err).Msg("Error creating widget config")
 	}
 
 	token := sessionService.CreateToken()

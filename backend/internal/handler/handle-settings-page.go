@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/devbydaniel/release-notes-go/internal/domain/organisation"
+	releasepageconfig "github.com/devbydaniel/release-notes-go/internal/domain/release-page-configs"
 	widgetconfigs "github.com/devbydaniel/release-notes-go/internal/domain/widget-configs"
 	mw "github.com/devbydaniel/release-notes-go/internal/middleware"
 	"github.com/devbydaniel/release-notes-go/templates"
@@ -11,9 +12,10 @@ import (
 )
 
 type settingsPageData struct {
-	Title     string
-	WidgetID  string
-	CustomUrl *string
+	Title          string
+	WidgetID       string
+	ReleasePageUrl string
+	CustomUrl      *string
 }
 
 var settingsTmpl = templates.Construct(
@@ -33,8 +35,9 @@ func (h *Handler) HandleSettingsPage(w http.ResponseWriter, r *http.Request) {
 	}
 	organisationService := organisation.NewService(*organisation.NewRepository(h.DB))
 	widgetConfigService := widgetconfigs.NewService(*widgetconfigs.NewRepository(h.DB))
+	releasePageConfigService := releasepageconfig.NewService(*releasepageconfig.NewRepository(h.DB, h.ObjStore))
 
-	widgetConfig, err := widgetConfigService.Get(orgId)
+	widgetConfig, err := widgetConfigService.Get(uuid.MustParse(orgId))
 	if err != nil {
 		h.log.Error().Err(err).Msg("Error getting widget config")
 		http.Error(w, "Error getting widget config", http.StatusInternalServerError)
@@ -48,9 +51,29 @@ func (h *Handler) HandleSettingsPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var releasePageUrl string
+	releasePageUrl, err = releasePageConfigService.GetUrl(uuid.MustParse(orgId))
+	h.log.Debug().Str("releasePageUrl", releasePageUrl).Msg("Got release page URL")
+	if err != nil {
+		h.log.Error().Err(err).Msg("Error getting release page URL")
+	} else if releasePageUrl == "" {
+		orgName := ctx.Value(mw.OrgNameKey).(string)
+		if err := releasePageConfigService.UpdateSlug(uuid.MustParse(orgId), orgName); err != nil {
+			h.log.Error().Err(err).Msg("Error updating release page slug")
+		} else {
+			releasePageUrl, err = releasePageConfigService.GetUrl(uuid.MustParse(orgId))
+			if err != nil {
+				h.log.Error().Err(err).Msg("Error getting release page URL")
+			}
+		}
+	}
+
 	pageData := settingsPageData{
 		Title:    "Settings",
 		WidgetID: externalId.String(),
+	}
+	if releasePageUrl != "" {
+		pageData.ReleasePageUrl = releasePageUrl
 	}
 
 	if widgetConfig.ReleasePageBaseUrl != nil {

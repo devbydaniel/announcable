@@ -54,7 +54,7 @@
 .content__rns__rn {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--gap-lg);
+  gap: var(--gap-xl);
   width: 100%;
   margin: 0 auto;
 }

@@ -20,6 +20,7 @@
 .input-row {
   display: flex;
   gap: var(--gap-sm);
+  align-items: center;
 }
 
 .input-row input {
@@ -28,4 +29,8 @@
 
 .has-focus {
   border: 2px solid var(--color-primary-lighter);
+}
+
+input#slug {
+  cursor: not-allowed;
 }

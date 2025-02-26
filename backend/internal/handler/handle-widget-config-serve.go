@@ -54,7 +54,7 @@ func (h *Handler) HandleWidgetConfigServe(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	widgetConfig, err := widgetConfigService.Get(org.ID.String())
+	widgetConfig, err := widgetConfigService.Get(org.ID)
 	if err != nil {
 		h.log.Error().Err(err).Msg("Error getting widget config")
 		http.Error(w, "Error getting widget config", http.StatusInternalServerError)

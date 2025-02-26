@@ -6,6 +6,7 @@ import (
 	widgetconfigs "github.com/devbydaniel/release-notes-go/internal/domain/widget-configs"
 	mw "github.com/devbydaniel/release-notes-go/internal/middleware"
 	"github.com/go-playground/validator"
+	"github.com/google/uuid"
 )
 
 type lpBaseUrlUpdateForm struct {
@@ -54,7 +55,7 @@ func (h *Handler) HandleReleasePageBaseUrlUpdate(w http.ResponseWriter, r *http.
 		newBaseUrl = nil
 	}
 
-	widgetService.UpdateBaseUrl(orgId, newBaseUrl)
+	widgetService.UpdateBaseUrl(uuid.MustParse(orgId), newBaseUrl)
 
 	w.Header().Set("HX-Trigger", "custom:submit-success")
 	w.WriteHeader(http.StatusOK)

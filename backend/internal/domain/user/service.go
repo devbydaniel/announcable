@@ -91,3 +91,23 @@ func (s *service) SendPwResetEmail(u *User, token string) error {
 	}
 	return nil
 }
+
+func (s *service) ConfirmTosNow(id uuid.UUID) error {
+	log.Trace().Str("id", id.String()).Msg("ConfirmTos")
+	return s.repo.ConfirmTosNow(id)
+}
+
+func (s *service) ConfirmPrivacyPolicyNow(id uuid.UUID) error {
+	log.Trace().Str("id", id.String()).Msg("ConfirmPrivacyPolicy")
+	return s.repo.ConfirmPrivacyPolicyNow(id)
+}
+
+func (s *service) GetLatestTosVersion(id uuid.UUID) (string, error) {
+	log.Trace().Str("id", id.String()).Msg("GetLatestTosConfirm")
+	return s.repo.GetLatestTosVersion(id)
+}
+
+func (s *service) GetLatestPrivacyPolicyVersion(id uuid.UUID) (string, error) {
+	log.Trace().Str("id", id.String()).Msg("GetLatestPrivacyPolicyVersion")
+	return s.repo.GetLatestPrivacyPolicyVersion(id)
+}

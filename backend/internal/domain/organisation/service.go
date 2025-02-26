@@ -1,6 +1,8 @@
 package organisation
 
 import (
+	"errors"
+	"regexp"
 	"time"
 
 	"github.com/devbydaniel/release-notes-go/config"
@@ -18,6 +20,21 @@ type service struct {
 func NewService(r repository) *service {
 	log.Trace().Msg("NewService")
 	return &service{repo: r}
+}
+
+func (s *service) IsValidOrgName(name string) error {
+	log.Trace().Str("name", name).Msg("IsValidOrgName")
+	if len(name) <= 0 {
+		return errors.New("Organisation name is required")
+	}
+	if len(name) > 100 {
+		return errors.New("Organisation name is too long")
+	}
+	// only allow alphanumeric characters and spaces
+	if !regexp.MustCompile(`^[a-zA-Z0-9 ]+$`).MatchString(name) {
+		return errors.New("Organisation name can only contain alphanumeric characters and spaces")
+	}
+	return nil
 }
 
 func (s *service) CreateOrgWithAdmin(name string, user *user.User) (*OrganisationUser, error) {
@@ -131,6 +148,11 @@ func (s *service) GetExternalId(orgId uuid.UUID) (uuid.UUID, error) {
 		return uuid.Nil, err
 	}
 	return org.ExternalID, nil
+}
+
+func (s *service) GetOrg(orgId uuid.UUID) (*Organisation, error) {
+	log.Trace().Str("orgId", orgId.String()).Msg("GetOrg")
+	return s.repo.FindOrg(orgId)
 }
 
 func (s *service) GetOrgByExternalId(externalId uuid.UUID) (*Organisation, error) {

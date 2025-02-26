@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"errors"
 	"html"
 	"net/http"
 
@@ -10,7 +11,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type landingPageData struct {
+type releasePageConfigPageData struct {
 	Title             string
 	Cfg               *releasepageconfig.ReleasePageConfig
 	SafeTitle         string
@@ -18,7 +19,7 @@ type landingPageData struct {
 	SafeBackLinkLabel string
 }
 
-var landingPageTmpl = templates.Construct(
+var releasePageConfigPageTmpl = templates.Construct(
 	"website",
 	"layouts/root.html",
 	"layouts/appframe.html",
@@ -36,19 +37,32 @@ func (h *Handler) HandleReleasePageConfigPage(w http.ResponseWriter, r *http.Req
 	}
 
 	// get release page config
+	var cfg *releasepageconfig.ReleasePageConfig
 	cfg, err := releasePageConfigService.Get(uuid.MustParse(orgId))
 	if err != nil {
-		http.Error(w, "Error getting widget config", http.StatusInternalServerError)
+		if errors.Is(err, h.DB.ErrRecordNotFound) {
+			// this should not happen, just in case...
+			h.log.Warn().Msg("Release page config not found, creating...")
+			orgName := r.Context().Value(mw.OrgNameKey).(string)
+			cfg, err = releasePageConfigService.Init(uuid.MustParse(orgId), orgName)
+			if err != nil {
+				h.log.Error().Err(err).Msg("Error creating release page config")
+				http.Error(w, "Error creating release page config", http.StatusInternalServerError)
+				return
+			}
+		} else {
+			http.Error(w, "Error getting widget config", http.StatusInternalServerError)
+		}
 	}
 
-	data := landingPageData{
+	data := releasePageConfigPageData{
 		Title:             "Release Page Config",
 		Cfg:               cfg,
 		SafeTitle:         html.EscapeString(cfg.Title),
 		SafeDescription:   html.EscapeString(cfg.Description),
 		SafeBackLinkLabel: html.EscapeString(cfg.BackLinkLabel),
 	}
-	if err := landingPageTmpl.ExecuteTemplate(w, "root", data); err != nil {
+	if err := releasePageConfigPageTmpl.ExecuteTemplate(w, "root", data); err != nil {
 		h.log.Error().Err(err).Msg("Error rendering page")
 		http.Error(w, "Error rendering page", http.StatusInternalServerError)
 	}

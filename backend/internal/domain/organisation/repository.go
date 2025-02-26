@@ -72,7 +72,7 @@ func (r *repository) FindOrgUserByUserId(userId uuid.UUID) (*OrganisationUser, e
 	log.Trace().Str("userId", userId.String()).Msg("FindByUserId")
 	var ou OrganisationUser
 
-	if err := r.db.Client.Preload("User").First(&ou, "user_id = ?", userId).Error; err != nil {
+	if err := r.db.Client.Preload("User").Preload("Organisation").First(&ou, "user_id = ?", userId).Error; err != nil {
 		log.Error().Err(err).Msg("Error finding organisation user")
 		return nil, err
 	}

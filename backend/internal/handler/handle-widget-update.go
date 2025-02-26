@@ -85,7 +85,7 @@ func (h *Handler) HandleWidgetUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 	h.log.Debug().Interface("widget config", widgetConfig).Msg("Widget config to update")
 
-	if err := widgetService.Update(orgId, widgetConfig); err != nil {
+	if err := widgetService.Update(uuid.MustParse(orgId), widgetConfig); err != nil {
 		h.log.Error().Err(err).Msg("Error updating widget config")
 		http.Error(w, "Error updating widget config", http.StatusInternalServerError)
 		return
