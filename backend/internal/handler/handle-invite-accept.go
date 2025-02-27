@@ -16,6 +16,7 @@ import (
 type inviteAcceptForm struct {
 	Password string
 	Confirm  string
+	Legal    string
 }
 
 func (h *Handler) HandleInviteAccept(w http.ResponseWriter, r *http.Request) {
@@ -72,6 +73,12 @@ func (h *Handler) HandleInviteAccept(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if acceptDTO.Legal != "on" {
+		h.log.Debug().Msg("Legal agreement not accepted")
+		http.Error(w, "Legal agreement not accepted", http.StatusBadRequest)
+		return
+	}
+
 	existingUser, err := userService.GetByEmail(invite.Email)
 	if err != nil && !errors.Is(err, h.DB.ErrRecordNotFound) {
 		h.log.Error().Err(err).Msg("Error checking existing user")
@@ -87,6 +94,16 @@ func (h *Handler) HandleInviteAccept(w http.ResponseWriter, r *http.Request) {
 	user, err := userService.Create(invite.Email, acceptDTO.Password, true)
 	if err != nil {
 		http.Error(w, "Error creating user", http.StatusInternalServerError)
+		return
+	}
+
+	if _, err := userService.ConfirmTosNow(user.ID); err != nil {
+		http.Error(w, "Error confirming ToS", http.StatusInternalServerError)
+		return
+	}
+
+	if _, err := userService.ConfirmPrivacyPolicyNow(user.ID); err != nil {
+		http.Error(w, "Error confirming Privacy Policy", http.StatusInternalServerError)
 		return
 	}
 
