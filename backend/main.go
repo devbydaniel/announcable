@@ -13,6 +13,7 @@ import (
 	"github.com/devbydaniel/release-notes-go/internal/logger"
 	mw "github.com/devbydaniel/release-notes-go/internal/middleware"
 	"github.com/devbydaniel/release-notes-go/internal/objstore"
+	"github.com/devbydaniel/release-notes-go/internal/stripeUtil"
 	"github.com/devbydaniel/release-notes-go/static"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -29,9 +30,9 @@ func main() {
 	log.Info().Msg("Starting application")
 	initEnv()
 	log.Info().Msg("Environment loaded")
-
 	db := initDb()
 	defer database.Close(db)
+	initStripe()
 	objStore := initObjStore()
 	mwHandler := mw.NewHandler(db)
 	handler := handler.NewHandler(db, objStore)
@@ -193,6 +194,24 @@ func main() {
 		r.Get("/{orgSlug}", handler.HandleReleasePage)
 	})
 
+	// STRIPE
+	r.With(mwHandler.Authenticate, mwHandler.Authorize(rbac.PermissionManageAccess)).Route("/payment", func(r chi.Router) {
+		r.Post("/create-checkout-session", handler.HandleCheckoutSession)
+		r.Post("/create-portal-session", handler.HandlePortalSession)
+	})
+
+	r.Route("/stripe", func(r chi.Router) {
+		r.Use(cors.Handler(cors.Options{
+			AllowedOrigins:   []string{"*"},
+			AllowedMethods:   []string{"GET", "POST", "OPTIONS"},
+			AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+			ExposedHeaders:   []string{"Link"},
+			AllowCredentials: false,
+			MaxAge:           300, // Maximum value not ignored by any of major browsers
+		}))
+		r.Post("/webhook", handler.HandleWebhook)
+	})
+
 	// STATIC
 	fs := http.FileServer(http.FS(static.Assets))
 	r.Get("/static/*", http.StripPrefix("/static/", fs).ServeHTTP)
@@ -242,4 +261,9 @@ func initObjStore() *objstore.ObjStore {
 	}
 	log.Info().Msg("Object store initialized")
 	return store
+}
+
+func initStripe() {
+	log.Trace().Msg("initStripe")
+	stripeUtil.Setup()
 }

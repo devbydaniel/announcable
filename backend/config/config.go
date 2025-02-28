@@ -48,6 +48,11 @@ type legal struct {
 	PPVersion  string
 }
 
+type payment struct {
+	StripeKey     string
+	WebhookSecret string
+}
+
 type config struct {
 	Env         string
 	BaseURL     string
@@ -58,6 +63,7 @@ type config struct {
 	Email       emailConfig
 	ProductInfo productInfo
 	Legal       legal
+	Payment     payment
 }
 
 func New() *config {
@@ -68,6 +74,10 @@ func New() *config {
 		Legal: legal{
 			ToSVersion: getEnv("TOS_VERSION"),
 			PPVersion:  getEnv("PP_VERSION"),
+		},
+		Payment: payment{
+			StripeKey:     getEnv("STRIPE_KEY"),
+			WebhookSecret: getEnv("STRIPE_WEBHOOK_SECRET"),
 		},
 		Postgres: postgresConfig{
 			Host:     getEnv("POSTGRES_HOST"),
