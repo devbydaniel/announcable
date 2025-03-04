@@ -1,9 +1,10 @@
 .onboard {
-  background-color: var(--background);
+  background-color: var(--color-mantle);
+  height: 100vh;
 }
 
 .onboard__content {
   max-width: 28em;
   margin: auto;
-  margin-top: var(--gap-xl);
+  padding-top: var(--gap-xl);
 }

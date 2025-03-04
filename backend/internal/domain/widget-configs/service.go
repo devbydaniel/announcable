@@ -22,7 +22,7 @@ func DefaultConfig(orgId uuid.UUID) *WidgetConfig {
 		WidgetBorderRadius:      12,
 		WidgetBorderColor:       "#7c7f93",
 		WidgetBorderWidth:       1,
-		WidgetBgColor:           "#e6e9ef",
+		WidgetBgColor:           "#dce0e8",
 		WidgetTextColor:         "#4c4f69",
 		WidgetType:              "modal",
 		ReleaseNoteBorderRadius: 12,

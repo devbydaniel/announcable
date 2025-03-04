@@ -7,7 +7,7 @@ import (
 )
 
 type registerPageData struct {
-	Title string
+	BaseTemplateData
 }
 
 var registerTmpl = templates.Construct(
@@ -19,7 +19,9 @@ var registerTmpl = templates.Construct(
 
 func (h *Handler) HandleRegisterPage(w http.ResponseWriter, r *http.Request) {
 	data := registerPageData{
-		Title: "Register",
+		BaseTemplateData: BaseTemplateData{
+			Title: "Register",
+		},
 	}
 	if err := registerTmpl.ExecuteTemplate(w, "root", data); err != nil {
 		h.log.Error().Err(err).Msg("Error rendering page")

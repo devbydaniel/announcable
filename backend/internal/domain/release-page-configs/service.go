@@ -105,7 +105,7 @@ func (s *service) Update(orgId uuid.UUID, cfg *ReleasePageConfig, imgInput *Imag
 
 	// Update image
 	if imgInput != nil {
-		if imgInput.ShoudDeleteImage {
+		if imgInput.ShouldDeleteImage {
 			if err := s.repo.DeleteImage(orgId); err != nil {
 				log.Error().Err(err).Msg("Error deleting image")
 				tx.Rollback()

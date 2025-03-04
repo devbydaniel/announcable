@@ -74,15 +74,15 @@ func (h *Handler) HandleReleasePageConfigUpdate(w http.ResponseWriter, r *http.R
 			return
 		}
 		imgInput = &releasepageconfig.ImageInput{
-			ShoudDeleteImage: false,
-			ImgData:          img,
-			Format:           imgHeader.Header.Get("Content-Type"),
+			ShouldDeleteImage: false,
+			ImgData:           img,
+			Format:            imgHeader.Header.Get("Content-Type"),
 		}
 	} else {
 		imgInput = &releasepageconfig.ImageInput{
-			ShoudDeleteImage: updateDTO.ShouldDeleteImage,
-			ImgData:          nil,
-			Format:           "",
+			ShouldDeleteImage: updateDTO.ShouldDeleteImage,
+			ImgData:           nil,
+			Format:            "",
 		}
 	}
 	h.log.Debug().Interface("imgInput", imgInput).Msg("ImageInput")

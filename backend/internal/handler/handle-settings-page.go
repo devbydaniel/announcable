@@ -5,6 +5,7 @@ import (
 
 	"github.com/devbydaniel/release-notes-go/internal/domain/organisation"
 	releasepageconfig "github.com/devbydaniel/release-notes-go/internal/domain/release-page-configs"
+	"github.com/devbydaniel/release-notes-go/internal/domain/subscription"
 	widgetconfigs "github.com/devbydaniel/release-notes-go/internal/domain/widget-configs"
 	mw "github.com/devbydaniel/release-notes-go/internal/middleware"
 	"github.com/devbydaniel/release-notes-go/templates"
@@ -12,10 +13,11 @@ import (
 )
 
 type settingsPageData struct {
-	Title          string
-	WidgetID       string
-	ReleasePageUrl string
-	CustomUrl      *string
+	BaseTemplateData
+	WidgetID            string
+	ReleasePageUrl      string
+	CustomUrl           *string
+	HasPaidSubscription bool
 }
 
 var settingsTmpl = templates.Construct(
@@ -33,9 +35,17 @@ func (h *Handler) HandleSettingsPage(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to authenticate", http.StatusInternalServerError)
 		return
 	}
+
+	hasActiveSubscription, ok := ctx.Value(mw.HasActiveSubscription).(bool)
+	if !ok {
+		h.log.Error().Msg("Subscription status not found in context")
+		http.Error(w, "Error checking subscription status", http.StatusInternalServerError)
+		return
+	}
 	organisationService := organisation.NewService(*organisation.NewRepository(h.DB))
 	widgetConfigService := widgetconfigs.NewService(*widgetconfigs.NewRepository(h.DB))
 	releasePageConfigService := releasepageconfig.NewService(*releasepageconfig.NewRepository(h.DB, h.ObjStore))
+	subscriptionService := subscription.NewService(*subscription.NewRepository(h.DB))
 
 	widgetConfig, err := widgetConfigService.Get(uuid.MustParse(orgId))
 	if err != nil {
@@ -68,9 +78,24 @@ func (h *Handler) HandleSettingsPage(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	isFree := false
+	if hasActiveSubscription {
+		var err error
+		isFree, err = subscriptionService.IsFreeSubscription(uuid.MustParse(orgId))
+		if err != nil {
+			h.log.Error().Err(err).Msg("Error checking if subscription is free")
+			http.Error(w, "Error checking subscription status", http.StatusInternalServerError)
+			return
+		}
+	}
+
 	pageData := settingsPageData{
-		Title:    "Settings",
-		WidgetID: externalId.String(),
+		BaseTemplateData: BaseTemplateData{
+			Title:                 "Settings",
+			HasActiveSubscription: hasActiveSubscription,
+		},
+		WidgetID:            externalId.String(),
+		HasPaidSubscription: hasActiveSubscription && !isFree,
 	}
 	if releasePageUrl != "" {
 		pageData.ReleasePageUrl = releasePageUrl

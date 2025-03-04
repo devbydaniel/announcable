@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -11,6 +12,8 @@ import (
 	"github.com/go-playground/validator"
 	"github.com/google/uuid"
 	"github.com/gorilla/schema"
+
+	subscription "github.com/devbydaniel/release-notes-go/internal/domain/subscription"
 )
 
 type releaseNoteCreateForm struct {
@@ -37,6 +40,7 @@ func (h *Handler) HandleReleaseNoteCreate(w http.ResponseWriter, r *http.Request
 
 	ctx := r.Context()
 	releaseNotesService := releasenotes.NewService(*releasenotes.NewRepository(h.DB, h.ObjStore))
+	subscriptionService := subscription.NewService(*subscription.NewRepository(h.DB))
 
 	// extract organisation ID from context
 	orgId, ok := ctx.Value(mw.OrgIDKey).(string)
@@ -50,6 +54,35 @@ func (h *Handler) HandleReleaseNoteCreate(w http.ResponseWriter, r *http.Request
 		h.log.Error().Msg("User ID not found in context")
 		http.Error(w, "Error while authenticating", http.StatusInternalServerError)
 		return
+	}
+
+	// Check subscription status
+	sub, err := subscriptionService.Get(uuid.MustParse(orgId))
+	var subscriptionActive bool
+	if err != nil {
+		if !errors.Is(err, h.DB.ErrRecordNotFound) {
+			h.log.Error().Err(err).Msg("Error getting subscription")
+			http.Error(w, "Error checking subscription status", http.StatusInternalServerError)
+			return
+		}
+		// No subscription found - leave as false
+	} else {
+		subscriptionActive = sub.IsActive || sub.IsFree
+	}
+
+	// If subscription is not active, check release note count
+	if !subscriptionActive {
+		count, err := releaseNotesService.GetCount(uuid.MustParse(orgId))
+		if err != nil {
+			h.log.Error().Err(err).Msg("Error getting release note count")
+			http.Error(w, "Error checking release note limit", http.StatusInternalServerError)
+			return
+		}
+		if count >= 5 {
+			h.log.Warn().Msg("Release note limit reached for free tier")
+			http.Error(w, "Free tier limited to 5 release notes. Please upgrade to create more.", http.StatusForbidden)
+			return
+		}
 	}
 
 	// parse form
@@ -92,9 +125,9 @@ func (h *Handler) HandleReleaseNoteCreate(w http.ResponseWriter, r *http.Request
 			return
 		}
 		imgInput = &releasenotes.ImageInput{
-			ShoudDeleteImage: false,
-			ImgData:          img,
-			Format:           imgHeader.Header.Get("Content-Type"),
+			ShouldDeleteImage: false,
+			ImgData:           img,
+			Format:            imgHeader.Header.Get("Content-Type"),
 		}
 	}
 

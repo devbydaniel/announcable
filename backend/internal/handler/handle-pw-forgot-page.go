@@ -7,7 +7,7 @@ import (
 )
 
 type forgotPwPageData struct {
-	Title string
+	BaseTemplateData
 }
 
 var forgotPwPageTmpl = templates.Construct(
@@ -19,8 +19,10 @@ var forgotPwPageTmpl = templates.Construct(
 
 func (h *Handler) HandlePwForgotPage(w http.ResponseWriter, r *http.Request) {
 	h.log.Trace().Msg("HandlePwForgotPage")
-	data := loginPageData{
-		Title: "Password reset",
+	data := forgotPwPageData{
+		BaseTemplateData: BaseTemplateData{
+			Title: "Password reset",
+		},
 	}
 	if err := forgotPwPageTmpl.ExecuteTemplate(w, "root", data); err != nil {
 		h.log.Error().Err(err).Msg("Error rendering page")

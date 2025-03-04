@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/devbydaniel/release-notes-go/config"
 	"github.com/devbydaniel/release-notes-go/internal/domain/organisation"
 	"github.com/devbydaniel/release-notes-go/internal/domain/rbac"
 	"github.com/devbydaniel/release-notes-go/internal/domain/session"
@@ -16,20 +17,22 @@ import (
 type contextKey string
 
 const (
-	SessionIdKey     contextKey = "sessionId"
-	UserIDKey        contextKey = "userId"
-	OrgRoleKey       contextKey = "orgRole"
-	OrgIDKey         contextKey = "orgId"
-	OrgNameKey       contextKey = "orgName"
-	EmailVerifiedKey contextKey = "emailVerified"
-	TosVersionKey    contextKey = "tosVersion"
-	PrivacyPolicyKey contextKey = "privacyPolicy"
+	SessionIdKey          contextKey = "sessionId"
+	UserIDKey             contextKey = "userId"
+	OrgRoleKey            contextKey = "orgRole"
+	OrgIDKey              contextKey = "orgId"
+	OrgNameKey            contextKey = "orgName"
+	EmailVerifiedKey      contextKey = "emailVerified"
+	TosVersionKey         contextKey = "tosVersion"
+	PrivacyPolicyKey      contextKey = "privacyPolicy"
+	HasActiveSubscription contextKey = "hasActiveSubscription"
 )
 
 func (h *Handler) Authenticate(next http.Handler) http.Handler {
 	sessionService := session.NewService(*session.NewRepository(h.DB))
 	orgService := organisation.NewService(*organisation.NewRepository(h.DB))
 	userService := user.NewService(*user.NewRepository(h.DB))
+
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		h.log.Trace().Msg("mw Authenticate")
 		// get session cookie
@@ -88,8 +91,14 @@ func (h *Handler) Authenticate(next http.Handler) http.Handler {
 		ctx = context.WithValue(ctx, OrgNameKey, ou.Organisation.Name)
 		ctx = context.WithValue(ctx, TosVersionKey, tosVersion)
 		ctx = context.WithValue(ctx, PrivacyPolicyKey, privatePolicyVersion)
+
 		r = r.WithContext(ctx)
-		h.log.Trace().Str("userId", session.UserID.String()).Str("role", ou.Role.String()).Str("orgId", ou.OrganisationID.String()).Msg("Authenticated")
+		h.log.Trace().
+			Str("userId", session.UserID.String()).
+			Str("role", ou.Role.String()).
+			Str("orgId", ou.OrganisationID.String()).
+			Msg("Authenticated")
+
 		next.ServeHTTP(w, r)
 	})
 }
@@ -127,4 +136,23 @@ func (h *Handler) Authorize(permissions ...rbac.Permission) func(http.Handler) h
 			next.ServeHTTP(w, r)
 		})
 	}
+}
+
+func (h *Handler) AuthorizeSuperAdmin(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		h.log.Trace().Msg("mw AuthorizeSuperAdmin")
+		ctx := r.Context()
+		userId, ok := ctx.Value(UserIDKey).(string)
+		if !ok {
+			h.log.Warn().Msg("UserId not found in context")
+			http.Error(w, "UserId not found in context", http.StatusInternalServerError)
+			return
+		}
+		if userId != config.New().AdminUserId {
+			h.log.Warn().Str("userId", userId).Msg("Unauthorized")
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
 }

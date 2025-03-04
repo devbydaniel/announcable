@@ -74,7 +74,7 @@
         </thead>
         <tbody>
           {{ range .Users }}
-            <tr class="table__tr">
+            <tr class="table__tr" data-user-id="{{ .UserID }}">
               <td class="table__td">
                 {{ .Email }}
               </td>

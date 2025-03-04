@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	releasenotes "github.com/devbydaniel/release-notes-go/internal/domain/release-notes"
+	mw "github.com/devbydaniel/release-notes-go/internal/middleware"
 	"github.com/devbydaniel/release-notes-go/templates"
 )
 
@@ -15,7 +16,7 @@ var releaseNoteCreatePageTmpl = templates.Construct(
 )
 
 type releaseNotePageData struct {
-	Title                        string
+	BaseTemplateData
 	Rn                           *releasenotes.ReleaseNote
 	IsEdit                       bool
 	TextWebsiteOverrideIsChecked bool
@@ -26,8 +27,17 @@ type releaseNotePageData struct {
 
 func (h *Handler) HandleReleaseNoteCreatePage(w http.ResponseWriter, r *http.Request) {
 	h.log.Trace().Msg("HandleReleaseNoteCreatePage")
+	hasActiveSubscription, ok := r.Context().Value(mw.HasActiveSubscription).(bool)
+	if !ok {
+		h.log.Error().Msg("Subscription status not found in context")
+		http.Error(w, "Error checking subscription status", http.StatusInternalServerError)
+		return
+	}
 	data := releaseNotePageData{
-		Title:                        "New Release Note",
+		BaseTemplateData: BaseTemplateData{
+			Title:                 "New Release Note",
+			HasActiveSubscription: hasActiveSubscription,
+		},
 		Rn:                           &releasenotes.ReleaseNote{},
 		IsEdit:                       false,
 		TextWebsiteOverrideIsChecked: false,

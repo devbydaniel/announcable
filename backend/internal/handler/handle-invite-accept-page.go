@@ -10,7 +10,7 @@ import (
 )
 
 type InviteAcceptPage struct {
-	Title string
+	BaseTemplateData
 	Org   string
 	Token string
 	Email string
@@ -50,7 +50,9 @@ func (h *Handler) HandleInviteAcceptPage(w http.ResponseWriter, r *http.Request)
 		return
 	}
 	data := InviteAcceptPage{
-		Title: "Login",
+		BaseTemplateData: BaseTemplateData{
+			Title: "Login",
+		},
 		Org:   invite.Organisation.Name,
 		Token: token,
 		Email: invite.Email,

@@ -8,7 +8,8 @@ import App from "./App";
 declare global {
   interface Window {
     release_beacon_widget_init: WidgetInit;
-    ReleaseBeaconWidget: {
+    announcable_widget_init: WidgetInit;
+    AnnouncableWidget: {
       init: (config: WidgetInit) => void;
     };
   }
@@ -20,7 +21,7 @@ function initialize(init: WidgetInit) {
     return;
   }
   const widgetRoot = document.createElement("div");
-  widgetRoot.id = "release-beacon-widget-root";
+  widgetRoot.id = "announcable-widget-root";
   document.body.appendChild(widgetRoot);
 
   // Create a closed Shadow DOM
@@ -33,7 +34,7 @@ function initialize(init: WidgetInit) {
 
   // Create a container for the React app inside the Shadow DOM
   const reactContainer = document.createElement("div");
-  reactContainer.className = "release-beacon-widget";
+  reactContainer.className = "announcable-widget";
   shadowRoot.appendChild(reactContainer);
 
   const root = ReactDOM.createRoot(reactContainer);
@@ -47,13 +48,18 @@ function initialize(init: WidgetInit) {
 }
 
 // Expose initialization function globally
-window.ReleaseBeaconWidget = {
+window.AnnouncableWidget = {
   init: (config: WidgetInit) => {
     initialize(config);
   },
 };
 
 // Automatically initialize if config is present
+if (window.announcable_widget_init) {
+  window.AnnouncableWidget.init(window.announcable_widget_init);
+}
+
+// Use release beacon legacy init for backwards compatibility
 if (window.release_beacon_widget_init) {
-  window.ReleaseBeaconWidget.init(window.release_beacon_widget_init);
+  window.AnnouncableWidget.init(window.release_beacon_widget_init);
 }

@@ -28,6 +28,12 @@ func (h *Handler) HandleReleaseNotePage(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, "Failed to authenticate", http.StatusInternalServerError)
 		return
 	}
+	hasActiveSubscription, ok := r.Context().Value(mw.HasActiveSubscription).(bool)
+	if !ok {
+		h.log.Error().Msg("Subscription status not found in context")
+		http.Error(w, "Error checking subscription status", http.StatusInternalServerError)
+		return
+	}
 	h.log.Debug().Str("id", id).Str("orgId", orgId).Msg("Release note page")
 
 	// get release note
@@ -37,7 +43,10 @@ func (h *Handler) HandleReleaseNotePage(w http.ResponseWriter, r *http.Request) 
 	}
 
 	data := releaseNotePageData{
-		Title:                        rn.Title,
+		BaseTemplateData: BaseTemplateData{
+			Title:                 rn.Title,
+			HasActiveSubscription: hasActiveSubscription,
+		},
 		Rn:                           rn,
 		IsEdit:                       true,
 		TextWebsiteOverrideIsChecked: rn.DescriptionLong != "",

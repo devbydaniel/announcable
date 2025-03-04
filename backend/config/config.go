@@ -57,6 +57,7 @@ type config struct {
 	Env         string
 	BaseURL     string
 	Port        int
+	AdminUserId string
 	Postgres    postgresConfig
 	ObjStorage  objStorageConfig
 	PgAdmin     pgAdminConfig
@@ -68,9 +69,10 @@ type config struct {
 
 func New() *config {
 	return &config{
-		Env:     getEnv("ENV"),
-		BaseURL: getEnv("BASE_URL"),
-		Port:    getEnvAsInt("PORT"),
+		Env:         getEnv("ENV"),
+		BaseURL:     getEnv("BASE_URL"),
+		Port:        getEnvAsInt("PORT"),
+		AdminUserId: getEnv("ADMIN_USER_ID"),
 		Legal: legal{
 			ToSVersion: getEnv("TOS_VERSION"),
 			PPVersion:  getEnv("PP_VERSION"),

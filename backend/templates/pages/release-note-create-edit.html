@@ -56,7 +56,12 @@
       {{ template "hx-publish-rn-button" .Rn.ID }}
     {{ end }}
   {{ end }}
-  <button id="submit-button" class="button button--primary">Save</button>
+  <button 
+    id="submit-button" 
+    class="button button--primary"
+  >
+    <span>Save</span>
+  </button>
 {{ end }}
 
 {{ define "main" }}

@@ -82,6 +82,7 @@ func (h *Handler) HandleReleaseNoteUpdate(w http.ResponseWriter, r *http.Request
 	if err != nil {
 		h.log.Debug().Err(err).Msg("No image uploaded")
 	}
+	h.log.Debug().Interface("img", img).Msg("img")
 
 	// prepare models
 	var imgInput *releasenotes.ImageInput
@@ -93,15 +94,15 @@ func (h *Handler) HandleReleaseNoteUpdate(w http.ResponseWriter, r *http.Request
 			return
 		}
 		imgInput = &releasenotes.ImageInput{
-			ShoudDeleteImage: false,
-			ImgData:          img,
-			Format:           imgHeader.Header.Get("Content-Type"),
+			ShouldDeleteImage: false,
+			ImgData:           img,
+			Format:            imgHeader.Header.Get("Content-Type"),
 		}
 	} else {
 		imgInput = &releasenotes.ImageInput{
-			ShoudDeleteImage: updateDTO.ShouldDeleteImage,
-			ImgData:          nil,
-			Format:           "",
+			ShouldDeleteImage: updateDTO.ShouldDeleteImage,
+			ImgData:           nil,
+			Format:            "",
 		}
 	}
 	h.log.Debug().Interface("imgInput", imgInput).Msg("ImageInput")

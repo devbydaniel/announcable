@@ -7,7 +7,7 @@ import (
 )
 
 type loginPageData struct {
-	Title string
+	BaseTemplateData
 }
 
 var loginTmpl = templates.Construct(
@@ -19,7 +19,9 @@ var loginTmpl = templates.Construct(
 
 func (h *Handler) HandleLoginPage(w http.ResponseWriter, r *http.Request) {
 	data := loginPageData{
-		Title: "Login",
+		BaseTemplateData: BaseTemplateData{
+			Title: "Login",
+		},
 	}
 	if err := loginTmpl.ExecuteTemplate(w, "root", data); err != nil {
 		h.log.Error().Err(err).Msg("Error rendering page")

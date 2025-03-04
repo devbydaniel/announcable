@@ -103,6 +103,7 @@ func main() {
 	r.With(
 		mwHandler.Authenticate,
 		mwHandler.Authorize(rbac.PermissionManageReleaseNote),
+		mwHandler.WithSubscriptionStatus,
 	).Route("/release-notes", func(r chi.Router) {
 		r.Get("/", handler.HandleReleaseNotesPage)
 		r.Post("/", handler.HandleReleaseNoteCreate)
@@ -118,6 +119,7 @@ func main() {
 	r.With(
 		mwHandler.Authenticate,
 		mwHandler.Authorize(rbac.PermissionManageReleaseNote),
+		mwHandler.WithSubscriptionStatus,
 	).Route("/widget-config", func(r chi.Router) {
 		r.Get("/", handler.HandleWidgetPage)
 		r.Patch("/", handler.HandleWidgetUpdate)
@@ -130,6 +132,7 @@ func main() {
 	r.With(
 		mwHandler.Authenticate,
 		mwHandler.Authorize(rbac.PermissionManageReleaseNote),
+		mwHandler.WithSubscriptionStatus,
 	).Route("/release-page-config", func(r chi.Router) {
 		r.Get("/", handler.HandleReleasePageConfigPage)
 		r.Patch("/", handler.HandleReleasePageConfigUpdate)
@@ -140,8 +143,20 @@ func main() {
 	r.With(
 		mwHandler.Authenticate,
 		mwHandler.Authorize(rbac.PermissionManageAccess),
+		mwHandler.WithSubscriptionStatus,
 	).Route("/settings", func(r chi.Router) {
 		r.Get("/", handler.HandleSettingsPage)
+	})
+
+	// ADMIN DASHBOARD
+	r.With(
+		mwHandler.Authenticate,
+		mwHandler.AuthorizeSuperAdmin,
+	).Route("/admin", func(r chi.Router) {
+		r.Get("/", handler.HandleAdminDashboard)
+		r.Get("/organisations/{orgId}", handler.HandleAdminOrgDetails)
+		r.Post("/organisations/{orgId}/subscriptions", handler.HandleAdminOrgSubscriptionCreate)
+		r.Delete("/organisations/{orgId}/subscriptions/{id}", handler.HandleAdminOrgSubscriptionDelete)
 	})
 
 	// API
@@ -150,7 +165,7 @@ func main() {
 	r.Route("/api", func(r chi.Router) {
 		r.Use(cors.Handler(cors.Options{
 			AllowedOrigins:   []string{"*"},
-			AllowedMethods:   []string{"GET", "OPTIONS"},
+			AllowedMethods:   []string{"GET", "POST", "OPTIONS"},
 			AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 			ExposedHeaders:   []string{"Link"},
 			AllowCredentials: false,
@@ -158,6 +173,7 @@ func main() {
 		}))
 		r.Get("/release-notes/{orgId}", handler.HandleReleaseNotesServe)
 		r.Get("/release-notes/{orgId}/status", handler.HandleReleaseNotesStatusServe)
+		r.Post("/release-notes/{orgId}/metrics", handler.HandleReleaseNoteMetricCreate)
 		r.Get("/widget-config/{orgId}", handler.HandleWidgetConfigServe)
 		r.Get("/img/*", handler.HandleObjStore)
 	})
@@ -198,6 +214,7 @@ func main() {
 	r.With(mwHandler.Authenticate, mwHandler.Authorize(rbac.PermissionManageAccess)).Route("/payment", func(r chi.Router) {
 		r.Post("/create-checkout-session", handler.HandleCheckoutSession)
 		r.Post("/create-portal-session", handler.HandlePortalSession)
+		r.Get("/success", handler.HandleSubscriptionSuccess)
 	})
 
 	r.Route("/stripe", func(r chi.Router) {

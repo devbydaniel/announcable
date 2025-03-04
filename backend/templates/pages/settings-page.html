@@ -176,15 +176,14 @@
         <button id="pw-update-submit-button" class="button">Change</button>
       </div>
     </div>
-    <div class="card">
-      <h2 class="card__title">Subscription</h2>
-      <div class="card__content"></div>
-      <form action="/payment/create-portal-session" method="POST">
-        <input type="hidden" id="session-id" name="session_id" value="" />
-        <button id="checkout-and-portal-button" type="submit" class="button">
-          Manage your billing information
-        </button>
-      </form>
-    </div>
+    {{ if .HasPaidSubscription }}
+      <div class="card">
+        <h2 class="card__title">Subscription</h2>
+        <div class="card__content"></div>
+        <form action="/payment/create-portal-session" method="POST">
+          <button type="submit" class="button">Manage your subscription</button>
+        </form>
+      </div>
+    {{ end }}
   </div>
 {{ end }}

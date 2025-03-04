@@ -54,7 +54,7 @@ const (
 )
 
 type ImageInput struct {
-	ShoudDeleteImage bool
-	ImgData          io.Reader
-	Format           string
+	ShouldDeleteImage bool
+	ImgData           io.Reader
+	Format            string
 }

@@ -155,7 +155,7 @@ func (s *service) Update(id uuid.UUID, rn *ReleaseNote, imgInput *ImageInput) er
 	var path string
 	// Update image
 	if imgInput != nil {
-		if imgInput.ShoudDeleteImage {
+		if imgInput.ShouldDeleteImage {
 			if err := s.repo.DeleteImage(id, tx.Tx); err != nil {
 				log.Error().Err(err).Msg("Error deleting image")
 				tx.Rollback()
@@ -210,4 +210,9 @@ func (s *service) ChangePublishedStatus(id uuid.UUID, published bool) error {
 func (s *service) Delete(id uuid.UUID) error {
 	log.Trace().Msg("Delete")
 	return s.repo.Delete(id, nil)
+}
+
+func (s *service) GetCount(orgID uuid.UUID) (int64, error) {
+	log.Trace().Str("orgID", orgID.String()).Msg("GetCount")
+	return s.repo.GetCount(orgID)
 }

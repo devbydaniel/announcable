@@ -214,3 +214,13 @@ func (r *repository) DeleteImage(id uuid.UUID, tx *gorm.DB) error {
 	}
 	return nil
 }
+
+func (r *repository) GetCount(orgID uuid.UUID) (int64, error) {
+	log.Trace().Str("orgID", orgID.String()).Msg("GetCount")
+	var count int64
+	if err := r.db.Client.Model(&ReleaseNote{}).Where("organisation_id = ?", orgID).Count(&count).Error; err != nil {
+		log.Error().Err(err).Msg("Error counting release notes")
+		return 0, err
+	}
+	return count, nil
+}

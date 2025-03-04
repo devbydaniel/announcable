@@ -69,3 +69,6 @@
   background: var(--background-raised);
   padding: var(--gap-sm);
 }
+.nav__list__item--highlight a {
+  border: var(--border-width) solid var(--color-yellow);
+}

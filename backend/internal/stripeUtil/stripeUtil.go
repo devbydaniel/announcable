@@ -11,6 +11,7 @@ import (
 	portalsession "github.com/stripe/stripe-go/v81/billingportal/session"
 	"github.com/stripe/stripe-go/v81/checkout/session"
 	"github.com/stripe/stripe-go/v81/price"
+	"github.com/stripe/stripe-go/v81/subscription"
 	"github.com/stripe/stripe-go/v81/webhook"
 )
 
@@ -44,8 +45,8 @@ func CreateStripeCheckoutSession(lookupKey string, organizationID uuid.UUID) (st
 				Quantity: stripe.Int64(1),
 			},
 		},
-		SuccessURL: stripe.String("http://" + baseUrl + "/success.html?session_id={CHECKOUT_SESSION_ID}"),
-		CancelURL:  stripe.String("http://" + baseUrl + "/cancel.html"),
+		SuccessURL: stripe.String("http://" + baseUrl + "/payment/success?session_id={CHECKOUT_SESSION_ID}"),
+		CancelURL:  stripe.String("http://" + baseUrl + "/payment/cancel"),
 		// Add metadata to link this session to your organization
 		Metadata: map[string]string{
 			"organization_id": organizationID.String(),
@@ -53,7 +54,7 @@ func CreateStripeCheckoutSession(lookupKey string, organizationID uuid.UUID) (st
 		// Also add metadata to the subscription
 		SubscriptionData: &stripe.CheckoutSessionSubscriptionDataParams{
 			Metadata: map[string]string{
-				"organization_id": fmt.Sprintf("%d", organizationID),
+				"organization_id": organizationID.String(),
 			},
 		},
 	}
@@ -67,18 +68,21 @@ func CreateStripeCheckoutSession(lookupKey string, organizationID uuid.UUID) (st
 	return s.URL, nil
 }
 
-// CreateStripePortalSession creates a Stripe billing portal session for a customer
-// based on the provided checkout session ID and return URL.
-func CreateStripePortalSession(checkoutSessionID, returnURL string) (string, error) {
-	// Get the checkout session to retrieve the customer ID
-	s, err := session.Get(checkoutSessionID, nil)
+// GetCustomerIDFromSubscription retrieves the customer ID associated with a Stripe subscription
+func GetCustomerIDFromSubscription(subscriptionID string) (string, error) {
+	sub, err := subscription.Get(subscriptionID, nil)
 	if err != nil {
-		return "", fmt.Errorf("session.Get: %w", err)
+		return "", fmt.Errorf("error getting subscription: %w", err)
 	}
+	return sub.Customer.ID, nil
+}
 
+// CreateStripePortalSession creates a Stripe billing portal session for a customer
+// based on the provided customer ID and return URL.
+func CreateStripePortalSession(customerID, returnURL string) (string, error) {
 	// Create the billing portal session
 	params := &stripe.BillingPortalSessionParams{
-		Customer:  stripe.String(s.Customer.ID),
+		Customer:  stripe.String(customerID),
 		ReturnURL: stripe.String(returnURL),
 	}
 

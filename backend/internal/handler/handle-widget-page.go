@@ -12,7 +12,7 @@ import (
 )
 
 type widgetPageData struct {
-	Title                  string
+	BaseTemplateData
 	Cfg                    *widgetconfigs.WidgetConfig
 	SafeTitle              string
 	SafeDescription        string
@@ -35,6 +35,12 @@ func (h *Handler) HandleWidgetPage(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to authenticate", http.StatusInternalServerError)
 		return
 	}
+	hasActiveSubscription, ok := r.Context().Value(mw.HasActiveSubscription).(bool)
+	if !ok {
+		h.log.Error().Msg("Subscription status not found in context")
+		http.Error(w, "Error checking subscription status", http.StatusInternalServerError)
+		return
+	}
 
 	// get widget config
 	var cfg *widgetconfigs.WidgetConfig
@@ -55,7 +61,10 @@ func (h *Handler) HandleWidgetPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := widgetPageData{
-		Title:                  "Widget Config",
+		BaseTemplateData: BaseTemplateData{
+			Title:                 "Widget Config",
+			HasActiveSubscription: hasActiveSubscription,
+		},
 		Cfg:                    cfg,
 		SafeTitle:              html.EscapeString(cfg.Title),
 		SafeDescription:        html.EscapeString(cfg.Description),

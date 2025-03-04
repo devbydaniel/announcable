@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/card";
 import type { ReleaseNote } from "@/lib/types";
 import { Skeleton } from "./skeleton";
+import useReleaseNoteMetrics from "@/hooks/useReleaseNoteMetrics";
 
 interface ReleaseNotesListProps {
   children: React.ReactNode;
@@ -33,14 +34,21 @@ export function ReleaseNoteEntry({
   config,
   releaseNote,
 }: ReleaseNoteEntryProps) {
+  const { elementRef, trackCtaClick } = useReleaseNoteMetrics({
+    releaseNoteId: releaseNote.id,
+    orgId: config.org_id,
+  });
+
   const ctaLabel = releaseNote.cta_label_override
     ? releaseNote.cta_label_override
     : config.cta_text;
   const baseUrl = config.release_page_baseurl;
   const ctaHref =
     releaseNote.cta_href_override || `${baseUrl}#${releaseNote.id}`;
+
   return (
     <Card
+      ref={elementRef}
       style={{
         borderRadius: config.release_note_border_radius,
         borderColor: config.release_note_border_color,
@@ -78,7 +86,11 @@ export function ReleaseNoteEntry({
           )}
           {!releaseNote.hide_cta && (
             <div className="w-full flex justify-center">
-              <a href={ctaHref} target="_blank">
+              <a
+                href={ctaHref}
+                target="_blank"
+                onClick={trackCtaClick}
+              >
                 {ctaLabel}
               </a>
             </div>

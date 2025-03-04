@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/devbydaniel/release-notes-go/internal/domain/organisation"
+	"github.com/devbydaniel/release-notes-go/internal/domain/subscription"
 	mw "github.com/devbydaniel/release-notes-go/internal/middleware"
 	"github.com/devbydaniel/release-notes-go/templates"
 	"github.com/google/uuid"
@@ -25,7 +26,7 @@ type InviteData struct {
 }
 
 type usersPageData struct {
-	Title   string
+	BaseTemplateData
 	Users   []*UserData
 	Invites []*InviteData
 	OwnID   string
@@ -54,6 +55,14 @@ func (h *Handler) HandleUsersPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	orgService := organisation.NewService(*organisation.NewRepository(h.DB))
+
+	// Get subscription status
+	subscriptionService := subscription.NewService(*subscription.NewRepository(h.DB))
+	sub, err := subscriptionService.Get(uuid.MustParse(orgId))
+	hasActiveSubscription := false
+	if err == nil {
+		hasActiveSubscription = sub.IsActive || sub.IsFree
+	}
 
 	orgUsers, err := orgService.GetOrgUsers(uuid.MustParse(orgId))
 	if err != nil {
@@ -85,7 +94,10 @@ func (h *Handler) HandleUsersPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	pageData := usersPageData{
-		Title:   "Users",
+		BaseTemplateData: BaseTemplateData{
+			Title:                 "Users",
+			HasActiveSubscription: hasActiveSubscription,
+		},
 		Users:   userData,
 		Invites: inviteData,
 		OwnID:   userID,

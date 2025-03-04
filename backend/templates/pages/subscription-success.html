@@ -1,0 +1,20 @@
+{{ define "page-css" }}
+  <link rel="stylesheet" href="/static/css/components/card.css" />
+  <link rel="stylesheet" href="/static/css/components/button.css" />
+  <link rel="stylesheet" href="/static/css/pages/subscription-success.css" />
+{{ end }}
+
+{{ define "main" }}
+  <div class="subscription-success">
+    <div class="card">
+      <h2 class="card__title">Thank You! ❤️</h2>
+      <div class="card__content">
+        <p>Your subscription has been successfully activated. You now have access to all premium features.</p>
+        <p>You can manage your subscription settings at any time from your account settings page.</p>
+      </div>
+      <div class="card__footer">
+        <a href="/settings" class="button">Go to Settings</a>
+      </div>
+    </div>
+  </div>
+{{ end }} 

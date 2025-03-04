@@ -33,9 +33,15 @@
               </td>
               <td class="table__td">{{ .Title }}</td>
               <td class="table__td table--align-right">
-                <span class="badge">
-                  {{ if .IsPublished }}published{{ else }}not published{{ end }}
+                <div class="metrics-cell">
+                  <span class="badge">
+                    <i data-feather="eye" width="14" height="14"></i>
+                    {{ .ViewCount }}
                 </span>
+                <span class="badge">
+                    {{ if .IsPublished }}published{{ else }}not published{{ end }}
+                  </span>
+                </div>
               </td>
             </tr>
           {{ end }}

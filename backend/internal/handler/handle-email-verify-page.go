@@ -12,7 +12,7 @@ import (
 )
 
 type emailVerifyPageData struct {
-	Title string
+	BaseTemplateData
 }
 
 var emailVerifyTmpl = templates.Construct(
@@ -64,7 +64,9 @@ func (h *Handler) HandleEmailVerifyPage(w http.ResponseWriter, r *http.Request) 
 	} else {
 		// user comes from registration or other
 		data := loginPageData{
-			Title: "Verify Email",
+			BaseTemplateData: BaseTemplateData{
+				Title: "Verify Email",
+			},
 		}
 		if err := emailVerifyTmpl.ExecuteTemplate(w, "root", data); err != nil {
 			h.log.Error().Err(err).Msg("Error rendering page")

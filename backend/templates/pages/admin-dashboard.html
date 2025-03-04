@@ -1,0 +1,40 @@
+{{ define "page-css" }}
+  <link rel="stylesheet" href="/static/css/components/button.css" />
+  <link rel="stylesheet" href="/static/css/components/card.css" />
+  <link rel="stylesheet" href="/static/css/components/table.css" />
+  <link rel="stylesheet" href="/static/css/components/badge.css" />
+  <link rel="stylesheet" href="/static/css/pages/release-notes-list.css" />
+{{ end }}
+
+{{ define "main" }}
+  {{ with .Organisations }}
+    <div class="card card--no-pad">
+      <table class="table">
+        <thead>
+          <tr class="table__tr table__tr--no-hover">
+            <th class="table__th">Created At</th>
+            <th class="table__th">Name</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{ range . }}
+            <tr
+              class="table__tr"
+              role="button"
+              onclick="window.location.href=`/admin/organisations/{{ .ID }}`"
+            >
+              <td class="table__td">{{ .CreatedAt }}</td>
+              <td class="table__td">
+                {{ .Name }}
+              </td>
+            </tr>
+          {{ end }}
+        </tbody>
+      </table>
+    </div>
+  {{ else }}
+    <div class="card empty-state">
+      <span>No organisations found</span>
+    </div>
+  {{ end }}
+{{ end }}

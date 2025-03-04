@@ -12,7 +12,7 @@ import (
 )
 
 type releasePageConfigPageData struct {
-	Title             string
+	BaseTemplateData
 	Cfg               *releasepageconfig.ReleasePageConfig
 	SafeTitle         string
 	SafeDescription   string
@@ -33,6 +33,12 @@ func (h *Handler) HandleReleasePageConfigPage(w http.ResponseWriter, r *http.Req
 	if !ok {
 		h.log.Error().Msg("Organisation ID not found in context")
 		http.Error(w, "Failed to authenticate", http.StatusInternalServerError)
+		return
+	}
+	hasActiveSubscription, ok := r.Context().Value(mw.HasActiveSubscription).(bool)
+	if !ok {
+		h.log.Error().Msg("Subscription status not found in context")
+		http.Error(w, "Error checking subscription status", http.StatusInternalServerError)
 		return
 	}
 
@@ -56,7 +62,10 @@ func (h *Handler) HandleReleasePageConfigPage(w http.ResponseWriter, r *http.Req
 	}
 
 	data := releasePageConfigPageData{
-		Title:             "Release Page Config",
+		BaseTemplateData: BaseTemplateData{
+			Title:                 "Release Page Config",
+			HasActiveSubscription: hasActiveSubscription,
+		},
 		Cfg:               cfg,
 		SafeTitle:         html.EscapeString(cfg.Title),
 		SafeDescription:   html.EscapeString(cfg.Description),

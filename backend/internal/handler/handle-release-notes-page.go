@@ -5,14 +5,20 @@ import (
 	"strconv"
 	"time"
 
+	releasenotemetrics "github.com/devbydaniel/release-notes-go/internal/domain/release-note-metrics"
 	releasenotes "github.com/devbydaniel/release-notes-go/internal/domain/release-notes"
 	mw "github.com/devbydaniel/release-notes-go/internal/middleware"
 	"github.com/devbydaniel/release-notes-go/templates"
 )
 
+type releaseNoteWithMetrics struct {
+	*releasenotes.ReleaseNote
+	ViewCount int
+}
+
 type releaseNotesPageData struct {
-	Title        string
-	ReleaseNotes []*releasenotes.ReleaseNote
+	BaseTemplateData
+	ReleaseNotes []*releaseNoteWithMetrics
 	NextPageLink string
 	PrevPageLink string
 }
@@ -33,7 +39,14 @@ func (h *Handler) HandleReleaseNotesPage(w http.ResponseWriter, r *http.Request)
 		http.Error(w, "Failed to authenticate", http.StatusInternalServerError)
 		return
 	}
+	hasActiveSubscription, ok := ctx.Value(mw.HasActiveSubscription).(bool)
+	if !ok {
+		h.log.Error().Msg("Subscription status not found in context")
+		http.Error(w, "Error checking subscription status", http.StatusInternalServerError)
+		return
+	}
 	releaseNotesService := releasenotes.NewService(*releasenotes.NewRepository(h.DB, h.ObjStore))
+	metricsService := releasenotemetrics.NewService(releasenotemetrics.NewRepository(h.DB))
 	page := r.URL.Query().Get("page")
 	if page == "" {
 		page = "1"
@@ -60,8 +73,13 @@ func (h *Handler) HandleReleaseNotesPage(w http.ResponseWriter, r *http.Request)
 		w.Write([]byte(err.Error()))
 		return
 	}
-	// format release date
-	for _, rn := range releaseNotes.Items {
+
+	// Create slice to hold release notes with metrics
+	releaseNotesWithMetrics := make([]*releaseNoteWithMetrics, len(releaseNotes.Items))
+
+	// For each release note, get its metrics and format date
+	for i, rn := range releaseNotes.Items {
+		// Format date as before
 		if rn.ReleaseDate != nil {
 			releaseDate, err := time.Parse("2006-01-02", *rn.ReleaseDate)
 			if err != nil {
@@ -74,7 +92,20 @@ func (h *Handler) HandleReleaseNotesPage(w http.ResponseWriter, r *http.Request)
 			rd := ""
 			rn.ReleaseDate = &rd
 		}
+
+		// Get view count for this release note
+		viewCount, err := metricsService.GetViewCount(rn.ID)
+		if err != nil {
+			h.log.Error().Err(err).Msg("Error getting view count for release note")
+			viewCount = 0
+		}
+
+		releaseNotesWithMetrics[i] = &releaseNoteWithMetrics{
+			ReleaseNote: rn,
+			ViewCount:   viewCount,
+		}
 	}
+
 	nextPageLink := ""
 	if releaseNotes.Page < releaseNotes.TotalPages {
 		nextPageLink = "/release-notes?page=" + strconv.Itoa(releaseNotes.Page+1) + "&pageSize=" + pageSize
@@ -84,8 +115,11 @@ func (h *Handler) HandleReleaseNotesPage(w http.ResponseWriter, r *http.Request)
 		prevPageLink = "/release-notes?page=" + strconv.Itoa(releaseNotes.Page-1) + "&pageSize=" + pageSize
 	}
 	data := releaseNotesPageData{
-		Title:        "Release Notes",
-		ReleaseNotes: releaseNotes.Items,
+		BaseTemplateData: BaseTemplateData{
+			Title:                 "Release Notes",
+			HasActiveSubscription: hasActiveSubscription,
+		},
+		ReleaseNotes: releaseNotesWithMetrics,
 		NextPageLink: nextPageLink,
 		PrevPageLink: prevPageLink,
 	}

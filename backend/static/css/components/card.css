@@ -3,6 +3,7 @@
   padding: var(--gap-md);
   border-radius: var(--border-radius);
   border: var(--border-width) solid var(--border-color);
+  position: relative;
 }
 
 .card--no-pad {
@@ -11,6 +12,13 @@
 
 .card__title {
   margin-bottom: var(--gap-md);
+  font-size: var(--font-size);
+}
+
+.card__actions {
+  position: absolute;
+  top: var(--gap-md);
+  right: var(--gap-md);
 }
 
 .card__paragraph {
