@@ -7,9 +7,12 @@ import App from "./App";
 
 declare global {
   interface Window {
-    release_beacon_widget_init: WidgetInit;
     announcable_widget_init: WidgetInit;
     AnnouncableWidget: {
+      init: (config: WidgetInit) => void;
+    };
+    release_beacon_widget_init: WidgetInit;
+    ReleaseBeaconWidget: {
       init: (config: WidgetInit) => void;
     };
   }
@@ -43,7 +46,7 @@ function initialize(init: WidgetInit) {
       <Providers>
         <App init={init} />
       </Providers>
-    </React.StrictMode>,
+    </React.StrictMode>
   );
 }
 
@@ -55,11 +58,11 @@ window.AnnouncableWidget = {
 };
 
 // Automatically initialize if config is present
-if (window.announcable_widget_init) {
+if (window.announcable_widget_init && window.AnnouncableWidget) {
   window.AnnouncableWidget.init(window.announcable_widget_init);
-}
-
-// Use release beacon legacy init for backwards compatibility
-if (window.release_beacon_widget_init) {
-  window.AnnouncableWidget.init(window.release_beacon_widget_init);
+} else if (window.release_beacon_widget_init && window.ReleaseBeaconWidget) {
+  // Use release beacon legacy init for backwards compatibility
+  window.ReleaseBeaconWidget.init(window.release_beacon_widget_init);
+} else {
+  console.error("No widget init config found");
 }
