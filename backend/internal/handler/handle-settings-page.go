@@ -89,9 +89,11 @@ func (h *Handler) HandleSettingsPage(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	orgName := ctx.Value(mw.OrgNameKey).(string)
+
 	pageData := settingsPageData{
 		BaseTemplateData: BaseTemplateData{
-			Title:                 "Settings",
+			Title:                 "Settings for " + orgName,
 			HasActiveSubscription: hasActiveSubscription,
 		},
 		WidgetID:            externalId.String(),

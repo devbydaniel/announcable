@@ -9,6 +9,7 @@
   border-bottom: var(--border-width) solid var(--border-color);
   position: sticky;
   top: 0;
+  z-index: 1000;
 }
 
 .header__bumper {

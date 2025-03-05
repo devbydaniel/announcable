@@ -51,6 +51,8 @@ func (s *service) GetByOrgID(orgID uuid.UUID) (*Subscription, error) {
 }
 
 // IsFreeSubscription checks if the subscription is a free subscription
+// If a subscription is free, the subscription button is not shown 
+// and there is no settings for managing the subscription
 func (s *service) IsFreeSubscription(orgID uuid.UUID) (bool, error) {
 	log.Trace().Str("orgID", orgID.String()).Msg("IsFreeSubscription")
 	sub, err := s.repo.Get(orgID)
