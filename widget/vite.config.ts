@@ -1,7 +1,6 @@
 import path from "path";
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import cssInjectedByJsPlugin from "vite-plugin-css-injected-by-js";
 // @ts-ignore
 import namespace from "postcss-plugin-namespace";
 import autoprefixer from "autoprefixer";
@@ -10,14 +9,10 @@ import tailwindcss from "tailwindcss";
 export default defineConfig({
   css: {
     postcss: {
-      plugins: [
-        tailwindcss(),
-        namespace(".release-beacon-widget"),
-        autoprefixer,
-      ],
+      plugins: [tailwindcss(), namespace(".announcable-widget"), autoprefixer],
     },
   },
-  plugins: [react(), cssInjectedByJsPlugin()],
+  plugins: [react()],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

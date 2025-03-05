@@ -30,7 +30,7 @@ function initialize(init: WidgetInit) {
   // Create a closed Shadow DOM
   const shadowRoot = widgetRoot.attachShadow({ mode: "closed" });
 
-  // Inject styles into Shadow DOM
+  // Inject styles into Shadow DOM first
   const styleElement = document.createElement("style");
   styleElement.textContent = styles;
   shadowRoot.appendChild(styleElement);
@@ -64,13 +64,20 @@ window.ReleaseBeaconWidget = {
   },
 };
 
+console.log("window.announcable_widget_init", window.announcable_widget_init);
+console.log(
+  "window.release_beacon_widget_init",
+  window.release_beacon_widget_init
+);
 // Automatically initialize if config is present
 if (window.announcable_widget_init && window.AnnouncableWidget?.init) {
+  console.log("AnnouncableWidget init");
   window.AnnouncableWidget.init(window.announcable_widget_init);
 } else if (
   window.release_beacon_widget_init &&
   window.ReleaseBeaconWidget?.init
 ) {
+  console.log("ReleaseBeaconWidget init");
   // Use release beacon legacy init for backwards compatibility
   window.ReleaseBeaconWidget.init(window.release_beacon_widget_init);
 } else {
