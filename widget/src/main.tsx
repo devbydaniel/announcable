@@ -57,18 +57,19 @@ window.AnnouncableWidget = {
   },
 };
 
+// Use release beacon legacy init for backwards compatibility
+window.ReleaseBeaconWidget = {
+  init: (config: WidgetInit) => {
+    initialize(config);
+  },
+};
+
 // Automatically initialize if config is present
 if (window.announcable_widget_init && window.AnnouncableWidget) {
   window.AnnouncableWidget.init(window.announcable_widget_init);
 } else if (window.release_beacon_widget_init && window.ReleaseBeaconWidget) {
   // Use release beacon legacy init for backwards compatibility
   window.ReleaseBeaconWidget.init(window.release_beacon_widget_init);
-} else if (window.release_beacon_widget_init && window.AnnouncableWidget) {
-  // Use announcable legacy init for backwards compatibility
-  window.AnnouncableWidget.init(window.release_beacon_widget_init);
-} else if (window.announcable_widget_init && window.ReleaseBeaconWidget) {
-  // Use release beacon legacy init for backwards compatibility
-  window.ReleaseBeaconWidget.init(window.announcable_widget_init);
 } else {
   console.error("No widget init config found");
 }
