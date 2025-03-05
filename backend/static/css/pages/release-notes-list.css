@@ -2,6 +2,13 @@
   width: 8em;
 }
 
+.release-notes-table__title-cell {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 16em;
+}
+
 tbody .table__tr {
   cursor: pointer;
 }

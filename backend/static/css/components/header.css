@@ -12,6 +12,12 @@
   z-index: 1000;
 }
 
+.header__left {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .header__bumper {
   flex: 1 1;
 }

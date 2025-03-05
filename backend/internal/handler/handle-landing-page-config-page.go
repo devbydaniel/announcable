@@ -4,8 +4,10 @@ import (
 	"errors"
 	"html"
 	"net/http"
+	"strings"
 
 	releasepageconfig "github.com/devbydaniel/release-notes-go/internal/domain/release-page-configs"
+	widgetconfigs "github.com/devbydaniel/release-notes-go/internal/domain/widget-configs"
 	mw "github.com/devbydaniel/release-notes-go/internal/middleware"
 	"github.com/devbydaniel/release-notes-go/templates"
 	"github.com/google/uuid"
@@ -17,6 +19,7 @@ type releasePageConfigPageData struct {
 	SafeTitle         string
 	SafeDescription   string
 	SafeBackLinkLabel string
+	ReleasePageUrl    string
 }
 
 var releasePageConfigPageTmpl = templates.Construct(
@@ -29,6 +32,7 @@ var releasePageConfigPageTmpl = templates.Construct(
 func (h *Handler) HandleReleasePageConfigPage(w http.ResponseWriter, r *http.Request) {
 	h.log.Trace().Msg("HandleReleasePageConfigPage")
 	releasePageConfigService := releasepageconfig.NewService(*releasepageconfig.NewRepository(h.DB, h.ObjStore))
+	widgetConfigService := widgetconfigs.NewService(*widgetconfigs.NewRepository(h.DB))
 	orgId, ok := r.Context().Value(mw.OrgIDKey).(string)
 	if !ok {
 		h.log.Error().Msg("Organisation ID not found in context")
@@ -61,6 +65,25 @@ func (h *Handler) HandleReleasePageConfigPage(w http.ResponseWriter, r *http.Req
 		}
 	}
 
+	// get release page URL, either from slug or custom URL
+	releasePageUrl, err := releasePageConfigService.GetUrl(uuid.MustParse(orgId))
+	if err != nil {
+		h.log.Error().Err(err).Msg("Error getting release page URL")
+	}
+	if strings.HasPrefix(releasePageUrl, "localhost") {
+		releasePageUrl = "http://" + releasePageUrl
+	} else {
+		releasePageUrl = "https://" + releasePageUrl
+	}
+	widgetCfg, err := widgetConfigService.Get(uuid.MustParse(orgId))
+	if err != nil {
+		h.log.Error().Err(err).Msg("Error getting widget config")
+	}
+	if widgetCfg.ReleasePageBaseUrl != nil {
+		releasePageUrl = *widgetCfg.ReleasePageBaseUrl
+	}
+	h.log.Debug().Str("releasePageUrl", releasePageUrl).Msg("Release page URL")
+
 	data := releasePageConfigPageData{
 		BaseTemplateData: BaseTemplateData{
 			Title:                 "Release Page Config",
@@ -70,6 +93,7 @@ func (h *Handler) HandleReleasePageConfigPage(w http.ResponseWriter, r *http.Req
 		SafeTitle:         html.EscapeString(cfg.Title),
 		SafeDescription:   html.EscapeString(cfg.Description),
 		SafeBackLinkLabel: html.EscapeString(cfg.BackLinkLabel),
+		ReleasePageUrl:    releasePageUrl,
 	}
 	if err := releasePageConfigPageTmpl.ExecuteTemplate(w, "root", data); err != nil {
 		h.log.Error().Err(err).Msg("Error rendering page")
