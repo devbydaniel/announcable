@@ -7,13 +7,13 @@ import App from "./App";
 
 declare global {
   interface Window {
-    announcable_widget_init: WidgetInit;
-    AnnouncableWidget: {
-      init: (config: WidgetInit) => void;
+    announcable_widget_init?: WidgetInit;
+    AnnouncableWidget?: {
+      init?: (config: WidgetInit) => void;
     };
-    release_beacon_widget_init: WidgetInit;
-    ReleaseBeaconWidget: {
-      init: (config: WidgetInit) => void;
+    release_beacon_widget_init?: WidgetInit;
+    ReleaseBeaconWidget?: {
+      init?: (config: WidgetInit) => void;
     };
   }
 }
@@ -65,9 +65,12 @@ window.ReleaseBeaconWidget = {
 };
 
 // Automatically initialize if config is present
-if (window.announcable_widget_init && window.AnnouncableWidget) {
+if (window.announcable_widget_init && window.AnnouncableWidget?.init) {
   window.AnnouncableWidget.init(window.announcable_widget_init);
-} else if (window.release_beacon_widget_init && window.ReleaseBeaconWidget) {
+} else if (
+  window.release_beacon_widget_init &&
+  window.ReleaseBeaconWidget?.init
+) {
   // Use release beacon legacy init for backwards compatibility
   window.ReleaseBeaconWidget.init(window.release_beacon_widget_init);
 } else {
