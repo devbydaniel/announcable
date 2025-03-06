@@ -7,7 +7,7 @@ import App from "./App";
 
 declare global {
   interface Window {
-    announcable_widget_init?: WidgetInit;
+    announcable_init?: WidgetInit;
     AnnouncableWidget?: {
       init?: (config: WidgetInit) => void;
     };
@@ -64,15 +64,10 @@ window.ReleaseBeaconWidget = {
   },
 };
 
-console.log("window.announcable_widget_init", window.announcable_widget_init);
-console.log(
-  "window.release_beacon_widget_init",
-  window.release_beacon_widget_init
-);
 // Automatically initialize if config is present
-if (window.announcable_widget_init && window.AnnouncableWidget?.init) {
+if (window.announcable_init && window.AnnouncableWidget?.init) {
   console.log("AnnouncableWidget init");
-  window.AnnouncableWidget.init(window.announcable_widget_init);
+  window.AnnouncableWidget.init(window.announcable_init);
 } else if (
   window.release_beacon_widget_init &&
   window.ReleaseBeaconWidget?.init

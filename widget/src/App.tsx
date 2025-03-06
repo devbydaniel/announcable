@@ -34,7 +34,7 @@ export default function App({ init }: Props) {
     () => ({
       orgId: init.org_id,
     }),
-    [init.org_id],
+    [init.org_id]
   );
 
   const { data: releaseNoteStatus } = useReleaseNoteStatus(queryParams);
@@ -168,13 +168,13 @@ function hasUnseenReleaseNotes({
   const lastOpenedDate = new Date(parseInt(lastOpened));
   return releaseNoteStatus.some(
     (note) =>
-      note.last_update_on && new Date(note.last_update_on) > lastOpenedDate,
+      note.last_update_on && new Date(note.last_update_on) > lastOpenedDate
   );
 }
 
 function updateIndicatorDataset(
   anchorElement: HTMLElement | null,
-  shouldDisplay: boolean,
+  shouldDisplay: boolean
 ) {
   if (!anchorElement) return;
   const newValue = shouldDisplay ? "true" : "false";
@@ -194,13 +194,13 @@ function shouldInstantOpen({
   return releaseNoteStatus.some(
     (note) =>
       note.attention_mechanism === "instant_open" &&
-      new Date(note.last_update_on) > lastOpenedDate,
+      new Date(note.last_update_on) > lastOpenedDate
   );
 }
 
 function updateInstantOpenDataset(
   anchorElement: HTMLElement | null,
-  shouldDisplay: boolean,
+  shouldDisplay: boolean
 ) {
   if (!anchorElement) return;
   const newValue = shouldDisplay ? "true" : "false";
