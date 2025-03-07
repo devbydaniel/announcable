@@ -25,7 +25,7 @@ services:
   app:
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.app.rule=Host(`release-notes.danielbenner.de`)"
+      - "traefik.http.routers.app.rule=Host(`release-notes.danielbenner.de`) || Host(`app.announcable.me`)"
       - "traefik.http.routers.app.entrypoints=websecure"
       - "traefik.http.routers.app.tls.certresolver=myresolver"
       - "traefik.http.services.app.loadbalancer.server.port=${PORT}"
