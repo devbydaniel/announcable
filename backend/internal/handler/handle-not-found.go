@@ -2,14 +2,16 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/devbydaniel/release-notes-go/templates"
 )
 
 var notFoundTmpl = templates.Construct(
-	"register",
+	"not-found",
 	"layouts/root.html",
 	"layouts/fullscreenmessage.html",
 	"pages/not-found.html",
@@ -37,9 +39,13 @@ func (h *Handler) HandleNotFound(w http.ResponseWriter, r *http.Request) {
 	} else {
 		// HTML response
 		w.WriteHeader(404)
-		if err := notFoundTmpl.ExecuteTemplate(w, "root", nil); err != nil {
+		data := map[string]interface{}{
+			"Title": "Page Not Found",
+		}
+		if err := notFoundTmpl.ExecuteTemplate(w, "root", data); err != nil {
+			fmt.Fprintf(os.Stderr, "HandleNotFound: Error executing template: %v\n", err)
 			h.log.Error().Err(err).Msg("Error rendering page")
-			http.Error(w, "Error rendering page", http.StatusInternalServerError)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		}
 	}
 }

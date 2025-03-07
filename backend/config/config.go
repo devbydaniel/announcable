@@ -53,6 +53,11 @@ type payment struct {
 	WebhookSecret string
 }
 
+type axiomConfig struct {
+	Dataset string
+	Token   string
+}
+
 type config struct {
 	Env         string
 	BaseURL     string
@@ -65,6 +70,7 @@ type config struct {
 	ProductInfo productInfo
 	Legal       legal
 	Payment     payment
+	Axiom       axiomConfig
 }
 
 func New() *config {
@@ -113,6 +119,10 @@ func New() *config {
 			CompanyAddress: "1234 Elm St, Springfield, IL 62701",
 			SupportEmail:   "support@test.de",
 			PersonalName:   "Daniel",
+		},
+		Axiom: axiomConfig{
+			Dataset: getEnv("AXIOM_DATASET"),
+			Token:   getEnv("AXIOM_TOKEN"),
 		},
 	}
 }

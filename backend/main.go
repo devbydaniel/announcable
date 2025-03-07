@@ -4,7 +4,10 @@ import (
 	"context"
 	"net/http"
 	"os"
+	"os/signal"
 	"strconv"
+	"syscall"
+	"time"
 
 	"github.com/devbydaniel/release-notes-go/config"
 	"github.com/devbydaniel/release-notes-go/internal/database"
@@ -32,6 +35,8 @@ func main() {
 	log.Info().Msg("Environment loaded")
 	db := initDb()
 	defer database.Close(db)
+	defer logger.Cleanup() // Ensure logger is cleaned up on shutdown
+	
 	initStripe()
 	objStore := initObjStore()
 	mwHandler := mw.NewHandler(db)
@@ -242,10 +247,44 @@ func main() {
 
 	r.NotFound(handler.HandleNotFound)
 
-	// SERVE
+	// Create server with timeout configurations
+	srv := &http.Server{
+		Addr:    ":" + strconv.Itoa(cfg.Port),
+		Handler: r,
+	}
 
-	portStr := ":" + strconv.Itoa(cfg.Port)
-	http.ListenAndServe(portStr, r)
+	// Channel to listen for errors coming from the listener.
+	serverErrors := make(chan error, 1)
+	
+	// Start the server in the background
+	go func() {
+		log.Info().Msgf("Server listening on port %d", cfg.Port)
+		serverErrors <- srv.ListenAndServe()
+	}()
+
+	// Channel to listen for an interrupt or terminate signal from the OS.
+	shutdown := make(chan os.Signal, 1)
+	signal.Notify(shutdown, os.Interrupt, syscall.SIGTERM)
+
+	// Blocking main and waiting for shutdown.
+	select {
+	case err := <-serverErrors:
+		log.Error().Err(err).Msg("Server error")
+	case sig := <-shutdown:
+		log.Info().Msgf("Start shutdown due to %s signal", sig)
+		
+		// Give outstanding requests a deadline for completion.
+		ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+		defer cancel()
+
+		// Asking listener to shut down and shed load.
+		if err := srv.Shutdown(ctx); err != nil {
+			log.Error().Err(err).Msg("Graceful shutdown did not complete")
+			if err := srv.Close(); err != nil {
+				log.Error().Err(err).Msg("Could not stop server")
+			}
+		}
+	}
 }
 
 func initEnv() {
