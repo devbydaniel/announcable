@@ -6,6 +6,7 @@ import (
 
 	"github.com/devbydaniel/release-notes-go/internal/domain/session"
 	"github.com/devbydaniel/release-notes-go/internal/domain/user"
+	"github.com/devbydaniel/release-notes-go/internal/ratelimit"
 	"github.com/devbydaniel/release-notes-go/templates"
 	"github.com/go-playground/validator"
 )
@@ -15,6 +16,7 @@ type pwForgotForm struct {
 }
 
 var pwForgotTmpl = templates.Construct("pw-reset-confirm", "partials/hx-pw-forgot-confirm.html")
+var pwForgotRateLimiter = ratelimit.New(60, 2)
 
 func (h *Handler) HandlePwForgot(w http.ResponseWriter, r *http.Request) {
 	h.log.Trace().Msg("HandlePwForgot")
@@ -41,6 +43,13 @@ func (h *Handler) HandlePwForgot(w http.ResponseWriter, r *http.Request) {
 	if err := validate.Struct(forgotForm); err != nil {
 		h.log.Error().Err(err).Msg("Validation error")
 		http.Error(w, "Error updating widget config", http.StatusBadRequest)
+		return
+	}
+
+	// check rate limit
+	if err := pwForgotRateLimiter.Deduct(forgotForm.Email, 1); err != nil {
+		h.log.Warn().Str("email", forgotForm.Email).Msg("Rate limit exceeded for password reset requests")
+		http.Error(w, "Too many password reset requests. Please try again later.", http.StatusTooManyRequests)
 		return
 	}
 

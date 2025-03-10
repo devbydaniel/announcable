@@ -23,6 +23,7 @@ type Bucket struct {
 }
 
 func (b *Bucket) consume(cost, maxValue float64, refillIntervalMillis int64) bool {
+	// lock the bucket
 	b.mu.Lock()
 	defer b.mu.Unlock()
 	// calculate refill until now & refill bucket
@@ -55,7 +56,7 @@ func (tbr *TokenBucketRateLimit) Deduct(id string, cost float64) error {
 		return tbr.Deduct(id, cost)
 	}
 	if ok := bucket.consume(cost, tbr.maxValue, tbr.refillIntervalMillis); !ok {
-		return errors.New("Rate limit reached")
+		return errors.New("rate limit reached")
 	}
 	return nil
 }

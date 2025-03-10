@@ -5,11 +5,10 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/devbydaniel/release-notes-go/internal/domain/organisation"
 	"github.com/devbydaniel/release-notes-go/internal/domain/rbac"
 	mw "github.com/devbydaniel/release-notes-go/internal/middleware"
+	"github.com/devbydaniel/release-notes-go/internal/ratelimit"
 	"github.com/go-playground/validator"
-	"github.com/google/uuid"
 )
 
 type userInviteForm struct {
@@ -17,15 +16,23 @@ type userInviteForm struct {
 	Role  rbac.Role `json:"role" validate:"required"`
 }
 
+var inviteUserRateLimiter = ratelimit.New(60, 10)
+
 func (h *Handler) HandleInvite(w http.ResponseWriter, r *http.Request) {
 	h.log.Trace().Msg("HandleInvite")
 	ctx := r.Context()
-	orgService := organisation.NewService(*organisation.NewRepository(h.DB))
 
 	userId := ctx.Value(mw.UserIDKey).(string)
 	if userId == "" {
 		h.log.Error().Msg("User ID not found in context")
 		http.Error(w, "Error updating release note", http.StatusInternalServerError)
+	}
+
+	// check rate limit
+	if err := inviteUserRateLimiter.Deduct(userId, 1); err != nil {
+		h.log.Warn().Str("user_id", userId).Msg("Rate limit exceeded for invite user requests")
+		http.Error(w, "Too many requests. Please try again later.", http.StatusTooManyRequests)
+		return
 	}
 
 	orgId := ctx.Value(mw.OrgIDKey).(string)
@@ -56,9 +63,6 @@ func (h *Handler) HandleInvite(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error updating widget config", http.StatusBadRequest)
 		return
 	}
-
-	// create invite
-	orgService.InviteUser(uuid.MustParse(orgId), inviteDTO.Email, rbac.Role(inviteDTO.Role))
 
 	successMsg := "invite sent"
 	escapedMsg := url.QueryEscape(successMsg)

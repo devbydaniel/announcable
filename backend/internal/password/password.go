@@ -32,25 +32,25 @@ func IsValidPassword(password string) error {
 	log.Trace().Msg("IsValidPassword")
 	// Check minimum length
 	if len(password) < 8 {
-		return errors.New("Password must be at least 8 characters long")
+		return errors.New("password must be at least 8 characters long")
 	}
 
 	// Check for at least one uppercase letter
 	uppercase := regexp.MustCompile(`[A-Z]`).MatchString(password)
 	if !uppercase {
-		return errors.New("Password must contain at least one uppercase letter")
+		return errors.New("password must contain at least one uppercase letter")
 	}
 
 	// Check for at least one lowercase letter
 	lowercase := regexp.MustCompile(`[a-z]`).MatchString(password)
 	if !lowercase {
-		return errors.New("Password must contain at least one lowercase letter")
+		return errors.New("password must contain at least one lowercase letter")
 	}
 
 	// Check for at least one number
 	number := regexp.MustCompile(`[0-9]`).MatchString(password)
 	if !number {
-		return errors.New("Password must contain at least one number")
+		return errors.New("password must contain at least one number")
 	}
 
 	return nil

@@ -10,6 +10,7 @@ import (
 	"github.com/devbydaniel/release-notes-go/internal/domain/user"
 	widgetconfigs "github.com/devbydaniel/release-notes-go/internal/domain/widget-configs"
 	"github.com/devbydaniel/release-notes-go/internal/password"
+	"github.com/devbydaniel/release-notes-go/internal/ratelimit"
 )
 
 type registerForm struct {
@@ -19,6 +20,8 @@ type registerForm struct {
 	ConfirmPassword string
 	Legal           string
 }
+
+var registerRateLimiter = ratelimit.New(60, 5)
 
 func (h *Handler) HandleRegister(w http.ResponseWriter, r *http.Request) {
 	h.log.Trace().Msg("HandleRegister")
@@ -42,6 +45,19 @@ func (h *Handler) HandleRegister(w http.ResponseWriter, r *http.Request) {
 		Legal:           r.FormValue("legal"),
 	}
 	h.log.Debug().Interface("req", req).Msg("Register request")
+
+	// check rate limit
+	if err := registerRateLimiter.Deduct(req.Email, 1); err != nil {
+		h.log.Warn().Str("email", req.Email).Msg("Rate limit exceeded for register requests")
+		http.Error(w, "Too many requests. Please try again later.", http.StatusTooManyRequests)
+		return
+	}
+	if err := registerRateLimiter.Deduct(req.OrgName, 1); err != nil {
+		h.log.Warn().Str("org_name", req.OrgName).Msg("Rate limit exceeded for register requests")
+		http.Error(w, "Too many requests. Please try again later.", http.StatusTooManyRequests)
+		return
+	}
+
 
 	if err := orgService.IsValidOrgName(req.OrgName); err != nil {
 		h.log.Debug().Err(err).Msg("Invalid org name")
