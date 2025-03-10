@@ -8,6 +8,7 @@ import (
 
 	"github.com/devbydaniel/release-notes-go/internal/domain/organisation"
 	releasenotes "github.com/devbydaniel/release-notes-go/internal/domain/release-notes"
+	"github.com/devbydaniel/release-notes-go/internal/util"
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 )
@@ -105,6 +106,9 @@ func (h *Handler) HandleReleaseNotesServe(w http.ResponseWriter, r *http.Request
 			releaseDate = ""
 		}
 		h.log.Debug().Str("releaseDate", releaseDate).Msg("Release date")
+		if rn.MediaLink != "" {
+			rn.MediaLink = util.TransformMediaLink(rn.MediaLink)
+		}
 		res.Data = append(res.Data, serveReleaseNotesWidgetResponseBodyReleaseNotes{
 			ID:                 rn.ID.String(),
 			Title:              rn.Title,

@@ -86,6 +86,14 @@
                     class="content__rns__rn__content__img"
                   />
                 {{ end }}
+                {{ with .MediaLink }}
+                  <iframe
+                    src="{{ . }}"
+                    class="content__rns__rn__content__video"
+                    allow="fullscreen"
+                    allowfullscreen
+                  ></iframe>
+                {{ end }}
                 <p
                   class="content__rns__rn__content__description"
                   style="color: {{ $.Cfg.TextColor }}"

@@ -10,7 +10,6 @@ import {
 import type { ReleaseNote } from "@/lib/types";
 import { Skeleton } from "./skeleton";
 import useReleaseNoteMetrics from "@/hooks/useReleaseNoteMetrics";
-import { getEmbedUrl } from "@/lib/media";
 
 interface ReleaseNotesListProps {
   children: React.ReactNode;
@@ -47,12 +46,6 @@ export function ReleaseNoteEntry({
   const ctaHref =
     releaseNote.cta_href_override || `${baseUrl}#${releaseNote.id}`;
 
-  // Get embedded media URL if available
-  const embeddedMedia = releaseNote.media_link
-    ? getEmbedUrl(releaseNote.media_link)
-    : null;
-  console.log("embeddedMedia", embeddedMedia);
-
   return (
     <Card
       ref={elementRef}
@@ -72,16 +65,16 @@ export function ReleaseNoteEntry({
       </CardHeader>
       <CardContent>
         <div className="w-full flex flex-col gap-4">
-          {embeddedMedia?.embedUrl ? (
+          {releaseNote.media_link ? (
             <div className="relative w-full aspect-video">
               <iframe
-                src={embeddedMedia.embedUrl}
+                src={releaseNote.media_link}
                 className="absolute top-0 left-0 w-full h-full"
                 allow="fullscreen"
                 allowFullScreen
                 loading="lazy"
                 referrerPolicy="no-referrer"
-                sandbox="allow-scripts allow-presentation"
+                sandbox="allow-scripts allow-presentation allow-same-origin"
                 title={releaseNote.title}
               />
             </div>

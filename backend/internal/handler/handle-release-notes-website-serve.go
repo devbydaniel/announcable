@@ -9,6 +9,7 @@ import (
 	"github.com/devbydaniel/release-notes-go/internal/domain/organisation"
 	releasenotes "github.com/devbydaniel/release-notes-go/internal/domain/release-notes"
 	releasepageconfig "github.com/devbydaniel/release-notes-go/internal/domain/release-page-configs"
+	"github.com/devbydaniel/release-notes-go/internal/util"
 	"github.com/devbydaniel/release-notes-go/templates"
 	"github.com/go-chi/chi/v5"
 )
@@ -81,7 +82,7 @@ func (h *Handler) HandleReleasePage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// format release date
+	// format release date and transform media links
 	for _, rn := range rns.Items {
 		if rn.ReleaseDate != nil {
 			releaseDate, err := time.Parse("2006-01-02", *rn.ReleaseDate)
@@ -94,6 +95,11 @@ func (h *Handler) HandleReleasePage(w http.ResponseWriter, r *http.Request) {
 		} else {
 			rd := ""
 			rn.ReleaseDate = &rd
+		}
+
+		// Transform media link to embed URL
+		if rn.MediaLink != "" {
+			rn.MediaLink = util.TransformMediaLink(rn.MediaLink)
 		}
 	}
 

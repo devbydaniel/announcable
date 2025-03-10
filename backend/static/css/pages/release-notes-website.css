@@ -94,6 +94,13 @@
   margin-bottom: var(--gap-lg);
 }
 
+.content__rns__rn__content__video {
+  width: 100%;
+  aspect-ratio: 16/9;
+  border: none;
+  margin-bottom: 1rem;
+}
+
 .content__rns__rn__content__description {
   font-size: var(--font-size);
   line-height: var(--gap-lg);
