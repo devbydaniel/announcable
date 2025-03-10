@@ -3,15 +3,17 @@ document.addEventListener("alpine:init", () => {
   Alpine.data(
     "form",
     (
-      textWebsiteOverrideIsChecked,
-      hideCtaIsChecked,
-      ctaLabelOverrideIsChecked,
-      ctaUrlOverrideIsChecked,
+      textWebsiteOverrideIsChecked = false,
+      hideCtaIsChecked = false,
+      ctaLabelOverrideIsChecked = false,
+      ctaUrlOverrideIsChecked = false,
+      mediaType,
     ) => ({
       textWebsiteOverrideIsChecked,
       hideCtaIsChecked,
       ctaLabelOverrideIsChecked,
       ctaUrlOverrideIsChecked,
+      mediaType,
       onSubmitError: function (event) {
         toastError(event.detail.xhr.response);
       },

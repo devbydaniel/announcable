@@ -13,3 +13,7 @@
     grid-template-columns: 2fr 1fr;
   }
 }
+
+.form__media-preview--mt {
+  margin-top: var(--gap-sm);
+}

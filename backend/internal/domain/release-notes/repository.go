@@ -58,7 +58,19 @@ func (r *repository) Update(id uuid.UUID, rn *ReleaseNote, tx *gorm.DB) error {
 	} else {
 		client = r.db.Client
 	}
-	if err := client.Model(&ReleaseNote{}).Where("id = ?", id).Select("Title", "DescriptionShort", "DescriptionLong", "ReleaseDate", "CtaLabelOverride", "CtaUrlOverride", "HideCta", "AttentionMechanism", "HideOnWidget", "HideOnReleasePage").Updates(rn).Error; err != nil {
+	if err := client.Model(&ReleaseNote{}).Where("id = ?", id).Select(
+		"Title", 
+		"DescriptionShort", 
+		"DescriptionLong", 
+		"ReleaseDate", 
+		"CtaLabelOverride", 
+		"CtaUrlOverride", 
+		"HideCta", 
+		"AttentionMechanism", 
+		"HideOnWidget", 
+		"HideOnReleasePage",
+		"MediaLink",
+	).Updates(rn).Error; err != nil {
 		log.Error().Err(err).Msg("Error updating release note")
 		return err
 	}
@@ -204,14 +216,17 @@ func (r *repository) DeleteImage(id uuid.UUID, tx *gorm.DB) error {
 		log.Error().Err(err).Msg("Error finding release note")
 		return err
 	}
-	if err := r.objStore.DeleteImage(r.bucket, rn.ImagePath); err != nil {
-		log.Error().Err(err).Msg("Error deleting image")
-		return err
+	if rn.ImagePath != "" {
+		if err := r.objStore.DeleteImage(r.bucket, rn.ImagePath); err != nil {
+			log.Error().Err(err).Msg("Error deleting image")
+			return err
+		}
+		if err := r.UpdateWithNil(id, map[string]interface{}{"ImagePath": nil}, tx); err != nil {
+			log.Error().Err(err).Msg("Error updating release note")
+			return err
+		}
 	}
-	if err := r.UpdateWithNil(id, map[string]interface{}{"ImagePath": nil}, tx); err != nil {
-		log.Error().Err(err).Msg("Error updating release note")
-		return err
-	}
+
 	return nil
 }
 

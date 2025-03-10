@@ -10,6 +10,7 @@ import {
 import type { ReleaseNote } from "@/lib/types";
 import { Skeleton } from "./skeleton";
 import useReleaseNoteMetrics from "@/hooks/useReleaseNoteMetrics";
+import { getEmbedUrl } from "@/lib/media";
 
 interface ReleaseNotesListProps {
   children: React.ReactNode;
@@ -46,6 +47,12 @@ export function ReleaseNoteEntry({
   const ctaHref =
     releaseNote.cta_href_override || `${baseUrl}#${releaseNote.id}`;
 
+  // Get embedded media URL if available
+  const embeddedMedia = releaseNote.media_link
+    ? getEmbedUrl(releaseNote.media_link)
+    : null;
+  console.log("embeddedMedia", embeddedMedia);
+
   return (
     <Card
       ref={elementRef}
@@ -65,7 +72,20 @@ export function ReleaseNoteEntry({
       </CardHeader>
       <CardContent>
         <div className="w-full flex flex-col gap-4">
-          {releaseNote.imageSrc && (
+          {embeddedMedia?.embedUrl ? (
+            <div className="relative w-full aspect-video">
+              <iframe
+                src={embeddedMedia.embedUrl}
+                className="absolute top-0 left-0 w-full h-full"
+                allow="fullscreen"
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer"
+                sandbox="allow-scripts allow-presentation"
+                title={releaseNote.title}
+              />
+            </div>
+          ) : releaseNote.imageSrc ? (
             <div>
               <img
                 src={releaseNote.imageSrc}
@@ -80,17 +100,13 @@ export function ReleaseNoteEntry({
                 }}
               />
             </div>
-          )}
+          ) : null}
           {releaseNote.text && (
             <div className="whitespace-pre-wrap">{releaseNote.text}</div>
           )}
           {!releaseNote.hide_cta && (
             <div className="w-full flex justify-center">
-              <a
-                href={ctaHref}
-                target="_blank"
-                onClick={trackCtaClick}
-              >
+              <a href={ctaHref} target="_blank" onClick={trackCtaClick}>
                 {ctaLabel}
               </a>
             </div>

@@ -17,6 +17,7 @@ type serveReleaseNotesWidgetResponseBodyReleaseNotes struct {
 	Title              string `json:"title"`
 	Date               string `json:"date"`
 	ImageSrc           string `json:"imageSrc"`
+	MediaLink          string `json:"media_link"`
 	Text               string `json:"text"`
 	LastUpdateOn       string `json:"last_update_on"`
 	CtaLabelOverride   string `json:"cta_label_override"`
@@ -109,6 +110,7 @@ func (h *Handler) HandleReleaseNotesServe(w http.ResponseWriter, r *http.Request
 			Title:              rn.Title,
 			Date:               releaseDate,
 			ImageSrc:           rn.ImageUrl,
+			MediaLink:          rn.MediaLink,
 			Text:               rn.DescriptionShort,
 			LastUpdateOn:       rn.UpdatedAt.String(),
 			CtaLabelOverride:   rn.CtaLabelOverride,

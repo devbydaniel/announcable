@@ -3,6 +3,7 @@ export interface ReleaseNote {
   title: string;
   date?: string;
   imageSrc?: string;
+  media_link?: string;
   text?: string;
   last_update_on: Date;
   cta_label_override?: string;

@@ -56,20 +56,31 @@
       {{ template "hx-publish-rn-button" .Rn.ID }}
     {{ end }}
   {{ end }}
-  <button 
-    id="submit-button" 
-    class="button button--primary"
-  >
+  <button id="submit-button" class="button button--primary">
     <span>Save</span>
   </button>
 {{ end }}
 
 {{ define "main" }}
+  {{/* Define the form initialization data */}}
+  {{ $mediaType := "image" }}
+  {{ if .Rn.MediaLink }}
+    {{ $mediaType = "embed" }}
+  {{ end }}
+  {{ $formData := printf "form(%v, %v, %v, %v, '%v')"
+    .TextWebsiteOverrideIsChecked
+    .HideCtaIsChecked
+    .CtaLabelOverrideIsChecked
+    .CtaUrlOverrideIsChecked
+    $mediaType
+  }}
+
+
   <div class="card">
     <form
       id="form"
       class="form"
-      x-data="form({{ .TextWebsiteOverrideIsChecked }}, {{ .HideCtaIsChecked }}, {{ .CtaLabelOverrideIsChecked }}, {{ .CtaUrlOverrideIsChecked }})"
+      x-data="{{ $formData }}"
       {{ if .IsEdit }}
         hx-patch="/release-notes/{{ .Rn.ID }}"
       {{ else }}
@@ -93,6 +104,37 @@
           />
         </div>
         <div class="form__group">
+          <div class="form__label">Media Type</div>
+          <div class="form__group__list">
+            <div class="checkbox">
+              <input
+                class="checkbox__input"
+                type="radio"
+                id="media_type_image"
+                name="media_type"
+                value="image"
+                x-model="mediaType"
+              />
+              <label class="checkbox__label" for="media_type_image"
+                >Image Upload</label
+              >
+            </div>
+            <div class="checkbox">
+              <input
+                class="checkbox__input"
+                type="radio"
+                id="media_type_embed"
+                name="media_type"
+                value="embed"
+                x-model="mediaType"
+              />
+              <label class="checkbox__label" for="media_type_embed"
+                >Embedded Media (YouTube/Loom)</label
+              >
+            </div>
+          </div>
+        </div>
+        <div class="form__group" x-show="mediaType === 'image'" x-transition>
           <label class="form__label" for="image">Image</label>
           <div
             class="file-input"
@@ -128,10 +170,44 @@
             </div>
           </div>
         </div>
-        <div class="form__group">
-          <label class="form__label" for="description_short"
-            >Description (Widget)</label
+        <div class="form__group" x-show="mediaType === 'embed'" x-transition>
+          <label class="form__label" for="media_link"
+            >Media Link (YouTube/Loom URL)</label
           >
+          <input
+            class="form__input"
+            type="url"
+            id="media_link"
+            name="media_link"
+            x-ref="mediaLink"
+            placeholder="https://www.youtube.com/watch?v=... or https://www.loom.com/share/..."
+            value="{{ .Rn.MediaLink }}"
+          />
+          <div
+            x-ref="mediaPreview"
+            class="form__media-preview form__media-preview--mt"
+            x-show="$refs.mediaLink.value"
+            x-transition
+          >
+            <template x-if="$refs.mediaLink.value.includes('youtube.com')">
+              <iframe
+                :src="'https://www.youtube.com/embed/' + $refs.mediaLink.value.split('v=')[1]?.split('&')[0]"
+                style="width: 100%; aspect-ratio: 16/9; border: none; border-radius: 4px;"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen
+              ></iframe>
+            </template>
+            <template x-if="$refs.mediaLink.value.includes('loom.com')">
+              <iframe
+                :src="$refs.mediaLink.value.replace('share', 'embed')"
+                style="width: 100%; aspect-ratio: 16/9; border: none; border-radius: 4px;"
+                allowfullscreen
+              ></iframe>
+            </template>
+          </div>
+        </div>
+        <div class="form__group">
+          <label class="form__label" for="description_short">Description</label>
           <textarea
             class="form__input"
             id="description_short"

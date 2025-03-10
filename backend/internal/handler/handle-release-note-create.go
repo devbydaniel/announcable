@@ -33,6 +33,8 @@ type releaseNoteCreateForm struct {
 	AttentionMechanism  string `schema:"attention_mechanism"`
 	HideOnWidget        bool   `schema:"hide_on_widget"`
 	HideOnReleasePage   bool   `schema:"hide_on_release_page"`
+	MediaType           string `schema:"media_type"`
+	MediaLink           string `schema:"media_link"`
 }
 
 func (h *Handler) HandleReleaseNoteCreate(w http.ResponseWriter, r *http.Request) {
@@ -109,25 +111,31 @@ func (h *Handler) HandleReleaseNoteCreate(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	// handle image
-	img, imgHeader, err := r.FormFile("image")
-	if err != nil {
-		h.log.Debug().Err(err).Msg("No image uploaded")
-	}
-
-	// prepare models
+	// Prepare the image input based on media type
 	var imgInput *releasenotes.ImageInput
-	if img != nil {
-		ok := imgUtil.VerifyImageType(img)
-		if !ok {
-			h.log.Error().Msg("Invalid image type")
-			http.Error(w, "Error updating release note", http.StatusBadRequest)
-			return
+	if createDTO.MediaType == "image" {
+		// Only process image if image type is selected
+		img, imgHeader, err := r.FormFile("image")
+		if err != nil {
+			h.log.Debug().Err(err).Msg("No image uploaded")
 		}
-		imgInput = &releasenotes.ImageInput{
-			ShouldDeleteImage: false,
-			ImgData:           img,
-			Format:            imgHeader.Header.Get("Content-Type"),
+
+		if img != nil {
+			ok := imgUtil.VerifyImageType(img)
+			if !ok {
+				h.log.Error().Msg("Invalid image type")
+				http.Error(w, "Error updating release note", http.StatusBadRequest)
+				return
+			}
+			imgInput = &releasenotes.ImageInput{
+				ShouldDeleteImage: false,
+				ImgData:           img,
+				Format:            imgHeader.Header.Get("Content-Type"),
+			}
+		} else if createDTO.DeleteImage {
+			imgInput = &releasenotes.ImageInput{
+				ShouldDeleteImage: true,
+			}
 		}
 	}
 
@@ -142,6 +150,22 @@ func (h *Handler) HandleReleaseNoteCreate(w http.ResponseWriter, r *http.Request
 		HideOnWidget:       createDTO.HideOnWidget,
 		HideOnReleasePage:  createDTO.HideOnReleasePage,
 	}
+
+	// Handle media type switching
+	switch createDTO.MediaType {
+	case "embed":
+		// If switching to embed, clear image path, set media link, and always delete any existing image
+		releaseNote.ImagePath = ""
+		releaseNote.MediaLink = createDTO.MediaLink
+		imgInput = &releasenotes.ImageInput{
+			ShouldDeleteImage: true,
+		}
+	case "image":
+		// If switching to image, clear media link
+		releaseNote.MediaLink = ""
+		// Image handling is done above with imgInput
+	}
+
 	if createDTO.TextWebsiteOverride == "on" {
 		releaseNote.DescriptionLong = createDTO.DescriptionLong
 	} else {

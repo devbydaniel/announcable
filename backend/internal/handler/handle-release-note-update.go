@@ -28,6 +28,8 @@ type releaseNoteUpdateForm struct {
 	AttentionMechanism  string `schema:"attention_mechanism"`
 	HideOnWidget        string `schema:"hide_on_widget"`
 	HideOnReleasePage   string `schema:"hide_on_release_page"`
+	MediaType           string `schema:"media_type"`
+	MediaLink           string `schema:"media_link"`
 }
 
 func (h *Handler) HandleReleaseNoteUpdate(w http.ResponseWriter, r *http.Request) {
@@ -86,25 +88,33 @@ func (h *Handler) HandleReleaseNoteUpdate(w http.ResponseWriter, r *http.Request
 
 	// prepare models
 	var imgInput *releasenotes.ImageInput
-	if img != nil {
-		ok := imgUtil.VerifyImageType(img)
-		if !ok {
-			h.log.Error().Msg("Invalid image type")
-			http.Error(w, "Error updating release note", http.StatusBadRequest)
-			return
+	if updateDTO.MediaType == "image" {
+		if updateDTO.ShouldDeleteImage {
+			// If delete is requested, always delete regardless of new upload
+			imgInput = &releasenotes.ImageInput{
+				ShouldDeleteImage: true,
+			}
+		} else if img != nil {
+			// Only process new image if no deletion is requested
+			ok := imgUtil.VerifyImageType(img)
+			if !ok {
+				h.log.Error().Msg("Invalid image type")
+				http.Error(w, "Error updating release note", http.StatusBadRequest)
+				return
+			}
+			imgInput = &releasenotes.ImageInput{
+				ShouldDeleteImage: false,
+				ImgData:           img,
+				Format:            imgHeader.Header.Get("Content-Type"),
+			}
 		}
+	} else if updateDTO.MediaType == "embed" {
+		// If switching to embed, always delete any existing image
 		imgInput = &releasenotes.ImageInput{
-			ShouldDeleteImage: false,
-			ImgData:           img,
-			Format:            imgHeader.Header.Get("Content-Type"),
-		}
-	} else {
-		imgInput = &releasenotes.ImageInput{
-			ShouldDeleteImage: updateDTO.ShouldDeleteImage,
-			ImgData:           nil,
-			Format:            "",
+			ShouldDeleteImage: true,
 		}
 	}
+
 	h.log.Debug().Interface("imgInput", imgInput).Msg("ImageInput")
 	h.log.Debug().Interface("updateDTO", updateDTO).Msg("updateDTO")
 
@@ -118,6 +128,19 @@ func (h *Handler) HandleReleaseNoteUpdate(w http.ResponseWriter, r *http.Request
 		HideOnWidget:       updateDTO.HideOnWidget == "on",
 		HideOnReleasePage:  updateDTO.HideOnReleasePage == "on",
 	}
+
+	// Handle media type switching
+	switch updateDTO.MediaType {
+	case "embed":
+		// If switching to embed, clear image path and set media link
+		releaseNote.ImagePath = ""
+		releaseNote.MediaLink = updateDTO.MediaLink
+	case "image":
+		// If switching to image, clear media link
+		releaseNote.MediaLink = ""
+		// Image handling is done above with imgInput
+	}
+
 	if updateDTO.TextWebsiteOverride == "on" {
 		releaseNote.DescriptionLong = updateDTO.DescriptionLong
 	} else {
