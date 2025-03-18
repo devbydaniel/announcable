@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"time"
 
+	releasenotelikes "github.com/devbydaniel/release-notes-go/internal/domain/release-note-likes"
 	releasenotemetrics "github.com/devbydaniel/release-notes-go/internal/domain/release-note-metrics"
 	releasenotes "github.com/devbydaniel/release-notes-go/internal/domain/release-notes"
 	mw "github.com/devbydaniel/release-notes-go/internal/middleware"
@@ -13,7 +14,9 @@ import (
 
 type releaseNoteWithMetrics struct {
 	*releasenotes.ReleaseNote
-	ViewCount int
+	ViewCount       int
+	LikeCount       int
+	CtaClickCount   int
 }
 
 type releaseNotesPageData struct {
@@ -47,6 +50,8 @@ func (h *Handler) HandleReleaseNotesPage(w http.ResponseWriter, r *http.Request)
 	}
 	releaseNotesService := releasenotes.NewService(*releasenotes.NewRepository(h.DB, h.ObjStore))
 	metricsService := releasenotemetrics.NewService(releasenotemetrics.NewRepository(h.DB))
+	likesService := releasenotelikes.NewService(releasenotelikes.NewRepository(h.DB))
+
 	page := r.URL.Query().Get("page")
 	if page == "" {
 		page = "1"
@@ -100,9 +105,25 @@ func (h *Handler) HandleReleaseNotesPage(w http.ResponseWriter, r *http.Request)
 			viewCount = 0
 		}
 
+		// Get like count for this release note
+		likeCount, err := likesService.GetLikeCount(rn.ID)
+		if err != nil {
+			h.log.Error().Err(err).Msg("Error getting like count for release note")
+			likeCount = 0
+		}
+
+		// Get CTA click count for this release note
+		ctaClickCount, err := metricsService.GetCtaClickCount(rn.ID)
+		if err != nil {
+			h.log.Error().Err(err).Msg("Error getting CTA click count for release note")
+			ctaClickCount = 0
+		}
+
 		releaseNotesWithMetrics[i] = &releaseNoteWithMetrics{
-			ReleaseNote: rn,
-			ViewCount:   viewCount,
+			ReleaseNote:   rn,
+			ViewCount:     viewCount,
+			LikeCount:     likeCount,
+			CtaClickCount: ctaClickCount,
 		}
 	}
 

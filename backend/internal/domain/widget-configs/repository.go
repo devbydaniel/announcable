@@ -28,7 +28,25 @@ func (r *repository) Create(cfg *WidgetConfig) error {
 func (r *repository) Update(orgId uuid.UUID, cfg *WidgetConfig) error {
 	log.Trace().Msg("Update")
 	client := r.db.Client
-	if err := client.Model(&WidgetConfig{}).Select("Title", "Description", "WidgetBorderRadius", "WidgetBorderColor", "WidgetBorderWidth", "WidgetBgColor", "WidgetTextColor", "WidgetType", "ReleaseNoteBorderRadius", "ReleaseNoteBorderColor", "ReleaseNoteBorderWidth", "ReleaseNoteBgColor", "ReleaseNoteTextColor", "ReleaseNoteCtaText").Where("organisation_id = ?", orgId).Updates(cfg).Error; err != nil {
+	if err := client.Model(&WidgetConfig{}).Select(
+		"Title", 
+		"Description", 
+		"WidgetBorderRadius", 
+		"WidgetBorderColor", 
+		"WidgetBorderWidth", 
+		"WidgetBgColor", 
+		"WidgetTextColor", 
+		"WidgetType", 
+		"ReleaseNoteBorderRadius", 
+		"ReleaseNoteBorderColor", 
+		"ReleaseNoteBorderWidth", 
+		"ReleaseNoteBgColor", 
+		"ReleaseNoteTextColor", 
+		"ReleaseNoteCtaText",
+		"EnableLikes",
+		"LikeButtonText",
+		"UnlikeButtonText",
+	).Where("organisation_id = ?", orgId).Updates(cfg).Error; err != nil {
 		log.Error().Err(err).Msg("Error updating widget config")
 		return err
 	}

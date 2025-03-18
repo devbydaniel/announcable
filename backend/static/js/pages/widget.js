@@ -15,6 +15,8 @@ const releaseNoteBorderWidthChangeEventName =
 const releaseNoteBackgroundColorChangeEventName =
   "release-notes-background-color-change";
 const releaseNoteTextColorChangeEventName = "release-notes-text-color-change";
+const enableLikesChangeEventName = "enable-likes-change";
+const likeButtonTextChangeEventName = "like-button-text-change";
 
 document.addEventListener("alpine:init", () => {
   Alpine.data("form", () => ({
@@ -117,6 +119,32 @@ document.addEventListener("alpine:init", () => {
         });
       },
     },
+    enableLikes: {
+      ["@change"]() {
+        this.$el.checked = this.$event.target.checked;
+        this.$dispatch(enableLikesChangeEventName, {
+          value: this.$event.target.checked,
+        });
+      },
+      ["x-ref"]: "enableLikes",
+    },
+    likeButtonContainer: {
+      [`@${enableLikesChangeEventName}.window`]() {
+        this.$el.style.display = this.$event.detail.value ? "block" : "none";
+      },
+      ["x-init"]() {
+        this.$el.style.display = this.$refs.enableLikes.checked
+          ? "block"
+          : "none";
+      },
+    },
+    likeButtonText: {
+      ["@input"]() {
+        this.$dispatch(likeButtonTextChangeEventName, {
+          value: this.$event.target.value,
+        });
+      },
+    },
   }));
 
   Alpine.data(
@@ -135,6 +163,8 @@ document.addEventListener("alpine:init", () => {
       releaseNoteBorderWidth,
       releaseNoteBgColor,
       releaseNoteTextColor,
+      enableLikes,
+      likeButtonText,
     ) => ({
       title: {
         [`@${titleChangeEventName}.window`]() {
@@ -219,6 +249,22 @@ document.addEventListener("alpine:init", () => {
         },
         ["x-init"]() {
           this.$el.innerText = decodeHtml(cta);
+          this.$el.style.color = releaseNoteTextColor;
+        },
+      },
+      likeButton: {
+        [`@${enableLikesChangeEventName}.window`]() {
+          console.log("widget -> likeButton");
+          console.log(this.$event.detail.value);
+          this.$el.style.display = this.$event.detail.value ? "block" : "none";
+        },
+        [`@${likeButtonTextChangeEventName}.window`]() {
+          this.$el.innerText = this.$event.detail.value;
+        },
+        ["x-init"]() {
+          this.$el.style.display =
+            enableLikes === "true" || enableLikes === true ? "block" : "none";
+          this.$el.innerText = likeButtonText || "Like";
           this.$el.style.color = releaseNoteTextColor;
         },
       },

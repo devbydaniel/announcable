@@ -31,6 +31,9 @@ func DefaultConfig(orgId uuid.UUID) *WidgetConfig {
 		ReleaseNoteBgColor:      "#eff1f5",
 		ReleaseNoteTextColor:    "#4c4f69",
 		ReleaseNoteCtaText:      "View Release Notes",
+		EnableLikes:             true,
+		LikeButtonText:          "Like",
+		UnlikeButtonText:        "Unlike",
 	}
 }
 

@@ -75,7 +75,7 @@ func (r *repository) UpdateWithNil(orgId uuid.UUID, fields map[string]interface{
 func (r *repository) Get(orgId uuid.UUID) (*ReleasePageConfig, error) {
 	log.Trace().Str("orgId", orgId.String()).Msg("Get")
 	var cfg ReleasePageConfig
-	if err := r.db.Client.Model(&ReleasePageConfig{}).Where("organisation_id = ?", orgId).First(&cfg).Error; err != nil {
+	if err := r.db.Client.Model(&ReleasePageConfig{}).Preload("Organisation").Where("organisation_id = ?", orgId).First(&cfg).Error; err != nil {
 		return nil, err
 	}
 	return &cfg, nil

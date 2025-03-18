@@ -40,6 +40,22 @@ func (s *service) GetViewCount(releaseNoteID uuid.UUID) (int, error) {
 	return viewCount, nil
 }
 
+func (s *service) GetCtaClickCount(releaseNoteID uuid.UUID) (int, error) {
+	log.Trace().Str("releaseNoteID", releaseNoteID.String()).Msg("GetCtaClickCount")
+	metrics, err := s.repo.FindByReleaseNoteID(releaseNoteID)
+	if err != nil {
+		return 0, err
+	}
+
+	clickCount := 0
+	for _, metric := range metrics {
+		if metric.MetricType == MetricTypeCtaClick {
+			clickCount++
+		}
+	}
+	return clickCount, nil
+}
+
 func (s *service) GetMetricsByReleaseNote(releaseNoteID uuid.UUID) ([]ReleaseNoteMetric, error) {
 	log.Trace().Str("releaseNoteID", releaseNoteID.String()).Msg("GetMetricsByReleaseNote")
 	return s.repo.FindByReleaseNoteID(releaseNoteID)

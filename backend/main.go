@@ -179,6 +179,8 @@ func main() {
 		r.Get("/release-notes/{orgId}", handler.HandleReleaseNotesServe)
 		r.Get("/release-notes/{orgId}/status", handler.HandleReleaseNotesStatusServe)
 		r.Post("/release-notes/{orgId}/metrics", handler.HandleReleaseNoteMetricCreate)
+		r.Get("/release-notes/{orgId}/{releaseNoteId}/like", handler.HandleGetReleaseNoteLikeState)
+		r.Post("/release-notes/{orgId}/{releaseNoteId}/like", handler.HandleReleaseNoteToggleLike)
 		r.Get("/widget-config/{orgId}", handler.HandleWidgetConfigServe)
 		r.Get("/img/*", handler.HandleObjStore)
 	})

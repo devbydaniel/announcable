@@ -1,4 +1,5 @@
 import React from "react";
+import { ThumbsUp, ExternalLink } from "lucide-react";
 import type { WidgetConfig } from "@/lib/types";
 import {
   Card,
@@ -10,6 +11,8 @@ import {
 import type { ReleaseNote } from "@/lib/types";
 import { Skeleton } from "./skeleton";
 import useReleaseNoteMetrics from "@/hooks/useReleaseNoteMetrics";
+import useReleaseNoteLikes from "@/hooks/useReleaseNoteLikes";
+import { getOrCreateClientId } from "@/lib/clientId";
 
 interface ReleaseNotesListProps {
   children: React.ReactNode;
@@ -37,6 +40,11 @@ export function ReleaseNoteEntry({
   const { elementRef, trackCtaClick } = useReleaseNoteMetrics({
     releaseNoteId: releaseNote.id,
     orgId: config.org_id,
+  });
+  const { toggleLike, isPending, isLiked } = useReleaseNoteLikes({
+    releaseNoteId: releaseNote.id,
+    orgId: config.org_id,
+    clientId: getOrCreateClientId(),
   });
 
   const ctaLabel = releaseNote.cta_label_override
@@ -97,11 +105,47 @@ export function ReleaseNoteEntry({
           {releaseNote.text && (
             <div className="whitespace-pre-wrap">{releaseNote.text}</div>
           )}
-          {!releaseNote.hide_cta && (
-            <div className="w-full flex justify-center">
-              <a href={ctaHref} target="_blank" onClick={trackCtaClick}>
-                {ctaLabel}
-              </a>
+          {(config.enable_likes || !releaseNote.hide_cta) && (
+            <div className="w-full flex justify-around mt-2">
+              {config.enable_likes && (
+                <div className="w-full flex justify-center mx-auto">
+                  <button onClick={() => toggleLike()}>
+                    {isPending ? (
+                      <div className="flex items-center gap-1">
+                        <span className="text-sm">
+                          {isLiked
+                            ? config.unlike_button_text
+                            : config.like_button_text}
+                        </span>
+                        <ThumbsUp
+                          className={`w-3 h-3 ${isLiked ? "fill-current" : ""}`}
+                        />
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-1">
+                        <span className="text-sm">
+                          {isLiked
+                            ? config.unlike_button_text
+                            : config.like_button_text}
+                        </span>
+                        <ThumbsUp
+                          className={`w-3 h-3 ${isLiked ? "fill-current" : ""}`}
+                        />
+                      </div>
+                    )}
+                  </button>
+                </div>
+              )}
+              {!releaseNote.hide_cta && (
+                <div className="w-full flex justify-center mx-auto">
+                  <a href={ctaHref} target="_blank" onClick={trackCtaClick}>
+                    <span className="flex items-center gap-1">
+                      {ctaLabel}
+                      <ExternalLink className="w-3 h-3" />
+                    </span>
+                  </a>
+                </div>
+              )}
             </div>
           )}
         </div>

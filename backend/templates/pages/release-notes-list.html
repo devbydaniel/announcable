@@ -41,12 +41,16 @@
                     {{ .ViewCount }}
                   </span>
                   <span class="badge">
-                    {{ if .IsPublished }}
-                      published
-                    {{ else }}
-                      not&nbsp;published
-                    {{ end }}
+                    <i data-feather="thumbs-up" width="14" height="14"></i>
+                    {{ .LikeCount }}
                   </span>
+                  <span class="badge">
+                    <i data-feather="mouse-pointer" width="14" height="14"></i>
+                    {{ .CtaClickCount }}
+                  </span>
+                  {{ if not .IsPublished }}
+                    <span class="badge"> unpublished </span>
+                  {{ end }}
                 </div>
               </td>
             </tr>

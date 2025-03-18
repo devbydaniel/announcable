@@ -24,6 +24,9 @@ type widgetUpdateForm struct {
 	ReleaseNoteBgColor      string `schema:"release_note_background_color" validate:"required"`
 	ReleaseNoteTextColor    string `schema:"release_note_text_color" validate:"required"`
 	ReleaseNoteCtaText      string `schema:"release_note_cta_text" validate:"required"`
+	EnableLikes             string `schema:"enable_likes"`
+	LikeButtonText          string `schema:"like_button_text"`
+	UnlikeButtonText        string `schema:"unlike_button_text"`
 }
 
 func (h *Handler) HandleWidgetUpdate(w http.ResponseWriter, r *http.Request) {
@@ -66,6 +69,23 @@ func (h *Handler) HandleWidgetUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Additional validation for like button text fields
+	isLikesEnabled := updateDTO.EnableLikes == "on"
+	if isLikesEnabled {
+		if updateDTO.LikeButtonText == "" {
+			http.Error(w, "Like button text is required when likes are enabled", http.StatusBadRequest)
+			return
+		}
+		if updateDTO.UnlikeButtonText == "" {
+			http.Error(w, "Unlike button text is required when likes are enabled", http.StatusBadRequest)
+			return
+		}
+	} else {
+		// Clear button text fields when likes are disabled
+		updateDTO.LikeButtonText = ""
+		updateDTO.UnlikeButtonText = ""
+	}
+
 	widgetConfig := &widgetconfigs.WidgetConfig{
 		OrganisationID:          uuid.MustParse(orgId),
 		Title:                   updateDTO.Title,
@@ -82,6 +102,9 @@ func (h *Handler) HandleWidgetUpdate(w http.ResponseWriter, r *http.Request) {
 		ReleaseNoteBgColor:      updateDTO.ReleaseNoteBgColor,
 		ReleaseNoteTextColor:    updateDTO.ReleaseNoteTextColor,
 		ReleaseNoteCtaText:      updateDTO.ReleaseNoteCtaText,
+		EnableLikes:             isLikesEnabled,
+		LikeButtonText:          updateDTO.LikeButtonText,
+		UnlikeButtonText:        updateDTO.UnlikeButtonText,
 	}
 	h.log.Debug().Interface("widget config", widgetConfig).Msg("Widget config to update")
 

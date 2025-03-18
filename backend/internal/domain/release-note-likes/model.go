@@ -1,0 +1,17 @@
+package releasenotelikes
+
+import (
+	"github.com/devbydaniel/release-notes-go/internal/database"
+	"github.com/devbydaniel/release-notes-go/internal/domain/organisation"
+	releasenotes "github.com/devbydaniel/release-notes-go/internal/domain/release-notes"
+	"github.com/google/uuid"
+)
+
+type ReleaseNoteLike struct {
+	database.BaseModel `gorm:"embedded"`
+	ReleaseNoteID     uuid.UUID
+	ReleaseNote       releasenotes.ReleaseNote
+	OrganisationID    uuid.UUID
+	Organisation      organisation.Organisation
+	ClientID          string `gorm:"type:text;not null"`
+} 

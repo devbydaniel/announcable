@@ -86,13 +86,38 @@ func (s *service) GetBySlug(slug string) (*ReleasePageConfig, error) {
 
 func (s *service) GetUrl(orgId uuid.UUID) (string, error) {
 	log.Trace().Str("orgId", orgId.String()).Msg("GetUrl")
-	baseUrl := config.New().BaseURL
+	var protocol string
+	if config.New().Env == "production" {
+		protocol = "https://"
+	} else {
+		protocol = "http://"
+	}
+	baseUrl := protocol + config.New().BaseURL
 	cfg, err := s.repo.Get(orgId)
 	if err != nil {
 		return "", err
 	}
 	if cfg.Slug == "" {
-		return "", nil
+		// Create a new slug if it doesn't exist
+		log.Debug().Msg("Slug does not exist, creating...")
+		// Get organization name from the config
+		if cfg.Organisation.Name == "" {
+			return "", nil // Cannot create slug without org name
+		}
+		// Update the slug using the org name
+		if err := s.UpdateSlug(orgId, cfg.Organisation.Name); err != nil {
+			log.Error().Err(err).Msg("Error updating release page slug")
+			return "", err
+		}
+		// Reload the config to get the new slug
+		cfg, err = s.repo.Get(orgId)
+		if err != nil {
+			log.Error().Err(err).Msg("Error getting updated config")
+			return "", err
+		}
+		if cfg.Slug == "" {
+			return "", nil
+		}
 	}
 	return baseUrl + "/s/" + cfg.Slug, nil
 }

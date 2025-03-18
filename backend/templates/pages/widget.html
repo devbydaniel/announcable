@@ -21,7 +21,7 @@
 {{ define "main" }}
   <div
     class="release-note"
-    x-data="widget('{{ .SafeTitle }}', '{{ .SafeDescription }}', '{{ .SafeReleaseNoteCtaText }}', '{{ .Cfg.WidgetBorderRadius }}', '{{ .Cfg.WidgetBorderColor }}', '{{ .Cfg.WidgetBorderWidth }}', '{{ .Cfg.WidgetBgColor }}', '{{ .Cfg.WidgetTextColor }}', '{{ .Cfg.ReleaseNoteBorderRadius }}', '{{ .Cfg.ReleaseNoteBorderColor }}', '{{ .Cfg.ReleaseNoteBorderWidth }}', '{{ .Cfg.ReleaseNoteBgColor }}', '{{ .Cfg.ReleaseNoteTextColor }}')"
+    x-data="widget('{{ .SafeTitle }}', '{{ .SafeDescription }}', '{{ .SafeReleaseNoteCtaText }}', '{{ .Cfg.WidgetBorderRadius }}', '{{ .Cfg.WidgetBorderColor }}', '{{ .Cfg.WidgetBorderWidth }}', '{{ .Cfg.WidgetBgColor }}', '{{ .Cfg.WidgetTextColor }}', '{{ .Cfg.ReleaseNoteBorderRadius }}', '{{ .Cfg.ReleaseNoteBorderColor }}', '{{ .Cfg.ReleaseNoteBorderWidth }}', '{{ .Cfg.ReleaseNoteBgColor }}', '{{ .Cfg.ReleaseNoteTextColor }}', '{{ .Cfg.EnableLikes }}', '{{ .Cfg.LikeButtonText }}')"
   >
     <div class="release-note__widget" x-bind="widget">
       <div class="release-note__widget__header">
@@ -41,7 +41,10 @@
             <div class="skeleton release-note-entry__content__skeleton"></div>
             <div class="skeleton release-note-entry__content__skeleton"></div>
           </div>
-          <span class="release-note-entry__cta" x-bind="cta"></span>
+          <div class="release-note-entry__footer">
+            <span class="release-note-entry__like" x-bind="likeButton"></span>
+            <span class="release-note-entry__cta" x-bind="cta"></span>
+          </div>
         </div>
       </div>
     </div>
@@ -175,19 +178,6 @@
         </div>
         <h3 class="config-panel__heading">Release Notes</h3>
         <div class="form__group form__group--no-mt">
-          <label class="form__label" for="release_note_cta"
-            >Call-to-action</label
-          >
-          <input
-            class="form__input"
-            type="text"
-            id="release_note_cta_text"
-            name="release_note_cta_text"
-            x-bind="release_note_cta_text"
-            value="{{ .Cfg.ReleaseNoteCtaText }}"
-          />
-        </div>
-        <div class="form__group form__group--no-mt">
           <label class="form__label" for="release_note_border_radius"
             >Border Radius</label
           >
@@ -252,6 +242,63 @@
             name="release_note_text_color"
             x-bind="releaseNoteTextColor"
             value="{{ .Cfg.ReleaseNoteTextColor }}"
+          />
+        </div>
+
+        <h3 class="config-panel__heading">Actions</h3>
+        <div class="form__group form__group--no-mt">
+          <label class="form__label form__label--checkbox" for="enable_likes">
+            <input
+              class="form__checkbox"
+              type="checkbox"
+              id="enable_likes"
+              name="enable_likes"
+              x-bind="enableLikes"
+              {{ if .Cfg.EnableLikes }}checked{{ end }}
+            />
+            <span>Enable Like Feature</span>
+          </label>
+        </div>
+        <div x-bind="likeButtonContainer">
+          <div class="form__group form__group--no-mt">
+            <label class="form__label" for="like_button_text"
+              >Like Button Label</label
+            >
+            <input
+              class="form__input"
+              type="text"
+              id="like_button_text"
+              name="like_button_text"
+              value="{{ .Cfg.LikeButtonText }}"
+              x-bind="likeButtonText"
+              placeholder="Like"
+            />
+          </div>
+          <div class="form__group form__group--no-mt">
+            <label class="form__label" for="unlike_button_text"
+              >Unlike Button Label</label
+            >
+            <input
+              class="form__input"
+              type="text"
+              id="unlike_button_text"
+              name="unlike_button_text"
+              value="{{ .Cfg.UnlikeButtonText }}"
+              placeholder="Unlike"
+            />
+          </div>
+        </div>
+        <div class="form__group form__group--no-mt">
+          <label class="form__label" for="release_note_cta"
+            >Call-to-action</label
+          >
+          <input
+            class="form__input"
+            type="text"
+            id="release_note_cta_text"
+            name="release_note_cta_text"
+            x-bind="release_note_cta_text"
+            value="{{ .Cfg.ReleaseNoteCtaText }}"
           />
         </div>
       </div>

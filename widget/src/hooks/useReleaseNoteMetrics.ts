@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef } from "react";
 import { backendUrl } from "@/lib/config";
+import { getOrCreateClientId } from "@/lib/clientId";
 
 type MetricType = "view" | "cta_click";
 
@@ -8,26 +9,14 @@ interface Props {
   orgId: string;
 }
 
-const CLIENT_ID_KEY = 'announcable_client_id';
-
 export default function useReleaseNoteMetrics({ releaseNoteId, orgId }: Props) {
   const hasTrackedView = useRef(false);
   const elementRef = useRef<HTMLDivElement | null>(null);
 
-  // Get or create client ID
-  const getClientId = useCallback(() => {
-    let clientId = localStorage.getItem(CLIENT_ID_KEY);
-    if (!clientId) {
-      clientId = crypto.randomUUID();
-      localStorage.setItem(CLIENT_ID_KEY, clientId);
-    }
-    return clientId;
-  }, []);
-
   const sendMetric = useCallback(
     async (type: MetricType) => {
       try {
-        const clientId = getClientId();
+        const clientId = getOrCreateClientId();
         await fetch(`${backendUrl}/api/release-notes/${orgId}/metrics`, {
           method: "POST",
           headers: {
@@ -43,7 +32,7 @@ export default function useReleaseNoteMetrics({ releaseNoteId, orgId }: Props) {
         console.error("Failed to send release note metric:", error);
       }
     },
-    [releaseNoteId, orgId, getClientId],
+    [releaseNoteId, orgId],
   );
 
   const trackCtaClick = useCallback(() => {
@@ -53,8 +42,10 @@ export default function useReleaseNoteMetrics({ releaseNoteId, orgId }: Props) {
   useEffect(() => {
     // Wait a bit for the ScrollArea to be fully mounted
     const timeoutId = setTimeout(() => {
-      const viewport = document.querySelector('[data-radix-scroll-area-viewport]');
-      
+      const viewport = document.querySelector(
+        "[data-radix-scroll-area-viewport]",
+      );
+
       const observer = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
@@ -95,4 +86,4 @@ export default function useReleaseNoteMetrics({ releaseNoteId, orgId }: Props) {
     elementRef,
     trackCtaClick,
   };
-} 
+}

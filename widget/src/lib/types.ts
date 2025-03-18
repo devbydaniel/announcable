@@ -17,6 +17,9 @@ export interface WidgetConfig {
   title: string;
   description: string;
   cta_text?: string;
+  enable_likes?: boolean;
+  like_button_text?: string;
+  unlike_button_text?: string;
   widget_type: "popover" | "modal" | "sidebar";
   widget_border_radius: number;
   widget_border_color: string;

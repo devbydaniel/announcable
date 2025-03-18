@@ -50,7 +50,17 @@
   width: 100%;
 }
 
+.release-note-entry__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .release-note-entry__cta {
+  text-align: center;
+}
+
+.release-note-entry__like {
   text-align: center;
 }
 

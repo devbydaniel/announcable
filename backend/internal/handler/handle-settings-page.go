@@ -63,19 +63,8 @@ func (h *Handler) HandleSettingsPage(w http.ResponseWriter, r *http.Request) {
 
 	var releasePageUrl string
 	releasePageUrl, err = releasePageConfigService.GetUrl(uuid.MustParse(orgId))
-	h.log.Debug().Str("releasePageUrl", releasePageUrl).Msg("Got release page URL")
 	if err != nil {
 		h.log.Error().Err(err).Msg("Error getting release page URL")
-	} else if releasePageUrl == "" {
-		orgName := ctx.Value(mw.OrgNameKey).(string)
-		if err := releasePageConfigService.UpdateSlug(uuid.MustParse(orgId), orgName); err != nil {
-			h.log.Error().Err(err).Msg("Error updating release page slug")
-		} else {
-			releasePageUrl, err = releasePageConfigService.GetUrl(uuid.MustParse(orgId))
-			if err != nil {
-				h.log.Error().Err(err).Msg("Error getting release page URL")
-			}
-		}
 	}
 
 	isFree := false

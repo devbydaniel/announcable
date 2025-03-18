@@ -25,6 +25,9 @@ type WidgetConfig struct {
 	ReleaseNoteTextColor    string     `gorm:"type:varchar(255)"`
 	ReleaseNoteCtaText      string     `gorm:"type:varchar(255)"`
 	ReleasePageBaseUrl      *string    `gorm:"type:varchar(255)"`
+	EnableLikes             bool       `gorm:"type:boolean;default:true"`
+	LikeButtonText          string     `gorm:"type:varchar(255);default:'Like'"`
+	UnlikeButtonText        string     `gorm:"type:varchar(255);default:'Unlike'"`
 }
 
 type WidgetType string
