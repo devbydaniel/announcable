@@ -37,14 +37,15 @@ export function ReleaseNoteEntry({
   config,
   releaseNote,
 }: ReleaseNoteEntryProps) {
+  const clientId = getOrCreateClientId();
   const { elementRef, trackCtaClick } = useReleaseNoteMetrics({
     releaseNoteId: releaseNote.id,
     orgId: config.org_id,
   });
-  const { toggleLike, isPending, isLiked } = useReleaseNoteLikes({
+  const { toggleLike, isLiked } = useReleaseNoteLikes({
     releaseNoteId: releaseNote.id,
     orgId: config.org_id,
-    clientId: getOrCreateClientId(),
+    clientId,
   });
 
   const ctaLabel = releaseNote.cta_label_override
@@ -109,30 +110,21 @@ export function ReleaseNoteEntry({
             <div className="w-full flex justify-around mt-2">
               {config.enable_likes && (
                 <div className="w-full flex justify-center mx-auto">
-                  <button onClick={() => toggleLike()}>
-                    {isPending ? (
-                      <div className="flex items-center gap-1">
-                        <span className="text-sm">
-                          {isLiked
-                            ? config.unlike_button_text
-                            : config.like_button_text}
-                        </span>
-                        <ThumbsUp
-                          className={`w-3 h-3 ${isLiked ? "fill-current" : ""}`}
-                        />
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-1">
-                        <span className="text-sm">
-                          {isLiked
-                            ? config.unlike_button_text
-                            : config.like_button_text}
-                        </span>
-                        <ThumbsUp
-                          className={`w-3 h-3 ${isLiked ? "fill-current" : ""}`}
-                        />
-                      </div>
-                    )}
+                  {/* only enable like button if clientId is set */}
+                  {/* TODO: show a tooltip if clientId is not set */}
+                  <button
+                    className="inline-flex items-center gap-1"
+                    onClick={() => toggleLike()}
+                    disabled={!clientId}
+                  >
+                    <span className="text-sm">
+                      {isLiked
+                        ? config.unlike_button_text
+                        : config.like_button_text}
+                    </span>
+                    <ThumbsUp
+                      className={`w-3 h-3 ${isLiked ? "fill-current" : ""}`}
+                    />
                   </button>
                 </div>
               )}

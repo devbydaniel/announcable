@@ -21,6 +21,11 @@ export default function useReleaseNoteLikes({
     useQuery<LikeState>({
       queryKey: ["release-note-like", releaseNoteId, clientId],
       queryFn: async () => {
+        if (!clientId) {
+          return {
+            is_liked: false,
+          };
+        }
         const response = await fetch(
           `${backendUrl}/api/release-notes/${orgId}/${releaseNoteId}/like?clientId=${clientId}`,
           {
@@ -36,6 +41,9 @@ export default function useReleaseNoteLikes({
 
   const { error, isPending, mutate } = useMutation({
     mutationFn: async () => {
+      if (!clientId) {
+        return;
+      }
       const response = await fetch(
         `${backendUrl}/api/release-notes/${orgId}/${releaseNoteId}/like`,
         {
