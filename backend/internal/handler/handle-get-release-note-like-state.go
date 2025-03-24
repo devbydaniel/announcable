@@ -35,11 +35,17 @@ func (h *Handler) HandleGetReleaseNoteLikeState(w http.ResponseWriter, r *http.R
 	// Get client ID from URL params
 	clientId := r.URL.Query().Get("clientId")
 	if clientId == "" {
-		h.log.Error().Msg("Client ID not found in query params")
-		http.Error(w, "Client ID required", http.StatusBadRequest)
+		// don't error, just return false
+		fallback := getLikeStateResponse{
+			IsLiked: false,
+		}
+		w.Header().Set("Content-Type", "application/json")
+		if err := json.NewEncoder(w).Encode(fallback); err != nil {
+			h.log.Error().Err(err).Msg("Error encoding response")
+			http.Error(w, "Error encoding response", http.StatusInternalServerError)
+		}
 		return
 	}
-
 	// Parse UUIDs
 	releaseNoteUUID, err := uuid.Parse(releaseNoteId)
 	if err != nil {
