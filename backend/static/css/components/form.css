@@ -33,6 +33,29 @@
   color: var(--color-text);
 }
 
+.form__input[type="color"] {
+  padding: 0;
+  cursor: pointer;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background: none;
+}
+
+.form__input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.form__input[type="color"]::-webkit-color-swatch {
+  border: none;
+  border-radius: inherit;
+}
+
+.form__input[type="color"]::-moz-color-swatch {
+  border: none;
+  border-radius: inherit;
+}
+
 .form__subtext {
   font-size: var(--font-size-xs);
   color: var(--text-muted);
