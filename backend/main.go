@@ -154,12 +154,15 @@ func main() {
 	})
 
 	// ADMIN DASHBOARD
+	
 	r.With(
 		mwHandler.Authenticate,
 		mwHandler.AuthorizeSuperAdmin,
 	).Route("/admin", func(r chi.Router) {
 		r.Get("/", handler.HandleAdminDashboard)
 		r.Get("/organisations/{orgId}", handler.HandleAdminOrgDetails)
+		r.Patch("/organisations/{orgId}", handler.HandleAdminOrgUpdate)
+		r.Patch("/organisations/{orgId}/release-page", handler.HandleAdminOrgReleasePageUpdate)
 		r.Post("/organisations/{orgId}/subscriptions", handler.HandleAdminOrgSubscriptionCreate)
 		r.Delete("/organisations/{orgId}/subscriptions/{id}", handler.HandleAdminOrgSubscriptionDelete)
 	})

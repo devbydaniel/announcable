@@ -160,6 +160,11 @@ func (s *service) GetOrgByExternalId(externalId uuid.UUID) (*Organisation, error
 	return s.repo.FindOrgByExternalId(externalId)
 }
 
+func (s *service) UpdateOrg(orgId uuid.UUID, org *Organisation) error {
+	log.Trace().Str("orgId", orgId.String()).Msg("UpdateOrg")
+	return s.repo.UpdateOrg(orgId, org)
+}
+
 func (s *service) RegenerateExternalId(orgId uuid.UUID) (uuid.UUID, error) {
 	log.Trace().Msg("RegenerateExternalId")
 	externalId, err := uuid.NewRandom()

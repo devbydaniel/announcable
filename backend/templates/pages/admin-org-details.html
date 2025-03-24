@@ -7,11 +7,67 @@
   <link rel="stylesheet" href="/static/css/components/form.css" />
 {{ end }}
 
+{{ define "page-js" }}
+  <script src="/static/js/components/toast.js"></script>
+{{ end }}
+
 {{ define "page-actions" }}
   <a href="/admin" class="button button--primary">Back to Admin Dashboard</a>
 {{ end }}
 
 {{ define "main" }}
+  <form
+    x-data
+    hx-patch="/admin/organisations/{{ .Organisation.ID }}"
+    hx-swap="none"
+    @htmx:response-error.camel="toastError($event.detail.xhr.response)"
+    @custom:submit-success="toastSuccess('Org data updated successfully')"
+  >
+    <div class="card">
+      <h2 class="card__title">Org Data</h2>
+      <div class="card__content">
+        <div class="form__group">
+          <label class="form__label" for="name">Name</label>
+          <input
+            class="form__input"
+            type="text"
+            id="name"
+            name="name"
+            value="{{ .Organisation.Name }}"
+          />
+        </div>
+      </div>
+      <div class="card__footer">
+        <button class="button button--primary">Save</button>
+      </div>
+    </div>
+  </form>
+  <form
+    x-data
+    hx-patch="/admin/organisations/{{ .Organisation.ID }}/release-page"
+    hx-swap="none"
+    @htmx:response-error.camel="toastError($event.detail.xhr.response)"
+    @custom:submit-success="toastSuccess('Release page updated successfully')"
+  >
+    <div class="card">
+      <h2 class="card__title">Release Page</h2>
+      <div class="card__content">
+        <div class="form__group">
+          <label class="form__label" for="slug">Slug</label>
+          <input
+            class="form__input"
+            type="text"
+            id="slug"
+            name="slug"
+            value="{{ .ReleasePage.Slug }}"
+          />
+        </div>
+      </div>
+      <div class="card__footer">
+        <button class="button button--primary">Save</button>
+      </div>
+    </div>
+  </form>
   <div class="card">
     <h2 class="card__title">Subscription Details</h2>
     <div class="card__actions">

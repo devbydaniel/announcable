@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/devbydaniel/release-notes-go/internal/domain/admin"
+	releasepageconfig "github.com/devbydaniel/release-notes-go/internal/domain/release-page-configs"
 	mw "github.com/devbydaniel/release-notes-go/internal/middleware"
 	"github.com/devbydaniel/release-notes-go/templates"
 	"github.com/go-chi/chi/v5"
@@ -13,6 +14,7 @@ import (
 type adminOrgDetailsData struct {
 	BaseTemplateData
 	Organisation  *OrganisationDetailData
+	ReleasePage   *ReleasePageData
 	Users         []*OrganisationUserData
 	Subscriptions []*SubscriptionData
 }
@@ -21,6 +23,10 @@ type OrganisationDetailData struct {
 	ID        string
 	Name      string
 	CreatedAt string
+}
+
+type ReleasePageData struct {
+	Slug string
 }
 
 type OrganisationUserData struct {
@@ -74,6 +80,16 @@ func (h *Handler) HandleAdminOrgDetails(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
+	// Get release page details
+	releasePageService := releasepageconfig.NewService(*releasepageconfig.NewRepository(h.DB, h.ObjStore))
+	releasePageConfig, err := releasePageService.Get(uuid.MustParse(orgId))
+	if err != nil {
+		h.log.Error().Err(err).Msg("Error getting release page details")
+		http.Error(w, "Error getting release page details", http.StatusInternalServerError)
+		return
+	}
+	h.log.Debug().Interface("releasePageConfig", releasePageConfig).Msg("releasePageConfig")
+
 	// Get subscriptions
 	subscriptions, err := adminService.GetSubscriptions(uuid.MustParse(userId), uuid.MustParse(orgId))
 	if err != nil {
@@ -88,6 +104,9 @@ func (h *Handler) HandleAdminOrgDetails(w http.ResponseWriter, r *http.Request) 
 		ID:        org.ID.String(),
 		Name:      org.Name,
 		CreatedAt: org.CreatedAt.Format("2006-01-02 15:04:05"),
+	}
+	releasePageData := &ReleasePageData{
+		Slug: releasePageConfig.Slug,
 	}
 
 	userData := make([]*OrganisationUserData, 0, len(orgUsers))
@@ -117,6 +136,7 @@ func (h *Handler) HandleAdminOrgDetails(w http.ResponseWriter, r *http.Request) 
 			HasActiveSubscription: true,
 		},
 		Organisation:  orgData,
+		ReleasePage:   releasePageData,
 		Users:         userData,
 		Subscriptions: subscriptionData,
 	}

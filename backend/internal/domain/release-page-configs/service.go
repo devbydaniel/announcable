@@ -1,7 +1,9 @@
 package releasepageconfig
 
 import (
+	"errors"
 	"net/url"
+	"regexp"
 	"strings"
 
 	"github.com/devbydaniel/release-notes-go/config"
@@ -171,6 +173,31 @@ func (s *service) Update(orgId uuid.UUID, cfg *ReleasePageConfig, imgInput *Imag
 func (s *service) UpdateSlug(orgId uuid.UUID, orgName string) error {
 	log.Trace().Str("orgId", orgId.String()).Str("orgName", orgName).Msg("UpdateSlug")
 	slug := s.formatSlug(orgName)
+	return s.repo.UpdateWithNil(orgId, map[string]interface{}{"Slug": slug}, nil)
+}
+
+func (s *service) EditSlugAsAdmin(orgId uuid.UUID, slug string) error {
+	log.Trace().Str("orgId", orgId.String()).Str("slug", slug).Msg("EditSlugAsAdmin")
+	// Validate slug format
+	if len(slug) <= 0 {
+		return errors.New("Slug is required")
+	}
+	if len(slug) > 100 {
+		return errors.New("Slug is too long")
+	}
+	// only allow alphanumeric characters and hyphens
+	if !regexp.MustCompile(`^[a-zA-Z0-9-]+$`).MatchString(slug) {
+		return errors.New("Slug can only contain alphanumeric characters and hyphens")
+	}
+	// Convert to lowercase
+	slug = strings.ToLower(slug)
+
+	// Check if slug is already in use by another organization
+	existingConfig, err := s.repo.GetBySlug(slug)
+	if err == nil && existingConfig.OrganisationID != orgId {
+		return errors.New("Slug is already in use by another organization")
+	}
+
 	return s.repo.UpdateWithNil(orgId, map[string]interface{}{"Slug": slug}, nil)
 }
 
