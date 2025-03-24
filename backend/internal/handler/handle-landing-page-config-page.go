@@ -4,7 +4,6 @@ import (
 	"errors"
 	"html"
 	"net/http"
-	"strings"
 
 	releasepageconfig "github.com/devbydaniel/release-notes-go/internal/domain/release-page-configs"
 	widgetconfigs "github.com/devbydaniel/release-notes-go/internal/domain/widget-configs"
@@ -69,11 +68,6 @@ func (h *Handler) HandleReleasePageConfigPage(w http.ResponseWriter, r *http.Req
 	releasePageUrl, err := releasePageConfigService.GetUrl(uuid.MustParse(orgId))
 	if err != nil {
 		h.log.Error().Err(err).Msg("Error getting release page URL")
-	}
-	if strings.HasPrefix(releasePageUrl, "localhost") {
-		releasePageUrl = "http://" + releasePageUrl
-	} else {
-		releasePageUrl = "https://" + releasePageUrl
 	}
 	widgetCfg, err := widgetConfigService.Get(uuid.MustParse(orgId))
 	if err != nil {
