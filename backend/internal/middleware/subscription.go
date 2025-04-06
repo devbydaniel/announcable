@@ -22,14 +22,13 @@ func (h *Handler) WithSubscriptionStatus(next http.Handler) http.Handler {
 		}
 
 		// Get subscription status
+		var hasActiveSubscription bool
 		subscriptionService := subscription.NewService(*subscription.NewRepository(h.DB))
 		sub, err := subscriptionService.Get(uuid.MustParse(orgId))
-		h.log.Debug().Interface("sub", sub).Msg("Subscription status")
-		hasActiveSubscription := false
-		if err == nil {
-			hasActiveSubscription = sub.IsActive || sub.IsFree
+		if err != nil {
+			hasActiveSubscription = false
 		} else {
-			h.log.Error().Err(err).Msg("Error getting subscription status")
+			hasActiveSubscription = sub.IsActive || sub.IsFree
 		}
 
 		// Add subscription status to context

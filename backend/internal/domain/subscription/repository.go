@@ -38,7 +38,7 @@ func (r *repository) Get(orgID uuid.UUID) (*Subscription, error) {
 	var subscription Subscription
 
 	if err := r.db.Client.Where("organisation_id = ?", orgID).First(&subscription).Error; err != nil {
-		log.Error().Err(err).Msg("Error finding subscription")
+		log.Warn().Err(err).Msg("Error finding subscription")
 		return nil, err
 	}
 	return &subscription, nil

@@ -61,7 +61,7 @@ func (r *repository) FindByEmail(email string) (*User, error) {
 	var u User
 
 	if err := r.db.Client.First(&u, "email = ?", email).Error; err != nil {
-		log.Error().Err(err).Msg("Error finding user")
+		log.Warn().Err(err).Msg("Error finding user")
 		return nil, err
 	}
 	return &u, nil
