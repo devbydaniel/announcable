@@ -60,7 +60,11 @@ func (s *service) Delete(id uuid.UUID) error {
 func (s *service) SendVerifcationEmail(u *User, token string) error {
 	log.Trace().Str("email", u.Email).Msg("SendVerifcationEmail")
 	baseUrl := config.New().BaseURL
-	verifyUrl := fmt.Sprintf("%s/verify-email?token=%s", baseUrl, token)
+	protocol := "https"
+	if config.New().Env == "development" {
+		protocol = "http"
+	}
+	verifyUrl := fmt.Sprintf("%s://%s/verify-email?token=%s", protocol, baseUrl, token)
 	config := email.EmailConfirmConfig{
 		To:        u.Email,
 		ActionURL: verifyUrl,
@@ -81,7 +85,11 @@ func (s *service) VerifyEmail(id uuid.UUID) error {
 func (s *service) SendPwResetEmail(u *User, token string) error {
 	log.Trace().Str("email", u.Email).Msg("SendPwResetEmail")
 	baseUrl := config.New().BaseURL
-	url := fmt.Sprintf("%s/reset-pw/%s", baseUrl, token)
+	protocol := "https"
+	if config.New().Env == "development" {
+		protocol = "http"
+	}
+	url := fmt.Sprintf("%s://%s/reset-pw/%s", protocol, baseUrl, token)
 	config := email.PasswordResetConfig{
 		To:        u.Email,
 		ActionURL: url,
