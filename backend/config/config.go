@@ -114,10 +114,10 @@ func New() *config {
 			PostmarkToken:     getEnv("POSTMARK_TOKEN"),
 		},
 		ProductInfo: productInfo{
-			ProductName:    "Release Notes",
-			CompanyName:    "Release Notes Inc.",
-			CompanyAddress: "1234 Elm St, Springfield, IL 62701",
-			SupportEmail:   "support@test.de",
+			ProductName:    "Announcable",
+			CompanyName:    "Announcable",
+			CompanyAddress: "Kameterstraße 52, 85579 Neubiberg",
+			SupportEmail:   "support@announcable.me",
 			PersonalName:   "Daniel",
 		},
 		Axiom: axiomConfig{
