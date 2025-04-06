@@ -25,7 +25,7 @@ func CreateStripeCheckoutSession(lookupKey string, organizationID uuid.UUID) (st
 	baseUrl := config.New().BaseURL
 	params := &stripe.PriceListParams{
 		LookupKeys: stripe.StringSlice([]string{
-			lookupKey,
+			lookupKey, // Currently 'pro_monthly', change if additional products are added
 		}),
 	}
 	i := price.List(params)

@@ -51,7 +51,8 @@
             action="/payment/create-checkout-session"
             method="POST"
           >
-            <input type="hidden" name="lookup_key" value="Test_Product-b9e5d0d" />
+            <!-- Change this in case of an additional product or new pricing -->
+            <input type="hidden" name="lookup_key" value="pro_monthly" />
             <a
               @click="$refs.subscribe_form.submit()"
               id="checkout-and-portal-button"
