@@ -34,7 +34,7 @@ export default function App({ init }: Props) {
     () => ({
       orgId: init.org_id,
     }),
-    [init.org_id]
+    [init.org_id],
   );
 
   const { data: releaseNoteStatus } = useReleaseNoteStatus(queryParams);
@@ -71,8 +71,10 @@ export default function App({ init }: Props) {
       {!init.anchor_query_selector && (
         <Button
           className="fixed z-50 bottom-4 right-4"
-          variant={isOpen ? "default" : "outline"}
           size="icon"
+          style={{
+            borderRadius: "0.5rem",
+          }}
           onClick={() => setIsOpen(!isOpen)}
         >
           {hasUnseenValue && <Indicator className="absolute top-0 right-0" />}
@@ -168,13 +170,13 @@ function hasUnseenReleaseNotes({
   const lastOpenedDate = new Date(parseInt(lastOpened));
   return releaseNoteStatus.some(
     (note) =>
-      note.last_update_on && new Date(note.last_update_on) > lastOpenedDate
+      note.last_update_on && new Date(note.last_update_on) > lastOpenedDate,
   );
 }
 
 function updateIndicatorDataset(
   anchorElement: HTMLElement | null,
-  shouldDisplay: boolean
+  shouldDisplay: boolean,
 ) {
   if (!anchorElement) return;
   const newValue = shouldDisplay ? "true" : "false";
@@ -194,13 +196,13 @@ function shouldInstantOpen({
   return releaseNoteStatus.some(
     (note) =>
       note.attention_mechanism === "instant_open" &&
-      new Date(note.last_update_on) > lastOpenedDate
+      new Date(note.last_update_on) > lastOpenedDate,
   );
 }
 
 function updateInstantOpenDataset(
   anchorElement: HTMLElement | null,
-  shouldDisplay: boolean
+  shouldDisplay: boolean,
 ) {
   if (!anchorElement) return;
   const newValue = shouldDisplay ? "true" : "false";

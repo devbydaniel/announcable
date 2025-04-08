@@ -46,7 +46,7 @@ function initialize(init: WidgetInit) {
       <Providers>
         <App init={init} />
       </Providers>
-    </React.StrictMode>
+    </React.StrictMode>,
   );
 }
 
