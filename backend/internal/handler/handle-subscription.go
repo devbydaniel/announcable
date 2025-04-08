@@ -64,8 +64,8 @@ func (h *Handler) HandlePortalSession(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	domain := "http://" + config.New().BaseURL
-	portalURL, err := stripeUtil.CreateStripePortalSession(customerID, domain)
+	returnUrl := "http://" + config.New().BaseURL
+	portalURL, err := stripeUtil.CreateStripePortalSession(customerID, returnUrl)
 	if err != nil {
 		h.log.Error().Err(err).Msg("Error creating portal session")
 		http.Error(w, err.Error(), http.StatusInternalServerError)

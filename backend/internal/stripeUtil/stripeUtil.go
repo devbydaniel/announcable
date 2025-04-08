@@ -45,8 +45,10 @@ func CreateStripeCheckoutSession(lookupKey string, organizationID uuid.UUID) (st
 				Quantity: stripe.Int64(1),
 			},
 		},
-		SuccessURL: stripe.String("http://" + baseUrl + "/payment/success?session_id={CHECKOUT_SESSION_ID}"),
-		CancelURL:  stripe.String("http://" + baseUrl + "/payment/cancel"),
+		//SuccessURL: stripe.String("http://" + baseUrl + "/payment/success?session_id={CHECKOUT_SESSION_ID}"),
+		SuccessURL: stripe.String("http://" + baseUrl + "/subscription/confirm"),
+		//CancelURL:  stripe.String("http://" + baseUrl + "/payment/cancel"),
+		CancelURL: stripe.String("http://" + baseUrl + "/subscription/cancel"),
 		// Add metadata to link this session to your organization
 		Metadata: map[string]string{
 			"organization_id": organizationID.String(),

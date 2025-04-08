@@ -224,8 +224,11 @@ func main() {
 	r.With(mwHandler.Authenticate, mwHandler.Authorize(rbac.PermissionManageAccess)).Route("/payment", func(r chi.Router) {
 		r.Post("/create-checkout-session", handler.HandleCheckoutSession)
 		r.Post("/create-portal-session", handler.HandlePortalSession)
-		r.Get("/success", handler.HandleSubscriptionSuccess)
 	})
+
+	// Subscription confirmation page (no auth required)
+	r.Get("/subscription/confirm", handler.HandleSubscriptionConfirm)
+	r.Get("/subscription/cancel", handler.HandleSubscriptionCancel)
 
 	r.Route("/stripe", func(r chi.Router) {
 		r.Use(cors.Handler(cors.Options{
