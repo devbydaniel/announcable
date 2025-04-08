@@ -29,3 +29,6 @@ migrations-unfuck:
 	migrate -database ${POSTGRES_URL} -path ${MIGRATION_DIR} force $$V; \
 	echo "Rolling back one migration..."; \
 	migrate -database ${POSTGRES_URL} -path ${MIGRATION_DIR} down 1
+
+stripe-webhook:
+	stripe listen --forward-to http://localhost:$(PORT)/stripe/webhook
