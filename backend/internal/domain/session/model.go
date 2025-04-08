@@ -12,7 +12,7 @@ type Session struct {
 	ExternalID         string
 }
 
-var AuthCookieName = "releasebeacon-session"
+var AuthCookieName = "announcable-session"
 
 func New(userId uuid.UUID, expiresAt int64, sessionId string) Session {
 	log.Trace().Str("userId", userId.String()).Int64("expiresAt", expiresAt).Str("sessionId", sessionId).Msg("New")

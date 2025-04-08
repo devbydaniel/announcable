@@ -36,7 +36,7 @@ func (h *Handler) Authenticate(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		h.log.Trace().Msg("mw Authenticate")
 		// get session cookie
-		cookie, err := r.Cookie("releasebeacon-session")
+		cookie, err := r.Cookie(session.AuthCookieName)
 		if err != nil {
 			escapedMsg := url.QueryEscape("please log in")
 			url := fmt.Sprintf("/login?info=%s", escapedMsg)
