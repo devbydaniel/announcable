@@ -10,7 +10,6 @@ import (
 	"github.com/devbydaniel/release-notes-go/internal/ratelimit"
 )
 
-
 type loginForm struct {
 	Email    string `json:"email" validate:"required,email"`
 	Password string `json:"password" validate:"required"`

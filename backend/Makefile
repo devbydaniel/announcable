@@ -32,3 +32,12 @@ migrations-unfuck:
 
 stripe-webhook:
 	stripe listen --forward-to http://localhost:$(PORT)/stripe/webhook
+
+dev-start:
+	docker compose -f ../compose-base.yml -f ../compose-dev.yml up -d
+
+dev-stop:
+	docker compose -f ../compose-base.yml -f ../compose-dev.yml down
+
+dev-logs:
+	docker compose -f ../compose-base.yml -f ../compose-dev.yml logs -f

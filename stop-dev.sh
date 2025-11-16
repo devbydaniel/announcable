@@ -1,1 +1,0 @@
-docker compose -f compose-base.yml -f compose-dev.yml down
