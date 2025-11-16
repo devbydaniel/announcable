@@ -14,11 +14,16 @@ This is a monorepo for Announcable, a release notes and announcement platform. I
 ### Starting Development Environment
 
 ```bash
+cd backend
+
 # Start all services (backend with hot-reload, postgres, pgadmin, mail, minio)
-./start-dev.sh
+make dev-start
 
 # Stop all services
-./stop-dev.sh
+make dev-stop
+
+# Follow logs from all services
+make dev-logs
 ```
 
 The backend runs with Air for hot-reloading. Changes to Go files, templates, or static assets trigger automatic rebuilds.
