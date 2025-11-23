@@ -1,9 +1,0 @@
-.login-hint {
-  text-align: center;
-  font-size: var(--font-size-sm);
-}
-
-label[for="legal"] a {
-  text-decoration: underline;
-  color: var(--color-primary);
-}

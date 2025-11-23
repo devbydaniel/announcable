@@ -1,3 +1,9 @@
+/* All @import statements must come first */
+@import '../components/form.css';
+@import '../components/skeleton.css';
+@import '../components/button.css';
+
+/* Widget config page styles */
 .release-note {
   margin-top: var(--gap-lg);
 }

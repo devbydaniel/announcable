@@ -1,3 +1,10 @@
+/* All @import statements must come first */
+@import '../components/form.css';
+@import '../components/skeleton.css';
+@import '../components/button.css';
+@import '../components/file-input.css';
+
+/* Landing page config page styles */
 .lp-container {
   margin-top: var(--gap-lg);
 }

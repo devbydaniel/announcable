@@ -1,0 +1,10 @@
+/* All @import statements must come first */
+@import '../components/card.css';
+@import '../components/form.css';
+@import '../components/button.css';
+
+/* Forgot password page styles */
+.login-hint {
+  text-align: center;
+  font-size: var(--font-size-sm);
+}

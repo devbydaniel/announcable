@@ -1,3 +1,10 @@
+/* All @import statements must come first */
+@import '../components/card.css';
+@import '../components/button.css';
+@import '../components/form.css';
+@import '../components/alert.css';
+
+/* Settings page styles */
 .settings {
   display: flex;
   flex-direction: column;

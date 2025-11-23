@@ -1,0 +1,11 @@
+/* Base styles */
+@import '../base/reset.css';
+@import '../base/variables.css';
+
+/* Fullscreen message layout styles */
+.message-container {
+  max-width: 24em;
+  margin-top: var(--gap-xl);
+  margin-left: auto;
+  margin-right: auto;
+}

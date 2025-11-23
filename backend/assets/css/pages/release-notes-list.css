@@ -1,0 +1,49 @@
+/* All @import statements must come first */
+@import '../components/button.css';
+@import '../components/card.css';
+@import '../components/table.css';
+@import '../components/badge.css';
+
+/* Release notes list page styles */
+.release-notes-table__date-cell {
+  width: 8em;
+}
+
+.release-notes-table__title-cell {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 16em;
+}
+
+tbody .table__tr {
+  cursor: pointer;
+}
+
+.empty-state {
+  height: 12em;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-md);
+  align-items: center;
+  justify-content: center;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--gap-xs);
+  padding: var(--gap-sm);
+}
+
+.pagination__item {
+  font-size: var(--font-size-sm);
+}
+
+.metrics-cell {
+  display: flex;
+  align-items: center;
+  justify-content: end;
+  gap: var(--gap-xs);
+}

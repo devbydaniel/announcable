@@ -139,28 +139,57 @@ loginTmpl.ExecuteTemplate(w, "root", data)
 
 The `templates.Construct()` helper automatically includes all partials and embeds templates via `//go:embed`.
 
-**CSS Organization** (`backend/static/css/`):
+**CSS Organization**:
 
-CSS follows a component-based architecture mirroring template structure:
+CSS uses Vite bundling with a component-based architecture:
 
+**Source CSS** (`backend/static/css/`):
 - **`base/`**: CSS reset and CSS variables (design tokens)
 - **`components/`**: Reusable UI components (button.css, card.css, form.css, nav.css, etc.)
-- **`layouts/`**: Layout-specific styles (appframe.css, onboard.css, fullscreenmessage.css)
 - **`pages/`**: Page-specific styles (login.css, release-notes-list.css, etc.)
 
-CSS is loaded progressively through template blocks:
+**Bundled CSS Entry Files** (`backend/assets/css/`):
+- **`layouts/`**: Layout entry files with inline styles + component imports (appframe.css, onboard.css, fullscreen.css)
+- **`pages/`**: Page entry files that import components and page-specific CSS (to be created)
 
-1. Base CSS always loads in `root.html` (`reset.css`, `variables.css`)
-2. Layout CSS loads via `layout-css` block (e.g., `appframe.css`, `nav.css`)
-3. Page CSS loads via `page-css` block (e.g., `login.css` plus needed component CSS)
+**Build Output** (`backend/static/dist/`):
+- Vite bundles and minifies CSS from `assets/css/` into `static/dist/`
+- Each entry file becomes one bundled, minified CSS file
 
-**JavaScript Organization** (`backend/static/js/`):
+**CSS Loading Pattern**:
+1. Layout CSS bundle loads via `layout-css` block (e.g., `/static/dist/layouts/appframe.css`)
+2. Page CSS bundle loads via `page-css` block (e.g., `/static/dist/pages/login.css`)
+3. Each bundle includes all required base, component, and page CSS in one optimized file
 
+**Important**: All `@import` statements must come at the very beginning of CSS files before any other CSS rules.
+
+**JavaScript Organization**:
+
+JavaScript uses Vite bundling with the same architecture as CSS:
+
+**Source JS** (`backend/assets/js/`):
 - **`app/`**: App-level utilities (confirmDialog.js, successMsg.js)
-- **`components/`**: Reusable component scripts (toast.js)
+- **`components/`**: Reusable component scripts (toast.js, file-input.js, popover.js)
 - **`pages/`**: Page-specific scripts
 
-JS loads similarly to CSS using `layout-js` and `page-js` blocks.
+**Note**: JS files are built individually (not bundled together)
+
+**Build Output** (`backend/static/dist/`):
+- Vite minifies each JS file from `assets/js/` into `static/dist/`
+- Directory structure is preserved (e.g., `assets/js/app/confirmDialog.js` → `static/dist/app/confirmDialog.js`)
+
+**JS Loading Pattern**:
+1. App-level JS files load in `root.html` header (e.g., `/static/dist/app/confirmDialog.js`, `/static/dist/components/toast.js`)
+2. Page-specific JS files load via `page-js` block (e.g., `/static/dist/pages/settings.js`)
+3. Component JS files are loaded explicitly where needed
+
+**Development Workflow**:
+- Source files in `assets/js/` for editing
+- `npm run dev` for watch mode with hot-reload
+- `npm run build` for production minification
+- Minified output in `static/dist/` (embedded in Go binary)
+
+For detailed JS architecture guidance, see `backend/assets/js/AGENTS.md`.
 
 **External Dependencies**:
 

@@ -22,12 +22,12 @@
         href="/static/media/favicon/favicon-16x16.png"
       />
       <link rel="manifest" href="/static/media/favicon/site.webmanifest" />
-      <link rel="stylesheet" href="/static/css/base/reset.css" />
-      <link rel="stylesheet" href="/static/css/base/variables.css" />
       {{ block "layout-css" . }}{{ end }}
       {{ block "page-css" . }}{{ end }}
-      <script src="/static/js/app/confirmDialog.js"></script>
-      <script src="/static/js/app/successMsg.js"></script>
+      <!-- App JS (loaded on all pages) -->
+      <script src="/static/dist/app/confirmDialog.js"></script>
+      <script src="/static/dist/app/successMsg.js"></script>
+      <script src="/static/dist/components/toast.js"></script>
       <!-- Alpine -->
       <script
         defer
@@ -61,7 +61,6 @@
     <body>
       {{ block "body" . }}
       {{ end }}
-      <script src="/static/js/components/toast.js"></script>
       <!-- Feather Icons-->
       <script>
         feather.replace();

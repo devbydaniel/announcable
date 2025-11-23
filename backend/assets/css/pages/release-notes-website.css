@@ -1,3 +1,6 @@
+/* Release notes website page styles */
+/* Note: This page has its own root template and doesn't use the standard layout system */
+
 .header {
   z-index: 50;
   position: sticky;

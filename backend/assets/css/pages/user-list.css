@@ -1,0 +1,27 @@
+/* All @import statements must come first */
+@import '../components/button.css';
+@import '../components/card.css';
+@import '../components/table.css';
+@import '../components/badge.css';
+@import '../components/alert.css';
+@import '../components/modal.css';
+@import '../components/form.css';
+
+/* User list page styles */
+.user-tables {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-md);
+}
+
+td:first-child {
+  width: 16em;
+}
+
+td:nth-child(2) {
+  width: 12em;
+}
+
+td:nth-child(3) {
+  width: 8em;
+}

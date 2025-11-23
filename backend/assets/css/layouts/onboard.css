@@ -1,3 +1,8 @@
+/* Base styles */
+@import '../base/reset.css';
+@import '../base/variables.css';
+
+/* Onboard layout styles */
 .onboard {
   background-color: var(--color-mantle);
   height: 100vh;

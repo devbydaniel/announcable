@@ -1,0 +1,9 @@
+/* All @import statements must come first */
+@import '../components/button.css';
+@import '../components/card.css';
+@import '../components/table.css';
+@import '../components/badge.css';
+@import '../components/modal.css';
+@import '../components/form.css';
+
+/* Admin org details page styles */

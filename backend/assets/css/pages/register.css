@@ -1,0 +1,15 @@
+/* All @import statements must come first */
+@import '../components/card.css';
+@import '../components/form.css';
+@import '../components/button.css';
+
+/* Register page styles */
+.login-hint {
+  text-align: center;
+  font-size: var(--font-size-sm);
+}
+
+label[for="legal"] a {
+  text-decoration: underline;
+  color: var(--color-primary);
+}

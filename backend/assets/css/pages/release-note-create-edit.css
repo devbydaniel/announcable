@@ -1,0 +1,29 @@
+/* All @import statements must come first */
+@import '../components/button.css';
+@import '../components/card.css';
+@import '../components/form.css';
+@import '../components/checkbox.css';
+@import '../components/file-input.css';
+@import '../components/popover.css';
+@import '../components/menu.css';
+
+/* Release note create/edit page styles */
+.form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--gap-lg);
+}
+
+.file-input {
+  height: 20em;
+}
+
+@media (min-width: 1280px) {
+  .form {
+    grid-template-columns: 2fr 1fr;
+  }
+}
+
+.form__media-preview--mt {
+  margin-top: var(--gap-sm);
+}

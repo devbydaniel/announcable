@@ -1,3 +1,10 @@
+/* All @import statements must come first */
+@import '../components/button.css';
+@import '../components/card.css';
+@import '../components/table.css';
+@import '../components/badge.css';
+
+/* Admin dashboard page styles - reuses release-notes-list styles */
 .release-notes-table__date-cell {
   width: 8em;
 }
@@ -20,23 +27,4 @@ tbody .table__tr {
   gap: var(--gap-md);
   align-items: center;
   justify-content: center;
-}
-
-.pagination {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: var(--gap-xs);
-  padding: var(--gap-sm);
-}
-
-.pagination__item {
-  font-size: var(--font-size-sm);
-}
-
-.metrics-cell {
-  display: flex;
-  align-items: center;
-  justify-content: end;
-  gap: var(--gap-xs);
 }

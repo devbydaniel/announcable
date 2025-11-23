@@ -1,3 +1,11 @@
+/* All @import statements must come first */
+@import '../base/reset.css';
+@import '../base/variables.css';
+@import '../components/nav.css';
+@import '../components/header.css';
+@import '../components/alert.css';
+
+/* Appframe layout styles */
 .app {
   position: relative;
   height: 100vh;
