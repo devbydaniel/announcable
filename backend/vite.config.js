@@ -34,8 +34,25 @@ function findEntryFiles(dir, basePath = '', extension = '.css') {
 const cssEntries = findEntryFiles(resolve(__dirname, 'assets/css'), '', '.css')
 const jsEntries = findEntryFiles(resolve(__dirname, 'assets/js'), '', '.js')
 
-// Combine entries
-const allEntries = { ...cssEntries, ...jsEntries }
+// Build a map to track which entries came from CSS vs JS sources
+const sourceTypes = {}
+
+// Combine entries: for files with both CSS and JS, give them unique entry names
+const allEntries = {}
+
+// Add CSS entries
+Object.keys(cssEntries).forEach(key => {
+  const entryName = `css__${key.replace(/\//g, '_')}`
+  allEntries[entryName] = cssEntries[key]
+  sourceTypes[entryName] = { type: 'css', path: key }
+})
+
+// Add JS entries
+Object.keys(jsEntries).forEach(key => {
+  const entryName = `js__${key.replace(/\//g, '_')}`
+  allEntries[entryName] = jsEntries[key]
+  sourceTypes[entryName] = { type: 'js', path: key }
+})
 
 export default defineConfig({
   build: {
@@ -45,10 +62,27 @@ export default defineConfig({
       // Only set input if we have entries, otherwise use empty object
       input: Object.keys(allEntries).length > 0 ? allEntries : undefined,
       output: {
-        // JS files go to their paths
-        entryFileNames: '[name].js',
-        // CSS files keep their paths
-        assetFileNames: '[name].css'
+        // JS files: use the original path from sourceTypes
+        entryFileNames: (chunkInfo) => {
+          const sourceInfo = sourceTypes[chunkInfo.name]
+          if (sourceInfo && sourceInfo.type === 'js') {
+            return `${sourceInfo.path}.js`
+          }
+          // For CSS sources or unknown entries, use default naming
+          return '[name].js'
+        },
+        // CSS files: use the original path from sourceTypes
+        assetFileNames: (assetInfo) => {
+          if (assetInfo.name && assetInfo.name.endsWith('.css')) {
+            // Find the matching source entry
+            for (const [entryName, info] of Object.entries(sourceTypes)) {
+              if (info.type === 'css' && assetInfo.name.includes(entryName)) {
+                return `${info.path}.css`
+              }
+            }
+          }
+          return '[name][extname]'
+        }
       }
     },
     minify: true,
