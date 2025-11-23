@@ -81,8 +81,12 @@ func (h *Handlers) ServeSettingsPage(w http.ResponseWriter, r *http.Request) {
 		h.deps.Log.Error().Err(err).Msg("Error getting release page URL")
 	}
 
+	orgName := ctx.Value(mw.OrgNameKey).(string)
+	cfg := config.New()
+
 	isFree := false
-	if hasActiveSubscription {
+	// Only check subscription tier in cloud mode
+	if cfg.IsCloud() && hasActiveSubscription {
 		var err error
 		isFree, err = subscriptionService.IsFreeSubscription(uuid.MustParse(orgId))
 		if err != nil {
@@ -91,9 +95,6 @@ func (h *Handlers) ServeSettingsPage(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-
-	orgName := ctx.Value(mw.OrgNameKey).(string)
-	cfg := config.New()
 
 	data := pageData{
 		BaseTemplateData: shared.BaseTemplateData{
