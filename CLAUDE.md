@@ -16,17 +16,27 @@ This is a monorepo for Announcable, a release notes and announcement platform. I
 ```bash
 cd backend
 
-# Start all services (backend with hot-reload, postgres, pgadmin, mail, minio)
-make dev-start
+# New workflow (recommended) - run in separate terminals:
+# Terminal 1: Start Docker services (postgres, mail, minio)
+make dev-services
+
+# Terminal 2: Start Go backend with Air hot-reload (loads env automatically)
+make dev-air
+
+# Terminal 3: Start Vite for CSS/JS hot-reload
+npm run dev
 
 # Stop all services
 make dev-stop
 
 # Follow logs from all services
 make dev-logs
+
+# Legacy workflow (runs everything in Docker)
+make dev-start
 ```
 
-The backend runs with Air for hot-reloading. Changes to Go files, templates, or static assets trigger automatic rebuilds.
+The backend runs with Air for hot-reloading. Changes to Go files, templates, or static assets trigger automatic rebuilds. The new workflow runs the app directly on your host (not in Docker) for faster rebuilds and easier debugging.
 
 ### Backend Development
 
