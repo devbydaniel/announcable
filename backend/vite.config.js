@@ -62,10 +62,16 @@ export default defineConfig({
       // Only set input if we have entries, otherwise use empty object
       input: Object.keys(allEntries).length > 0 ? allEntries : undefined,
       output: {
+        // Prevent code splitting for vendor bundle
+        manualChunks: undefined,
         // JS files: use the original path from sourceTypes
         entryFileNames: (chunkInfo) => {
           const sourceInfo = sourceTypes[chunkInfo.name]
           if (sourceInfo && sourceInfo.type === 'js') {
+            // Special handling for vendor bundle - output as vendor.js at root
+            if (sourceInfo.path === 'vendor') {
+              return 'vendor.js'
+            }
             return `${sourceInfo.path}.js`
           }
           // For CSS sources or unknown entries, use default naming
@@ -77,6 +83,10 @@ export default defineConfig({
             // Find the matching source entry
             for (const [entryName, info] of Object.entries(sourceTypes)) {
               if (info.type === 'css' && assetInfo.name.includes(entryName)) {
+                // Special handling for vendor bundle - output as vendor.css at root
+                if (info.path === 'vendor') {
+                  return 'vendor.css'
+                }
                 return `${info.path}.css`
               }
             }

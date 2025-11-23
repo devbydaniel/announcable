@@ -24,32 +24,17 @@
       <link rel="manifest" href="/static/media/favicon/site.webmanifest" />
       {{ block "layout-css" . }}{{ end }}
       {{ block "page-css" . }}{{ end }}
-      <!-- App JS (loaded on all pages) -->
-      <script src="/static/dist/app/confirmDialog.js"></script>
-      <script src="/static/dist/app/successMsg.js"></script>
-      <script src="/static/dist/components/toast.js"></script>
-      <!-- Alpine -->
-      <script
-        defer
-        src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
-      ></script>
-      <!-- HTMX -->
-      <script
-        src="https://unpkg.com/htmx.org@2.0.4"
-        integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+"
-        crossorigin="anonymous"
-      ></script>
-      <!-- Toastify -->
-      <link
-        rel="stylesheet"
-        type="text/css"
-        href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"
-      />
-      <!-- Sweet Alert-->
-      <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-      <!-- Feather Icons -->
-      <script src="https://unpkg.com/feather-icons"></script>
-      <!-- Plausible -->
+      
+      <!-- Vendor Bundle CSS (Toastify) -->
+      <link rel="stylesheet" type="text/css" href="/static/dist/vendor.css" />
+      
+      <!-- Vendor Bundle JS (HTMX, Toastify, SweetAlert, Feather) -->
+      <script src="/static/dist/vendor.js"></script>
+      
+      <!-- Alpine.js from CDN with defer -->
+      <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+      
+      <!-- Plausible Analytics -->
       <script
         defer
         data-domain="app.announcable.me"
@@ -61,15 +46,11 @@
     <body>
       {{ block "body" . }}
       {{ end }}
-      <!-- Feather Icons-->
+      
+      <!-- Feather Icons -->
       <script>
         feather.replace();
       </script>
-      <!-- Toastify -->
-      <script
-        type="text/javascript"
-        src="https://cdn.jsdelivr.net/npm/toastify-js"
-      ></script>
       {{ block "layout-js" . }}{{ end }}
       {{ block "page-js" . }}{{ end }}
     </body>

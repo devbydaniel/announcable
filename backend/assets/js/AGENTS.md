@@ -143,14 +143,21 @@ document.addEventListener('alpine:init', () => {
 
 ## External Dependencies
 
-All JS code depends on CDN-loaded libraries defined in `root.html`:
+All external JS libraries are bundled via npm and loaded from the vendor bundle (`/static/dist/vendor.js`):
 - **Alpine.js**: Reactive UI framework
 - **HTMX**: AJAX and partial page updates
 - **SweetAlert**: Modal dialogs (used by confirmDialog.js)
 - **Toastify**: Toast notifications (used by toast.js)
 - **Feather Icons**: Icon library
 
-These libraries are available as global objects - no imports needed.
+These libraries are available as global objects after vendor.js loads:
+- `window.Alpine` - Alpine.js
+- `window.htmx` - HTMX
+- `window.Toastify` - Toastify
+- `window.swal` - SweetAlert
+- `window.feather` - Feather Icons
+
+The vendor bundle is loaded in `templates/layouts/root.html` before any app or page scripts.
 
 ## Debugging Tips
 

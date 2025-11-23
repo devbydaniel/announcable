@@ -5,6 +5,13 @@
     "dev": "vite build --watch",
     "build": "vite build"
   },
+  "dependencies": {
+    "alpinejs": "^3.14.1",
+    "htmx.org": "^2.0.4",
+    "toastify-js": "^1.12.0",
+    "sweetalert": "^2.1.2",
+    "feather-icons": "^4.29.2"
+  },
   "devDependencies": {
     "vite": "^7.2.2"
   }

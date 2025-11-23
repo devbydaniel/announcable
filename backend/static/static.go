@@ -2,7 +2,7 @@ package static
 
 import "embed"
 
-//go:embed media/* dist/**/*
+//go:embed media/* dist/* dist/**/*
 var Assets embed.FS
 
 //go:embed widget/widget.js
