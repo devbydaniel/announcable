@@ -36,3 +36,8 @@ function toastError(message) {
     },
   }).showToast();
 }
+
+// Expose toast functions globally for use in Alpine.js components and inline handlers
+window.toastSuccess = toastSuccess;
+window.toastInfo = toastInfo;
+window.toastError = toastError;
