@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/devbydaniel/release-notes-go/config"
 	releasenotelikes "github.com/devbydaniel/release-notes-go/internal/domain/release-note-likes"
 	releasenotemetrics "github.com/devbydaniel/release-notes-go/internal/domain/release-note-metrics"
 	releasenotes "github.com/devbydaniel/release-notes-go/internal/domain/release-notes"
@@ -149,10 +150,13 @@ func (h *Handlers) ServeReleaseNotesListPage(w http.ResponseWriter, r *http.Requ
 	if releaseNotes.Page > 1 {
 		prevPageLink = "/release-notes?page=" + strconv.Itoa(releaseNotes.Page-1) + "&pageSize=" + pageSize
 	}
+	cfg := config.New()
+
 	data := pageData{
 		BaseTemplateData: shared.BaseTemplateData{
 			Title:                 "Release Notes",
 			HasActiveSubscription: hasActiveSubscription,
+			ShowSubscriptionUI:    cfg.IsCloud(),
 		},
 		ReleaseNotes: releaseNotesWithMetrics,
 		NextPageLink: nextPageLink,

@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/devbydaniel/release-notes-go/config"
 	releasenotes "github.com/devbydaniel/release-notes-go/internal/domain/release-notes"
 	subscription "github.com/devbydaniel/release-notes-go/internal/domain/subscription"
 	"github.com/devbydaniel/release-notes-go/internal/imgUtil"
@@ -58,34 +59,40 @@ func (h *Handlers) HandleReleaseNoteCreate(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	// Check subscription status
-	sub, err := subscriptionService.Get(uuid.MustParse(orgId))
-	var subscriptionActive bool
-	if err != nil {
-		if !errors.Is(err, h.deps.DB.ErrRecordNotFound) {
-			h.deps.Log.Error().Err(err).Msg("Error getting subscription")
-			http.Error(w, "Error checking subscription status", http.StatusInternalServerError)
-			return
-		}
-		// No subscription found - leave as false
-	} else {
-		subscriptionActive = sub.IsActive || sub.IsFree
-	}
+	cfg := config.New()
 
-	// If subscription is not active, check release note count
-	if !subscriptionActive {
-		count, err := releaseNotesService.GetCount(uuid.MustParse(orgId))
+	// Only check subscription limits in cloud mode
+	if cfg.IsCloud() {
+		// Check subscription status
+		sub, err := subscriptionService.Get(uuid.MustParse(orgId))
+		var subscriptionActive bool
 		if err != nil {
-			h.deps.Log.Error().Err(err).Msg("Error getting release note count")
-			http.Error(w, "Error checking release note limit", http.StatusInternalServerError)
-			return
+			if !errors.Is(err, h.deps.DB.ErrRecordNotFound) {
+				h.deps.Log.Error().Err(err).Msg("Error getting subscription")
+				http.Error(w, "Error checking subscription status", http.StatusInternalServerError)
+				return
+			}
+			// No subscription found - leave as false
+		} else {
+			subscriptionActive = sub.IsActive || sub.IsFree
 		}
-		if count >= 5 {
-			h.deps.Log.Warn().Msg("Release note limit reached for free tier")
-			http.Error(w, "Free tier limited to 5 release notes. Please upgrade to create more.", http.StatusForbidden)
-			return
+
+		// If subscription is not active, check release note count
+		if !subscriptionActive {
+			count, err := releaseNotesService.GetCount(uuid.MustParse(orgId))
+			if err != nil {
+				h.deps.Log.Error().Err(err).Msg("Error getting release note count")
+				http.Error(w, "Error checking release note limit", http.StatusInternalServerError)
+				return
+			}
+			if count >= 5 {
+				h.deps.Log.Warn().Msg("Release note limit reached for free tier")
+				http.Error(w, "Free tier limited to 5 release notes. Please upgrade to create more.", http.StatusForbidden)
+				return
+			}
 		}
 	}
+	// Self-hosted mode: skip all subscription checks and continue
 
 	// parse form
 	if err := r.ParseMultipartForm(10 << 20); err != nil {

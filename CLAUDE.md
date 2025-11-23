@@ -210,6 +210,28 @@ Copy `.env.example` to `.env` and configure:
 - Axiom logging token (optional)
 - Legal document versions (TOS_VERSION, PP_VERSION)
 
+### App Environment Modes
+
+The application supports two operational modes controlled by the `APP_ENVIRONMENT` variable. **If not set, defaults to self-hosted mode.**
+
+**Cloud Mode (`APP_ENVIRONMENT=cloud`)**:
+- Full Stripe integration enabled
+- Subscription checks enforce limits (5 release notes for free tier)
+- Subscription UI elements visible in navigation and settings
+- Payment and billing portal accessible
+- Requires Stripe API keys configured
+
+**Self-Hosted Mode (`APP_ENVIRONMENT=self-hosted` or not set)**:
+- No Stripe integration required
+- All subscription checks bypassed - unlimited release notes
+- Subscription UI elements hidden
+- Payment routes return 404
+- Stripe API keys optional (can be left empty)
+
+To configure, set in `.env`:
+- For cloud: `APP_ENVIRONMENT=cloud`
+- For self-hosted: `APP_ENVIRONMENT=self-hosted` (or leave unset)
+
 ## Docker Services
 
 Development uses Docker Compose with two config files:

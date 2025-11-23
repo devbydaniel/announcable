@@ -5,6 +5,7 @@ import (
 	"html"
 	"net/http"
 
+	"github.com/devbydaniel/release-notes-go/config"
 	releasepageconfig "github.com/devbydaniel/release-notes-go/internal/domain/release-page-configs"
 	widgetconfigs "github.com/devbydaniel/release-notes-go/internal/domain/widget-configs"
 	"github.com/devbydaniel/release-notes-go/internal/handler/shared"
@@ -94,10 +95,13 @@ func (h *Handlers) ServeReleasePageConfigPage(w http.ResponseWriter, r *http.Req
 	}
 	h.deps.Log.Debug().Str("releasePageUrl", releasePageUrl).Msg("Release page URL")
 
+	appCfg := config.New()
+
 	data := pageData{
 		BaseTemplateData: shared.BaseTemplateData{
 			Title:                 "Release Page Config",
 			HasActiveSubscription: hasActiveSubscription,
+			ShowSubscriptionUI:    appCfg.IsCloud(),
 		},
 		Cfg:               cfg,
 		SafeTitle:         html.EscapeString(cfg.Title),

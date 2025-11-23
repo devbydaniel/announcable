@@ -4,6 +4,7 @@ package shared
 type BaseTemplateData struct {
 	Title                 string
 	HasActiveSubscription bool
+	ShowSubscriptionUI    bool
 }
 
 // PageData interface allows type-safe access to base template data

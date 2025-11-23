@@ -3,6 +3,7 @@ package account
 import (
 	"net/http"
 
+	"github.com/devbydaniel/release-notes-go/config"
 	"github.com/devbydaniel/release-notes-go/internal/domain/organisation"
 	releasepageconfig "github.com/devbydaniel/release-notes-go/internal/domain/release-page-configs"
 	"github.com/devbydaniel/release-notes-go/internal/domain/subscription"
@@ -92,11 +93,13 @@ func (h *Handlers) ServeSettingsPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	orgName := ctx.Value(mw.OrgNameKey).(string)
+	cfg := config.New()
 
 	data := pageData{
 		BaseTemplateData: shared.BaseTemplateData{
 			Title:                 "Settings for " + orgName,
 			HasActiveSubscription: hasActiveSubscription,
+			ShowSubscriptionUI:    cfg.IsCloud(),
 		},
 		WidgetID:            externalId.String(),
 		HasPaidSubscription: hasActiveSubscription && !isFree,

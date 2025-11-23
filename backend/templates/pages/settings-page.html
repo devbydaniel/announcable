@@ -182,7 +182,7 @@
         <button id="pw-update-submit-button" class="button">Change</button>
       </div>
     </div>
-    {{ if .HasPaidSubscription }}
+    {{ if and .HasPaidSubscription .ShowSubscriptionUI }}
       <div class="card">
         <h2 class="card__title">Subscription</h2>
         <div class="card__content"></div>

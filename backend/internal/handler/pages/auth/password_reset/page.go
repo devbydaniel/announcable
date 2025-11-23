@@ -3,6 +3,7 @@ package password_reset
 import (
 	"net/http"
 
+	"github.com/devbydaniel/release-notes-go/config"
 	"github.com/devbydaniel/release-notes-go/internal/handler/shared"
 	mw "github.com/devbydaniel/release-notes-go/internal/middleware"
 	"github.com/devbydaniel/release-notes-go/templates"
@@ -42,10 +43,13 @@ func (h *Handlers) ServeResetPasswordPage(w http.ResponseWriter, r *http.Request
 		http.Error(w, "Error checking subscription status", http.StatusInternalServerError)
 		return
 	}
+	cfg := config.New()
+
 	data := pageData{
 		BaseTemplateData: shared.BaseTemplateData{
 			Title:                 "Reset Password",
 			HasActiveSubscription: hasActiveSubscription,
+			ShowSubscriptionUI:    cfg.IsCloud(),
 		},
 		Token: token,
 	}

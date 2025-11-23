@@ -18,7 +18,19 @@ import (
 var log = logger.Get()
 
 func Setup() {
-	stripe.Key = config.New().Payment.StripeKey
+	cfg := config.New()
+	if cfg.IsSelfHosted() {
+		log.Info().Msg("Stripe not configured - self-hosted mode")
+		return
+	}
+
+	if cfg.Payment.StripeKey == "" {
+		log.Warn().Msg("Stripe key not configured but in cloud mode")
+		return
+	}
+
+	stripe.Key = cfg.Payment.StripeKey
+	log.Info().Msg("Stripe initialized")
 }
 
 func CreateStripeCheckoutSession(lookupKey string, organizationID uuid.UUID) (string, error) {

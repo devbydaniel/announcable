@@ -3,6 +3,7 @@ package detail
 import (
 	"net/http"
 
+	"github.com/devbydaniel/release-notes-go/config"
 	releasenotes "github.com/devbydaniel/release-notes-go/internal/domain/release-notes"
 	"github.com/devbydaniel/release-notes-go/internal/handler/shared"
 	mw "github.com/devbydaniel/release-notes-go/internal/middleware"
@@ -65,10 +66,13 @@ func (h *Handlers) ServeReleaseNoteDetailPage(w http.ResponseWriter, r *http.Req
 		http.Error(w, "Error getting release note", http.StatusInternalServerError)
 	}
 
+	cfg := config.New()
+
 	data := pageData{
 		BaseTemplateData: shared.BaseTemplateData{
 			Title:                 rn.Title,
 			HasActiveSubscription: hasActiveSubscription,
+			ShowSubscriptionUI:    cfg.IsCloud(),
 		},
 		Rn:                           rn,
 		IsEdit:                       true,

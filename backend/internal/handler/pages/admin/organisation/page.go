@@ -3,6 +3,7 @@ package organisation
 import (
 	"net/http"
 
+	"github.com/devbydaniel/release-notes-go/config"
 	"github.com/devbydaniel/release-notes-go/internal/domain/admin"
 	releasepageconfig "github.com/devbydaniel/release-notes-go/internal/domain/release-page-configs"
 	"github.com/devbydaniel/release-notes-go/internal/handler/shared"
@@ -147,10 +148,13 @@ func (h *Handlers) ServeOrganisationDetailsPage(w http.ResponseWriter, r *http.R
 		})
 	}
 
+	cfg := config.New()
+
 	data := OrganisationDetailsData{
 		BaseTemplateData: shared.BaseTemplateData{
 			Title:                 org.Name,
 			HasActiveSubscription: true,
+			ShowSubscriptionUI:    cfg.IsCloud(),
 		},
 		Organisation:  orgData,
 		ReleasePage:   releasePageData,

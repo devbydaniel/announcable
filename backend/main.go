@@ -57,11 +57,18 @@ func main() {
 	log.Info().Msg("Starting application")
 	initEnv()
 	log.Info().Msg("Environment loaded")
+	log.Info().Msgf("Running in %s mode", cfg.AppEnvironment)
 	db := initDb()
 	defer database.Close(db)
 	defer logger.Cleanup() // Ensure logger is cleaned up on shutdown
 
-	initStripe()
+	// Only initialize Stripe in cloud mode
+	if cfg.AppEnvironment == "cloud" {
+		initStripe()
+	} else {
+		log.Info().Msg("Skipping Stripe initialization in self-hosted mode")
+	}
+
 	objStore := initObjStore()
 	mwHandler := mw.NewHandler(db)
 
@@ -284,16 +291,22 @@ func main() {
 	})
 
 	// PAYMENT & STRIPE
-	r.With(mwHandler.Authenticate, mwHandler.Authorize(rbac.PermissionManageAccess)).Route("/payment", func(r chi.Router) {
+	r.With(
+		mwHandler.Authenticate,
+		mwHandler.Authorize(rbac.PermissionManageAccess),
+		mwHandler.CloudOnly,
+	).Route("/payment", func(r chi.Router) {
 		r.Post("/create-checkout-session", paymentHandler.HandleCheckoutSession)
 		r.Post("/create-portal-session", paymentHandler.HandlePortalSession)
 	})
 
-	// Subscription confirmation page (no auth required)
-	r.Get("/subscription/confirm", subscriptionHandler.HandleSubscriptionConfirm)
-	r.Get("/subscription/cancel", subscriptionHandler.HandleSubscriptionCancel)
+	// Subscription confirmation pages (no auth required, but cloud only)
+	r.With(mwHandler.CloudOnly).Get("/subscription/confirm", subscriptionHandler.HandleSubscriptionConfirm)
+	r.With(mwHandler.CloudOnly).Get("/subscription/cancel", subscriptionHandler.HandleSubscriptionCancel)
 
+	// Stripe webhook (cloud only)
 	r.Route("/stripe", func(r chi.Router) {
+		r.Use(mwHandler.CloudOnly)
 		r.Use(cors.Handler(cors.Options{
 			AllowedOrigins:   []string{"*"},
 			AllowedMethods:   []string{"GET", "POST", "OPTIONS"},

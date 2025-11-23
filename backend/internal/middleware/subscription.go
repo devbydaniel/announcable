@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/devbydaniel/release-notes-go/config"
 	"github.com/devbydaniel/release-notes-go/internal/domain/subscription"
 	"github.com/google/uuid"
 )
@@ -13,6 +14,16 @@ func (h *Handler) WithSubscriptionStatus(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
+		cfg := config.New()
+
+		// In self-hosted mode, always set subscription as active
+		if cfg.IsSelfHosted() {
+			ctx = context.WithValue(ctx, HasActiveSubscription, true)
+			next.ServeHTTP(w, r.WithContext(ctx))
+			return
+		}
+
+		// Cloud mode: existing subscription check logic
 		// Get organization ID from context
 		orgId, ok := ctx.Value(OrgIDKey).(string)
 		if !ok {

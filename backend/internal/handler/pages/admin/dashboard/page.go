@@ -3,6 +3,7 @@ package dashboard
 import (
 	"net/http"
 
+	"github.com/devbydaniel/release-notes-go/config"
 	"github.com/devbydaniel/release-notes-go/internal/domain/admin"
 	"github.com/devbydaniel/release-notes-go/internal/handler/shared"
 	mw "github.com/devbydaniel/release-notes-go/internal/middleware"
@@ -77,10 +78,13 @@ func (h *Handlers) ServeDashboardPage(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
+	cfg := config.New()
+
 	data := DashboardData{
 		BaseTemplateData: shared.BaseTemplateData{
 			Title:                 "Admin Dashboard",
 			HasActiveSubscription: true,
+			ShowSubscriptionUI:    cfg.IsCloud(),
 		},
 		Organisations: orgData,
 	}

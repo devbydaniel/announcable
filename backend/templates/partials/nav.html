@@ -43,7 +43,7 @@
     </ul>
     <div class="nav__divider"></div>
     <ul class="nav__list">
-      {{ if not .HasActiveSubscription }}
+      {{ if and (not .HasActiveSubscription) .ShowSubscriptionUI }}
         <li class="nav__list__item nav__list__item--highlight">
           <form
             x-data

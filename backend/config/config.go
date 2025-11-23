@@ -59,26 +59,28 @@ type axiomConfig struct {
 }
 
 type config struct {
-	Env         string
-	BaseURL     string
-	Port        int
-	AdminUserId string
-	Postgres    postgresConfig
-	ObjStorage  objStorageConfig
-	PgAdmin     pgAdminConfig
-	Email       emailConfig
-	ProductInfo productInfo
-	Legal       legal
-	Payment     payment
-	Axiom       axiomConfig
+	Env            string
+	AppEnvironment string
+	BaseURL        string
+	Port           int
+	AdminUserId    string
+	Postgres       postgresConfig
+	ObjStorage     objStorageConfig
+	PgAdmin        pgAdminConfig
+	Email          emailConfig
+	ProductInfo    productInfo
+	Legal          legal
+	Payment        payment
+	Axiom          axiomConfig
 }
 
 func New() *config {
-	return &config{
-		Env:         getEnv("ENV"),
-		BaseURL:     getEnv("BASE_URL"),
-		Port:        getEnvAsInt("PORT"),
-		AdminUserId: getEnv("ADMIN_USER_ID"),
+	cfg := &config{
+		Env:            getEnv("ENV"),
+		AppEnvironment: getEnvWithDefault("APP_ENVIRONMENT", "self-hosted"),
+		BaseURL:        getEnv("BASE_URL"),
+		Port:           getEnvAsInt("PORT"),
+		AdminUserId:    getEnv("ADMIN_USER_ID"),
 		Legal: legal{
 			ToSVersion: getEnv("TOS_VERSION"),
 			PPVersion:  getEnv("PP_VERSION"),
@@ -125,6 +127,13 @@ func New() *config {
 			Token:   getEnv("AXIOM_TOKEN"),
 		},
 	}
+
+	// Validate APP_ENVIRONMENT
+	if cfg.AppEnvironment != "cloud" && cfg.AppEnvironment != "self-hosted" {
+		panic("APP_ENVIRONMENT must be either 'cloud' or 'self-hosted', got: " + cfg.AppEnvironment)
+	}
+
+	return cfg
 }
 
 func getEnv(key string) string {
@@ -132,6 +141,13 @@ func getEnv(key string) string {
 		return value
 	}
 	panic("Environment variable " + key + " not set")
+}
+
+func getEnvWithDefault(key, defaultValue string) string {
+	if value, exists := os.LookupEnv(key); exists {
+		return value
+	}
+	return defaultValue
 }
 
 func getEnvAsInt(name string) int {
@@ -148,4 +164,14 @@ func getEnvAsBool(name string) bool {
 		return val
 	}
 	panic("Environment variable " + name + " is not a boolean")
+}
+
+// IsCloud returns true if the application is running in cloud mode
+func (c *config) IsCloud() bool {
+	return c.AppEnvironment == "cloud"
+}
+
+// IsSelfHosted returns true if the application is running in self-hosted mode
+func (c *config) IsSelfHosted() bool {
+	return c.AppEnvironment == "self-hosted"
 }

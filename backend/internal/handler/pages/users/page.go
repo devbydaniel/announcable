@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/devbydaniel/release-notes-go/config"
 	"github.com/devbydaniel/release-notes-go/internal/domain/organisation"
 	"github.com/devbydaniel/release-notes-go/internal/domain/subscription"
 	"github.com/devbydaniel/release-notes-go/internal/handler/shared"
@@ -108,10 +109,13 @@ func (h *Handlers) ServeUsersPage(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
+	cfg := config.New()
+
 	data := pageData{
 		BaseTemplateData: shared.BaseTemplateData{
 			Title:                 "Users",
 			HasActiveSubscription: hasActiveSubscription,
+			ShowSubscriptionUI:    cfg.IsCloud(),
 		},
 		Users:   userData,
 		Invites: inviteData,
