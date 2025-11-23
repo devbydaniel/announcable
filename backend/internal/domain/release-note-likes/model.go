@@ -9,9 +9,9 @@ import (
 
 type ReleaseNoteLike struct {
 	database.BaseModel `gorm:"embedded"`
-	ReleaseNoteID     uuid.UUID
-	ReleaseNote       releasenotes.ReleaseNote
-	OrganisationID    uuid.UUID
-	Organisation      organisation.Organisation
-	ClientID          string `gorm:"type:text;not null"`
-} 
+	ReleaseNoteID      uuid.UUID
+	ReleaseNote        releasenotes.ReleaseNote
+	OrganisationID     uuid.UUID
+	Organisation       organisation.Organisation
+	ClientID           string `gorm:"type:text;not null"`
+}

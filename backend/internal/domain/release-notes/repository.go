@@ -59,15 +59,15 @@ func (r *repository) Update(id uuid.UUID, rn *ReleaseNote, tx *gorm.DB) error {
 		client = r.db.Client
 	}
 	if err := client.Model(&ReleaseNote{}).Where("id = ?", id).Select(
-		"Title", 
-		"DescriptionShort", 
-		"DescriptionLong", 
-		"ReleaseDate", 
-		"CtaLabelOverride", 
-		"CtaUrlOverride", 
-		"HideCta", 
-		"AttentionMechanism", 
-		"HideOnWidget", 
+		"Title",
+		"DescriptionShort",
+		"DescriptionLong",
+		"ReleaseDate",
+		"CtaLabelOverride",
+		"CtaUrlOverride",
+		"HideCta",
+		"AttentionMechanism",
+		"HideOnWidget",
 		"HideOnReleasePage",
 		"MediaLink",
 	).Updates(rn).Error; err != nil {

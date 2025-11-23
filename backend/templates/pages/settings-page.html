@@ -48,7 +48,7 @@
       <div class="card__footer">
         <button
           class="button"
-          hx-patch="/widget-config/external-id"
+          hx-patch="/settings/widget-id"
           hx-swap="none"
           hx-confirm="You will need to update the widget configuration in your product before the widget can display release notes again."
           @htmx:response-error.camel="onSubmitError"
@@ -72,7 +72,7 @@
       <div class="card__content">
         <form
           id="custom-url-form"
-          hx-patch="/widget-config/base-url"
+          hx-patch="/settings/release-page-url"
           hx-swap="none"
           @htmx:response-error.camel="onSubmitError"
           @custom:submit-success="onSubmitSuccess"
@@ -141,7 +141,7 @@
         <form
           id="pw-update-form"
           x-data="pwUpdate"
-          hx-patch="/profile/password"
+          hx-patch="/settings/password"
           hx-swap="none"
           @htmx:response-error.camel="onSubmitError"
           @custom:submit-success="onSubmitSuccess"

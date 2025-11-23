@@ -15,7 +15,7 @@ func NewService(r *repository) *service {
 
 func (s *service) ToggleLike(releaseNoteID uuid.UUID, orgID uuid.UUID, clientID string) (bool, error) {
 	log.Trace().Msg("ToggleLike")
-	
+
 	// Check if like already exists
 	existingLike, err := s.repo.FindByReleaseNoteAndClientID(releaseNoteID, clientID)
 	if err != nil {
@@ -68,4 +68,4 @@ func (s *service) GetLikesByReleaseNote(releaseNoteID uuid.UUID) ([]ReleaseNoteL
 func (s *service) GetLikesByOrg(orgID uuid.UUID) ([]ReleaseNoteLike, error) {
 	log.Trace().Str("orgID", orgID.String()).Msg("GetLikesByOrg")
 	return s.repo.FindByOrgID(orgID)
-} 
+}

@@ -22,4 +22,4 @@ func TransformMediaLink(mediaLink string) string {
 	}
 
 	return ""
-} 
+}

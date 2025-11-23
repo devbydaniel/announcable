@@ -66,4 +66,4 @@ func (r *repository) FindByReleaseNoteAndClientID(releaseNoteID uuid.UUID, clien
 		return nil, err
 	}
 	return &like, nil
-} 
+}

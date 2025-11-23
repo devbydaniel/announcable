@@ -17,7 +17,7 @@ var (
 func init() {
 	// Set global log level to trace
 	zerolog.SetGlobalLevel(zerolog.TraceLevel)
-	
+
 	env := config.New().Env
 	var err error
 	axiomWriter, err = adapter.New()
@@ -32,7 +32,7 @@ func init() {
 		Caller().
 		Str("env", env).
 		Logger()
-	
+
 	// Replace the global logger instance
 	log.Logger = logger
 }

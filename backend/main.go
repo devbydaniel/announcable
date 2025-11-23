@@ -12,7 +12,31 @@ import (
 	"github.com/devbydaniel/release-notes-go/config"
 	"github.com/devbydaniel/release-notes-go/internal/database"
 	"github.com/devbydaniel/release-notes-go/internal/domain/rbac"
-	"github.com/devbydaniel/release-notes-go/internal/handler"
+	apiShared "github.com/devbydaniel/release-notes-go/internal/handler/api/shared"
+	apiStripe "github.com/devbydaniel/release-notes-go/internal/handler/api/stripe"
+	apiWidget "github.com/devbydaniel/release-notes-go/internal/handler/api/widget"
+	"github.com/devbydaniel/release-notes-go/internal/handler/pages/admin/dashboard"
+	"github.com/devbydaniel/release-notes-go/internal/handler/pages/admin/organisation"
+	"github.com/devbydaniel/release-notes-go/internal/handler/pages/auth/invite_accept"
+	"github.com/devbydaniel/release-notes-go/internal/handler/pages/auth/login"
+	"github.com/devbydaniel/release-notes-go/internal/handler/pages/auth/logout"
+	"github.com/devbydaniel/release-notes-go/internal/handler/pages/auth/password_forgot"
+	"github.com/devbydaniel/release-notes-go/internal/handler/pages/auth/password_reset"
+	"github.com/devbydaniel/release-notes-go/internal/handler/pages/auth/register"
+	"github.com/devbydaniel/release-notes-go/internal/handler/pages/auth/verify_email"
+	"github.com/devbydaniel/release-notes-go/internal/handler/pages/payment"
+	"github.com/devbydaniel/release-notes-go/internal/handler/pages/public/home"
+	"github.com/devbydaniel/release-notes-go/internal/handler/pages/public/release_page"
+	"github.com/devbydaniel/release-notes-go/internal/handler/pages/public/subscription"
+	"github.com/devbydaniel/release-notes-go/internal/handler/pages/public/widget_script"
+	rnCreateHandler "github.com/devbydaniel/release-notes-go/internal/handler/pages/release_notes/create"
+	rnDetailHandler "github.com/devbydaniel/release-notes-go/internal/handler/pages/release_notes/detail"
+	rnListHandler "github.com/devbydaniel/release-notes-go/internal/handler/pages/release_notes/list"
+	releasePageConfigHandler "github.com/devbydaniel/release-notes-go/internal/handler/pages/release_page/config"
+	"github.com/devbydaniel/release-notes-go/internal/handler/pages/settings/account"
+	"github.com/devbydaniel/release-notes-go/internal/handler/pages/users"
+	widgetConfigHandler "github.com/devbydaniel/release-notes-go/internal/handler/pages/widget/config"
+	"github.com/devbydaniel/release-notes-go/internal/handler/shared"
 	"github.com/devbydaniel/release-notes-go/internal/logger"
 	mw "github.com/devbydaniel/release-notes-go/internal/middleware"
 	"github.com/devbydaniel/release-notes-go/internal/objstore"
@@ -36,38 +60,80 @@ func main() {
 	db := initDb()
 	defer database.Close(db)
 	defer logger.Cleanup() // Ensure logger is cleaned up on shutdown
-	
+
 	initStripe()
 	objStore := initObjStore()
 	mwHandler := mw.NewHandler(db)
-	handler := handler.NewHandler(db, objStore)
+
+	// All handlers now use shared dependencies
+	deps := shared.New(db, objStore)
+
+	// Auth handlers
+	loginHandler := login.New(deps)
+	registerHandler := register.New(deps)
+	verifyEmailHandler := verify_email.New(deps)
+	inviteAcceptHandler := invite_accept.New(deps)
+	passwordForgotHandler := password_forgot.New(deps)
+	passwordResetHandler := password_reset.New(deps)
+	logoutHandler := logout.New(deps)
+
+	// User & Settings handlers
+	usersHandler := users.New(deps)
+	settingsHandler := account.New(deps)
+
+	// Release Notes handlers
+	rnListHandler := rnListHandler.New(deps)
+	rnCreateHandler := rnCreateHandler.New(deps)
+	rnDetailHandler := rnDetailHandler.New(deps)
+
+	// Config handlers
+	widgetHandler := widgetConfigHandler.New(deps)
+	releasePageHandler := releasePageConfigHandler.New(deps)
+
+	// Admin handlers
+	adminDashboardHandler := dashboard.New(deps)
+	adminOrgHandler := organisation.New(deps)
+
+	// Public handlers
+	homeHandler := home.New(deps)
+	releasePagePublicHandler := release_page.New(deps)
+	widgetScriptHandler := widget_script.New(deps)
+	subscriptionHandler := subscription.New(deps)
+
+	// Payment handlers
+	paymentHandler := payment.New(deps)
+
+	// API handlers
+	widgetAPIHandler := apiWidget.New(deps)
+	sharedAPIHandler := apiShared.New(deps)
+	stripeAPIHandler := apiStripe.New(deps)
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 
-	r.Get("/", handler.HandleHomePage)
+	r.Get("/", homeHandler.ServeHomePage)
 
 	// ONBOARDING AND AUTH
 
 	r.Route("/login", func(r chi.Router) {
-		r.Get("/", handler.HandleLoginPage)
-		r.Post("/", handler.HandleLogin)
+		r.Get("/", loginHandler.ServeLoginPage)
+		r.Post("/", loginHandler.HandleLogin)
 	})
 
 	r.Route("/register", func(r chi.Router) {
-		r.Get("/", handler.HandleRegisterPage)
-		r.Post("/", handler.HandleRegister)
+		r.Get("/", registerHandler.ServeRegisterPage)
+		r.Post("/", registerHandler.HandleRegister)
 	})
 
 	r.Route("/verify-email", func(r chi.Router) {
-		r.Get("/", handler.HandleEmailVerifyPage)
-		r.Post("/", handler.HandleEmailVerifyResend)
+		r.Get("/", verifyEmailHandler.ServeVerifyEmailPage)
+		r.Post("/", verifyEmailHandler.HandleResend)
 	})
 
 	r.Route("/invite-accept/{token}", func(r chi.Router) {
-		r.Get("/", handler.HandleInviteAcceptPage)
-		r.Post("/", handler.HandleInviteAccept)
+		r.Get("/", inviteAcceptHandler.ServeInviteAcceptPage)
+		r.Post("/", inviteAcceptHandler.HandleAccept)
 	})
 
 	// USER AND PASSWORDS
@@ -76,31 +142,27 @@ func main() {
 		mwHandler.Authenticate,
 		mwHandler.Authorize(rbac.PermissionManageAccess),
 	).Route("/users", func(r chi.Router) {
-		r.Get("/", handler.HandleUsersPage)
-		r.Delete("/{id}", handler.HandleUserDelete)
-	})
-
-	r.With(mwHandler.Authenticate).Route("/profile", func(r chi.Router) {
-		r.Patch("/password", handler.HandlePwUpdate)
+		r.Get("/", usersHandler.ServeUsersPage)
+		r.Delete("/{id}", usersHandler.HandleUserDelete)
 	})
 
 	r.With(mwHandler.Authenticate, mwHandler.Authorize(rbac.PermissionManageAccess)).Route("/invites", func(r chi.Router) {
-		r.Post("/", handler.HandleInvite)
-		r.Delete("/{id}", handler.HandleInviteDelete)
+		r.Post("/", usersHandler.HandleInviteCreate)
+		r.Delete("/{id}", usersHandler.HandleInviteDelete)
 	})
 
 	r.Route("/forgot-pw", func(r chi.Router) {
-		r.Get("/", handler.HandlePwForgotPage)
-		r.Post("/", handler.HandlePwForgot)
+		r.Get("/", passwordForgotHandler.ServeForgotPasswordPage)
+		r.Post("/", passwordForgotHandler.HandleForgotPassword)
 	})
 
 	r.Route("/reset-pw/{token}", func(r chi.Router) {
-		r.Get("/", handler.HandlePwResetPage)
-		r.Post("/", handler.HandlePwReset)
+		r.Get("/", passwordResetHandler.ServeResetPasswordPage)
+		r.Post("/", passwordResetHandler.HandleResetPassword)
 	})
 
 	r.With(mwHandler.Authenticate).Route("/logout", func(r chi.Router) {
-		r.Get("/", handler.HandleLogout)
+		r.Get("/", logoutHandler.HandleLogout)
 	})
 
 	// RELEASE NOTES
@@ -110,13 +172,13 @@ func main() {
 		mwHandler.Authorize(rbac.PermissionManageReleaseNote),
 		mwHandler.WithSubscriptionStatus,
 	).Route("/release-notes", func(r chi.Router) {
-		r.Get("/", handler.HandleReleaseNotesPage)
-		r.Post("/", handler.HandleReleaseNoteCreate)
-		r.Get("/new", handler.HandleReleaseNoteCreatePage)
-		r.Get("/{id}", handler.HandleReleaseNotePage)
-		r.Patch("/{id}", handler.HandleReleaseNoteUpdate)
-		r.Delete("/{id}", handler.HandleReleaseNoteDelete)
-		r.Patch("/{id}/publish", handler.HandleReleaseNotePublish)
+		r.Get("/", rnListHandler.ServeReleaseNotesListPage)
+		r.Post("/", rnCreateHandler.HandleReleaseNoteCreate)
+		r.Get("/new", rnCreateHandler.ServeReleaseNoteCreatePage)
+		r.Get("/{id}", rnDetailHandler.ServeReleaseNoteDetailPage)
+		r.Patch("/{id}", rnDetailHandler.HandleReleaseNoteUpdate)
+		r.Delete("/{id}", rnDetailHandler.HandleReleaseNoteDelete)
+		r.Patch("/{id}/publish", rnDetailHandler.HandleReleaseNotePublish)
 	})
 
 	// WIDGET
@@ -126,10 +188,8 @@ func main() {
 		mwHandler.Authorize(rbac.PermissionManageReleaseNote),
 		mwHandler.WithSubscriptionStatus,
 	).Route("/widget-config", func(r chi.Router) {
-		r.Get("/", handler.HandleWidgetPage)
-		r.Patch("/", handler.HandleWidgetUpdate)
-		r.Patch("/external-id", handler.HandleOrgExternalIdRegenerate)
-		r.Patch("/base-url", handler.HandleReleasePageBaseUrlUpdate)
+		r.Get("/", widgetHandler.ServeWidgetConfigPage)
+		r.Patch("/", widgetHandler.HandleConfigUpdate)
 	})
 
 	// RELEASE PAGE CONFIG
@@ -139,8 +199,8 @@ func main() {
 		mwHandler.Authorize(rbac.PermissionManageReleaseNote),
 		mwHandler.WithSubscriptionStatus,
 	).Route("/release-page-config", func(r chi.Router) {
-		r.Get("/", handler.HandleReleasePageConfigPage)
-		r.Patch("/", handler.HandleReleasePageConfigUpdate)
+		r.Get("/", releasePageHandler.ServeReleasePageConfigPage)
+		r.Patch("/", releasePageHandler.HandleConfigUpdate)
 	})
 
 	// SETTINGS
@@ -150,21 +210,24 @@ func main() {
 		mwHandler.Authorize(rbac.PermissionManageAccess),
 		mwHandler.WithSubscriptionStatus,
 	).Route("/settings", func(r chi.Router) {
-		r.Get("/", handler.HandleSettingsPage)
+		r.Get("/", settingsHandler.ServeSettingsPage)
+		r.Patch("/password", settingsHandler.HandlePasswordUpdate)
+		r.Patch("/widget-id", settingsHandler.HandleWidgetIdRegenerate)
+		r.Patch("/release-page-url", settingsHandler.HandleReleasePageUrlUpdate)
 	})
 
 	// ADMIN DASHBOARD
-	
+
 	r.With(
 		mwHandler.Authenticate,
 		mwHandler.AuthorizeSuperAdmin,
 	).Route("/admin", func(r chi.Router) {
-		r.Get("/", handler.HandleAdminDashboard)
-		r.Get("/organisations/{orgId}", handler.HandleAdminOrgDetails)
-		r.Patch("/organisations/{orgId}", handler.HandleAdminOrgUpdate)
-		r.Patch("/organisations/{orgId}/release-page", handler.HandleAdminOrgReleasePageUpdate)
-		r.Post("/organisations/{orgId}/subscriptions", handler.HandleAdminOrgSubscriptionCreate)
-		r.Delete("/organisations/{orgId}/subscriptions/{id}", handler.HandleAdminOrgSubscriptionDelete)
+		r.Get("/", adminDashboardHandler.ServeDashboardPage)
+		r.Get("/organisations/{orgId}", adminOrgHandler.ServeOrganisationDetailsPage)
+		r.Patch("/organisations/{orgId}", adminOrgHandler.HandleOrgUpdate)
+		r.Patch("/organisations/{orgId}/release-page", adminOrgHandler.HandleReleasePageUpdate)
+		r.Post("/organisations/{orgId}/subscriptions", adminOrgHandler.HandleSubscriptionCreate)
+		r.Delete("/organisations/{orgId}/subscriptions/{id}", adminOrgHandler.HandleSubscriptionDelete)
 	})
 
 	// API
@@ -179,13 +242,13 @@ func main() {
 			AllowCredentials: false,
 			MaxAge:           300, // Maximum value not ignored by any of major browsers
 		}))
-		r.Get("/release-notes/{orgId}", handler.HandleReleaseNotesServe)
-		r.Get("/release-notes/{orgId}/status", handler.HandleReleaseNotesStatusServe)
-		r.Post("/release-notes/{orgId}/metrics", handler.HandleReleaseNoteMetricCreate)
-		r.Get("/release-notes/{orgId}/{releaseNoteId}/like", handler.HandleGetReleaseNoteLikeState)
-		r.Post("/release-notes/{orgId}/{releaseNoteId}/like", handler.HandleReleaseNoteToggleLike)
-		r.Get("/widget-config/{orgId}", handler.HandleWidgetConfigServe)
-		r.Get("/img/*", handler.HandleObjStore)
+		r.Get("/release-notes/{orgId}", widgetAPIHandler.HandleReleaseNotesServe)
+		r.Get("/release-notes/{orgId}/status", widgetAPIHandler.HandleReleaseNotesStatusServe)
+		r.Post("/release-notes/{orgId}/metrics", widgetAPIHandler.HandleReleaseNoteMetricCreate)
+		r.Get("/release-notes/{orgId}/{releaseNoteId}/like", widgetAPIHandler.HandleGetReleaseNoteLikeState)
+		r.Post("/release-notes/{orgId}/{releaseNoteId}/like", widgetAPIHandler.HandleReleaseNoteToggleLike)
+		r.Get("/widget-config/{orgId}", widgetAPIHandler.HandleWidgetConfigServe)
+		r.Get("/img/*", sharedAPIHandler.HandleObjStore)
 	})
 
 	// WIDGET SCRIPT
@@ -200,7 +263,7 @@ func main() {
 			AllowCredentials: false,
 			MaxAge:           300, // Maximum value not ignored by any of major browsers
 		}))
-		r.Get("/", handler.HandleWidgetjsServe)
+		r.Get("/", widgetScriptHandler.ServeWidgetScript)
 	})
 
 	// RELEASE PAGE
@@ -217,18 +280,18 @@ func main() {
 			MaxAge:           300, // Maximum value not ignored by any of major browsers
 
 		}))
-		r.Get("/{orgSlug}", handler.HandleReleasePage)
+		r.Get("/{orgSlug}", releasePagePublicHandler.ServeReleasePage)
 	})
 
-	// STRIPE
+	// PAYMENT & STRIPE
 	r.With(mwHandler.Authenticate, mwHandler.Authorize(rbac.PermissionManageAccess)).Route("/payment", func(r chi.Router) {
-		r.Post("/create-checkout-session", handler.HandleCheckoutSession)
-		r.Post("/create-portal-session", handler.HandlePortalSession)
+		r.Post("/create-checkout-session", paymentHandler.HandleCheckoutSession)
+		r.Post("/create-portal-session", paymentHandler.HandlePortalSession)
 	})
 
 	// Subscription confirmation page (no auth required)
-	r.Get("/subscription/confirm", handler.HandleSubscriptionConfirm)
-	r.Get("/subscription/cancel", handler.HandleSubscriptionCancel)
+	r.Get("/subscription/confirm", subscriptionHandler.HandleSubscriptionConfirm)
+	r.Get("/subscription/cancel", subscriptionHandler.HandleSubscriptionCancel)
 
 	r.Route("/stripe", func(r chi.Router) {
 		r.Use(cors.Handler(cors.Options{
@@ -239,7 +302,7 @@ func main() {
 			AllowCredentials: false,
 			MaxAge:           300, // Maximum value not ignored by any of major browsers
 		}))
-		r.Post("/webhook", handler.HandleWebhook)
+		r.Post("/webhook", stripeAPIHandler.HandleWebhook)
 	})
 
 	// STATIC
@@ -248,12 +311,12 @@ func main() {
 	if cfg.Env != "production" {
 		// proxy to obj storage since Minio doesn't support different
 		// urls for signing and accessing
-		r.Get("/img/*", handler.HandleObjStore)
+		r.Get("/img/*", sharedAPIHandler.HandleObjStore)
 	}
 
 	// OTHER
 
-	r.NotFound(handler.HandleNotFound)
+	r.NotFound(sharedAPIHandler.HandleNotFound)
 
 	// Create server with timeout configurations
 	srv := &http.Server{
@@ -263,7 +326,7 @@ func main() {
 
 	// Channel to listen for errors coming from the listener.
 	serverErrors := make(chan error, 1)
-	
+
 	// Start the server in the background
 	go func() {
 		log.Info().Msgf("Server listening on port %d", cfg.Port)
@@ -280,7 +343,7 @@ func main() {
 		log.Error().Err(err).Msg("Server error")
 	case sig := <-shutdown:
 		log.Info().Msgf("Start shutdown due to %s signal", sig)
-		
+
 		// Give outstanding requests a deadline for completion.
 		ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 		defer cancel()
