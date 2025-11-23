@@ -1,0 +1,20 @@
+/* Base CSS variables for the widget - no Tailwind needed */
+:root {
+  --announcable-background: #ffffff;
+  --announcable-foreground: #0a0a0b;
+  --announcable-card: #ffffff;
+  --announcable-card-foreground: #0a0a0b;
+  --announcable-border: #e5e5e5;
+  --announcable-radius: 0.5rem;
+}
+
+/* Minimal reset for widget container */
+.announcable-widget {
+  box-sizing: border-box;
+}
+
+.announcable-widget *,
+.announcable-widget *::before,
+.announcable-widget *::after {
+  box-sizing: inherit;
+}
