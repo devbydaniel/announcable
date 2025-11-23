@@ -193,13 +193,15 @@ For detailed JS architecture guidance, see `backend/assets/js/AGENTS.md`.
 
 **External Dependencies**:
 
-The application uses CDN-hosted libraries loaded in `root.html`:
+The application uses npm packages bundled into a vendor bundle via Vite:
 
-- **HTMX**: Enables AJAX requests and partial page updates without JavaScript
-- **Alpine.js**: Lightweight reactive framework for UI interactions
-- **Feather Icons**: Icon library
-- **SweetAlert**: Modal dialogs
+- **Alpine.js**: Reactive UI framework for interactive components
+- **HTMX**: AJAX requests and partial page updates
 - **Toastify**: Toast notifications
+- **SweetAlert**: Modal dialogs
+- **Feather Icons**: Icon library
+
+All dependencies are bundled into `/static/dist/vendor.js` and `/static/dist/vendor.css` and loaded in `root.html`. They are exposed as global objects (window.Alpine, window.htmx, etc.) for use in vanilla JavaScript files.
 
 **Static Asset Serving**:
 

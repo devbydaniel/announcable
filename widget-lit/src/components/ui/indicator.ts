@@ -68,7 +68,7 @@ export class AnchorIndicator extends LitElement {
     if (this.indicatorElement && this.anchorElement) {
       try {
         this.anchorElement.removeChild(this.indicatorElement);
-      } catch (e) {
+      } catch {
         // Element may already be removed
       }
       this.indicatorElement = null;
