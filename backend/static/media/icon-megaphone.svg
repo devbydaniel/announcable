@@ -1,0 +1,8 @@
+<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Angular megaphone body -->
+  <path d="M4 12L4 20L10 20L24 26V6L10 12Z" stroke="rgb(20, 184, 166)" stroke-width="2" stroke-linejoin="miter" fill="none"/>
+  <!-- Sound lines -->
+  <path d="M27 13L30 13" stroke="rgb(20, 184, 166)" stroke-width="2" stroke-linecap="square"/>
+  <path d="M27 16L31 16" stroke="rgb(20, 184, 166)" stroke-width="2" stroke-linecap="square"/>
+  <path d="M27 19L30 19" stroke="rgb(20, 184, 166)" stroke-width="2" stroke-linecap="square"/>
+</svg>

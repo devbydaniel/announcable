@@ -10,9 +10,15 @@
   padding: 0;
 }
 
+.card--surface {
+  background-color: var(--color-surface0);
+}
+
 .card__title {
   margin-bottom: var(--gap-md);
   font-size: var(--font-size);
+  font-weight: var(--font-weight-md);
+  letter-spacing: var(--tracking-lg);
 }
 
 .card__actions {
@@ -24,8 +30,11 @@
 .card__paragraph {
   margin-top: var(--gap-sm);
   margin-bottom: var(--gap-sm);
+  color: var(--color-subtext0);
 }
 
 .card__footer {
   margin-top: var(--gap-md);
+  padding-top: var(--gap-md);
+  border-top: var(--border-width) solid var(--border-color);
 }

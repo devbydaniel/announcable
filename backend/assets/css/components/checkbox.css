@@ -1,5 +1,11 @@
 .checkbox {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--gap-sm);
+}
+
+.checkbox__label {
+  font-size: var(--font-size-sm);
+  color: var(--color-subtext1);
+  line-height: 1.4;
 }

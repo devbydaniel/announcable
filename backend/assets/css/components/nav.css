@@ -7,6 +7,7 @@
   display: flex;
   flex-direction: column;
 }
+
 .nav__brand {
   padding: var(--gap-sm);
   font-weight: var(--font-weight-md);
@@ -14,18 +15,22 @@
   font-size: var(--font-size-sm);
   display: inline-flex;
   gap: var(--gap-sm);
+  letter-spacing: var(--tracking-lg);
 }
+
 .nav__list {
   list-style: none;
   padding: 0;
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--gap-xs);
+  gap: 2px;
 }
+
 .nav__list__item {
   overflow: hidden;
 }
+
 .nav__list__item a {
   position: relative;
   display: inline-flex;
@@ -41,24 +46,33 @@
   padding: var(--gap-sm);
   cursor: pointer;
   font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-sm);
   text-align: left;
   text-decoration: none;
-  text-decoration: none;
-  color: var(--color-text);
-  transition: background 0.3s ease;
+  color: var(--color-subtext1);
+  transition: all 0.15s ease;
 }
+
 .nav__list__item a:hover {
   background: var(--color-crust);
+  color: var(--color-text);
+  font-weight: var(--font-weight-md);
 }
+
 .nav__list__item a:active {
-  background: var(--color-surface0);
+  background: var(--color-surface2);
 }
-.nav__list__item--active {
+
+.nav__list__item--active a {
   background: var(--color-crust);
+  color: var(--color-text);
+  font-weight: var(--font-weight-md);
 }
+
 .nav__divider {
   flex-grow: 1;
 }
+
 .nav__tab-bar {
   position: fixed;
   bottom: 0;
@@ -66,9 +80,16 @@
   right: 0;
   display: flex;
   align-items: center;
-  background: var(--background-raised);
+  background: var(--color-base);
   padding: var(--gap-sm);
+  border-top: var(--border-width) solid var(--border-color);
 }
+
+/* Highlight uses teal accent instead of yellow */
 .nav__list__item--highlight a {
-  border: var(--border-width) solid var(--color-yellow);
+  color: var(--color-primary);
+}
+
+.nav__list__item--highlight a:hover {
+  background: var(--color-primary-light);
 }

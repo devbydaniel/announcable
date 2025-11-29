@@ -1,26 +1,31 @@
 .swal-modal {
   background-color: var(--color-base);
   border-radius: var(--border-radius);
+  border: var(--border-width) solid var(--border-color);
   text-align: left;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
 }
 
 .swal-title {
   font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-md);
   margin-top: 0 !important;
   margin-bottom: 0 !important;
   text-align: left;
-  padding: var(--gap-md);
+  padding: var(--gap-lg);
   padding-bottom: 0;
+  letter-spacing: var(--tracking-lg);
 }
 
 .swal-text {
   font-size: var(--font-size);
-  padding: var(--gap-md);
+  padding: var(--gap-lg);
   max-width: none;
+  color: var(--color-subtext0);
 }
 
 .swal-footer {
-  padding: var(--gap-md);
+  padding: var(--gap-lg);
   padding-top: 0;
   margin-top: 0;
 }
@@ -39,27 +44,30 @@
   gap: var(--gap-sm);
   border: none;
   border-radius: var(--border-radius-sm);
-  background: transparent;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.15s ease;
   font-family: var(--font-family);
+  font-weight: var(--font-weight-md);
   letter-spacing: var(--tracking-lg);
+  background-color: var(--color-surface2);
+  color: var(--color-text);
+}
+
+.swal-button:hover {
   background-color: var(--color-overlay0);
-  border-color: var(--color-overlay0);
-}
-
-.swal-button--danger:hover {
-  filter: brightness(90%) !important;
-  background-color: var(--color-error) !important;
-}
-
-.swal-button--danger:active {
-  filter: brightness(80%) !important;
-  background-color: var(--color-error) !important;
 }
 
 .swal-button--danger {
   background-color: var(--color-error);
-  border-color: var(--color-error);
   color: var(--color-base);
+}
+
+.swal-button--danger:hover {
+  opacity: 0.9;
+  background-color: var(--color-error) !important;
+}
+
+.swal-button--danger:active {
+  opacity: 0.85;
+  background-color: var(--color-error) !important;
 }

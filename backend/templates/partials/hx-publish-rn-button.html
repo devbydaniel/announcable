@@ -6,7 +6,7 @@
     @htmx:response-error.camel="toastError('Error updating release note')"
   >
     <input hidden name="publish" value="true" />
-    <button class="button button--success" type="submit">Publish</button>
+    <button class="button button--outline" type="submit">Publish</button>
   </form>
 {{ end }}
 
@@ -18,6 +18,6 @@
     @htmx:response-error.camel="toastError('Error updating release note')"
   >
     <input hidden name="publish" value="false" />
-    <button class="button button--error" type="submit">Unpublish</button>
+    <button class="button button--outline" type="submit">Unpublish</button>
   </form>
 {{ end }}

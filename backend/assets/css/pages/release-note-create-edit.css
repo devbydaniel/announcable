@@ -8,22 +8,51 @@
 @import '../components/menu.css';
 
 /* Release note create/edit page styles */
-.form {
+.rn-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-md);
+  max-width: 36em;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.rn-form__row {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: auto 1fr;
   gap: var(--gap-lg);
+  align-items: start;
+}
+
+.rn-form__radio-row {
+  display: flex;
+  gap: var(--gap-md);
+  align-items: center;
+  height: 100%;
+  padding-top: var(--gap-xs);
 }
 
 .file-input {
-  height: 20em;
-}
-
-@media (min-width: 1280px) {
-  .form {
-    grid-template-columns: 2fr 1fr;
-  }
+  height: 16em;
 }
 
 .form__media-preview--mt {
   margin-top: var(--gap-sm);
+}
+
+/* Option groups in options card */
+.rn-form__option-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-sm);
+}
+
+.rn-form__option-group + .rn-form__option-group {
+  margin-top: var(--gap-lg);
+}
+
+@media (max-width: 768px) {
+  .rn-form__row {
+    grid-template-columns: 1fr;
+  }
 }

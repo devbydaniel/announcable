@@ -1,49 +1,46 @@
 :root {
-  --color-rosewater: rgb(220, 138, 120);
-  --color-flamingo: rgb(221, 120, 120);
-  --color-pink: rgb(234, 118, 203);
-  --color-mauve: rgb(136, 57, 239);
-  --color-red: rgb(210, 15, 57);
-  --color-maroon: rgb(230, 69, 83);
-  --color-peach: rgb(254, 100, 11);
-  --color-yellow: rgb(223, 142, 29);
-  --color-green: rgb(64, 160, 43);
-  --color-teal: rgb(23, 146, 153);
-  --color-sky: rgb(4, 165, 229);
-  --color-sapphire: rgb(32, 159, 181);
-  --color-blue: rgb(30, 102, 245);
-  --color-lavender: rgb(114, 135, 253);
+  /* Accent - Teal */
+  --color-teal: rgb(20, 184, 166);
+  --color-teal-hover: rgb(13, 148, 136);
+  --color-teal-light: rgba(20, 184, 166, 0.1);
 
-  --color-text: rgb(76, 79, 105);
-  --color-subtext1: rgb(92, 95, 119);
-  --color-subtext0: rgb(108, 111, 133);
-  --color-overlay2: rgb(124, 127, 147);
-  --color-overlay1: rgb(140, 143, 161);
-  --color-overlay0: rgb(156, 160, 176);
-  --color-surface2: rgb(172, 176, 190);
-  --color-surface1: rgb(188, 192, 204);
-  --color-surface0: rgb(204, 208, 218);
-  --color-base: rgb(239, 241, 245);
-  --color-mantle: rgb(230, 233, 239);
-  --color-crust: rgb(220, 224, 232);
+  /* Semantic colors */
+  --color-green: rgb(34, 197, 94);
+  --color-red: rgb(239, 68, 68);
+  --color-yellow: rgb(234, 179, 8);
 
-  --color-primary: var(--color-blue);
-  --color-primary-light: rgba(30, 102, 245, 0.8);
-  --color-primary-lighter: rgba(30, 102, 245, 0.7);
-  --color-secondary: var(--color-blue);
+  /* Neutral scale - Pure grays */
+  --color-text: rgb(23, 23, 23);
+  --color-subtext1: rgb(64, 64, 64);
+  --color-subtext0: rgb(82, 82, 82);
+  --color-overlay2: rgb(115, 115, 115);
+  --color-overlay1: rgb(163, 163, 163);
+  --color-overlay0: rgb(212, 212, 212);
+  --color-surface2: rgb(229, 229, 229);
+  --color-surface1: rgb(245, 245, 245);
+  --color-surface0: rgb(250, 250, 250);
+  --color-base: rgb(255, 255, 255);
+  --color-mantle: rgb(250, 250, 250);
+  --color-crust: rgb(245, 245, 245);
+
+  /* Primary = Teal accent */
+  --color-primary: var(--color-teal);
+  --color-primary-hover: var(--color-teal-hover);
+  --color-primary-light: var(--color-teal-light);
+  --color-secondary: var(--color-teal);
   --color-success: var(--color-green);
   --color-error: var(--color-red);
-  --color-selected: rgba(var(--color-overlay2), 0.3);
-  --color-pressed: rgba(var(--color-overlay2), 0.2);
-  --color-border: var(--color-subtext1);
+  --color-border: rgb(229, 229, 229);
 
-  --border-radius: 0.75rem;
-  --border-radius-sm: 0.5rem;
-  --border-color: var(--color-surface1);
-  --border-color-light: var(--color-surface0);
+  /* Border radius - subtle 4px */
+  --border-radius: 0.25rem;
+  --border-radius-sm: 0.125rem;
+  --border-color: rgb(229, 229, 229);
+  --border-color-light: rgb(245, 245, 245);
   --border-width: 1px;
 
-  --font-family: sans-serif;
+  /* Typography - JetBrains Mono */
+  --font-family: "JetBrains Mono", monospace;
   --font-size-xs: 0.75rem;
   --font-size-sm: 0.875rem;
   --font-size: 1rem;
@@ -52,6 +49,7 @@
   --font-weight-sm: 300;
   --font-weight-md: 500;
 
+  /* Spacing */
   --gap-xs: 0.25rem;
   --gap-sm: 0.5rem;
   --gap-md: 1rem;
@@ -69,11 +67,11 @@
 }
 
 @font-face {
-  font-family: "Inter Variable";
+  font-family: "JetBrains Mono";
   font-style: normal;
   font-display: swap;
-  font-weight: 100 900;
-  src: url(https://cdn.jsdelivr.net/fontsource/fonts/inter:vf@latest/latin-wght-normal.woff2)
+  font-weight: 100 800;
+  src: url(https://cdn.jsdelivr.net/fontsource/fonts/jetbrains-mono:vf@latest/latin-wght-normal.woff2)
     format("woff2-variations");
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
     U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,

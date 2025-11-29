@@ -1,0 +1,10 @@
+<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Geometric A -->
+  <path d="M16 4L4 28H10L12 24H20L22 28H28L16 4Z" stroke="rgb(20, 184, 166)" stroke-width="2" stroke-linejoin="miter" fill="none"/>
+  <path d="M13 20L16 12L19 20" stroke="rgb(20, 184, 166)" stroke-width="2" stroke-linecap="square"/>
+  <!-- Signal waves from apex -->
+  <path d="M10 6L8 4" stroke="rgb(20, 184, 166)" stroke-width="2" stroke-linecap="square"/>
+  <path d="M22 6L24 4" stroke="rgb(20, 184, 166)" stroke-width="2" stroke-linecap="square"/>
+  <path d="M7 8L4 5" stroke="rgb(20, 184, 166)" stroke-width="2" stroke-linecap="square"/>
+  <path d="M25 8L28 5" stroke="rgb(20, 184, 166)" stroke-width="2" stroke-linecap="square"/>
+</svg>

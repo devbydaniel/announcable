@@ -4,7 +4,7 @@
 }
 
 .table__tr {
-  border-bottom: var(--border-width) solid var(--border-color-light);
+  border-bottom: var(--border-width) solid var(--border-color);
 }
 
 .table--hide-bottom-border tbody .table__tr:last-child {
@@ -13,9 +13,11 @@
 
 .table__th {
   padding: var(--gap-md);
-  color: var(--color-text-muted);
+  color: var(--color-overlay2);
   font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-md);
   text-align: left;
+  letter-spacing: var(--tracking-lg);
 }
 
 .table__td {
@@ -29,10 +31,10 @@
 }
 
 .table__tr:hover .table__td {
-  background-color: var(--color-mantle);
+  background-color: var(--color-crust);
 }
 
-.table__tr--no-hover:hover {
+.table__tr--no-hover:hover .table__td {
   background-color: inherit;
 }
 

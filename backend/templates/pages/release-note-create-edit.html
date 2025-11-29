@@ -66,180 +66,37 @@
   }}
 
 
-  <div class="card">
-    <form
-      id="form"
-      class="form"
-      x-data="{{ $formData }}"
-      {{ if .IsEdit }}
-        hx-patch="/release-notes/{{ .Rn.ID }}"
-      {{ else }}
-        hx-post="/release-notes"
-      {{ end }}
-      enctype="multipart/form-data"
-      hx-swap="none"
-      @htmx:response-error.camel="onSubmitError"
-      @custom:submit-success="onSubmitSuccess"
-    >
-      <div>
-        <div class="form__group form__group--no-mt">
-          <label class="form__label" for="title">Title</label>
-          <input
-            class="form__input"
-            type="text"
-            id="title"
-            name="title"
-            required
-            value="{{ .Rn.Title }}"
-          />
-        </div>
-        <div class="form__group">
-          <div class="form__label">Media Type</div>
-          <div class="form__group__list">
-            <div class="checkbox">
-              <input
-                class="checkbox__input"
-                type="radio"
-                id="media_type_image"
-                name="media_type"
-                value="image"
-                x-model="mediaType"
-              />
-              <label class="checkbox__label" for="media_type_image"
-                >Image Upload</label
-              >
-            </div>
-            <div class="checkbox">
-              <input
-                class="checkbox__input"
-                type="radio"
-                id="media_type_embed"
-                name="media_type"
-                value="embed"
-                x-model="mediaType"
-              />
-              <label class="checkbox__label" for="media_type_embed"
-                >Embedded Media (YouTube/Loom)</label
-              >
-            </div>
-          </div>
-        </div>
-        <div class="form__group" x-show="mediaType === 'image'" x-transition>
-          <label class="form__label" for="image">Image</label>
-          <div
-            class="file-input"
-            x-data="fileInput('{{ .Rn.ImageUrl }}')"
-            @click="$refs.imgUpload.click()"
-          >
-            <input
-              class="file-input__input"
-              type="file"
-              id="image"
-              name="image"
-              accept="image/*"
-              x-ref="imgUpload"
-              @change="onImgChange"
-            />
-            <input
-              class="file-input__delete"
-              type="checkbox"
-              id="delete_image"
-              name="delete_image"
-              x-model="deleteImg"
-            />
-            <span class="file-input__placeholder">Click to upload</span>
-            <div x-show="imgUrl && imgUrl !== ''" class="file-input__preview">
-              <button
-                type="button"
-                class="file-input__preview__delete button button--sm button--square button--ghost"
-                @click="onImgDelete"
-              >
-                <i data-feather="x"></i>
-              </button>
-              <img :src="imgUrl" class="file-input__preview__img" />
-            </div>
-          </div>
-        </div>
-        <div class="form__group" x-show="mediaType === 'embed'" x-transition>
-          <label class="form__label" for="media_link"
-            >Media Link (YouTube/Loom URL)</label
-          >
-          <input
-            class="form__input"
-            type="url"
-            id="media_link"
-            name="media_link"
-            x-ref="mediaLink"
-            placeholder="https://www.youtube.com/watch?v=... or https://www.loom.com/share/..."
-            value="{{ .Rn.MediaLink }}"
-          />
-          <div
-            x-ref="mediaPreview"
-            class="form__media-preview form__media-preview--mt"
-            x-show="$refs.mediaLink.value"
-            x-transition
-          >
-            <template x-if="$refs.mediaLink.value.includes('youtube.com')">
-              <iframe
-                :src="'https://www.youtube.com/embed/' + $refs.mediaLink.value.split('v=')[1]?.split('&')[0]"
-                style="width: 100%; aspect-ratio: 16/9; border: none; border-radius: 4px;"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen
-              ></iframe>
-            </template>
-            <template x-if="$refs.mediaLink.value.includes('loom.com')">
-              <iframe
-                :src="$refs.mediaLink.value.replace('share', 'embed')"
-                style="width: 100%; aspect-ratio: 16/9; border: none; border-radius: 4px;"
-                allowfullscreen
-              ></iframe>
-            </template>
-          </div>
-        </div>
-        <div class="form__group">
-          <label class="form__label" for="description_short">Description</label>
-          <textarea
-            class="form__input"
-            id="description_short"
-            name="description_short"
-            required
-          >
-{{ .Rn.DescriptionShort }}</textarea
-          >
-        </div>
-        <div>
-          <div class="checkbox">
-            <input
-              class="checkbox__input"
-              type="checkbox"
-              id="text_website_override"
-              name="text_website_override"
-              x-model="textWebsiteOverrideIsChecked"
-              {{ if .Rn.DescriptionLong }}checked{{ end }}
-            />
-            <label class="checkbox__label" for="text_website_override"
-              >Use a different description on the release notes website</label
-            >
-          </div>
-          <div
-            class="form__group form__group--no-mb"
-            x-show="textWebsiteOverrideIsChecked"
-            x-transition
-          >
-            <label class="form__label" for="description_long"
-              >Description (Website)</label
-            >
-            <textarea
-              class="form__input"
-              id="description_long"
-              name="description_long"
-            >
-{{ .Rn.DescriptionLong }}</textarea
-            >
-          </div>
-        </div>
+  <form
+    id="form"
+    class="rn-form"
+    x-data="{{ $formData }}"
+    {{ if .IsEdit }}
+      hx-patch="/release-notes/{{ .Rn.ID }}"
+    {{ else }}
+      hx-post="/release-notes"
+    {{ end }}
+    enctype="multipart/form-data"
+    hx-swap="none"
+    @htmx:response-error.camel="onSubmitError"
+    @custom:submit-success="onSubmitSuccess"
+  >
+    <!-- Content Card -->
+    <div class="card">
+      <!-- Title -->
+      <div class="form__group form__group--no-mt">
+        <label class="form__label" for="title">Title</label>
+        <input
+          class="form__input"
+          type="text"
+          id="title"
+          name="title"
+          required
+          value="{{ .Rn.Title }}"
+        />
       </div>
-      <div>
+
+      <!-- Release Date + Media Type row -->
+      <div class="rn-form__row">
         <div class="form__group form__group--no-mt">
           <label class="form__label" for="release_date">Release Date</label>
           <input
@@ -250,152 +107,286 @@
             value="{{ .Rn.ReleaseDate }}"
           />
         </div>
-        <div class="form__group">
-          <div class="form__label">Call to action</div>
-          <div class="form__group__list">
-            <div class="checkbox">
-              <input
-                class="checkbox__input"
-                type="checkbox"
-                id="hide_cta"
-                name="hide_cta"
-                x-ref="hideCta"
-                x-model="hideCtaIsChecked"
-              />
-              <label class="checkbox__label" for="hide_cta"
-                >Hide call to action</label
-              >
-            </div>
-            <div>
-              <div class="checkbox" x-show="!hideCtaIsChecked" x-transition>
-                <input
-                  class="checkbox__input"
-                  type="checkbox"
-                  id="override_cta_label"
-                  name="override_cta_label"
-                  x-model="ctaLabelOverrideIsChecked"
-                />
-                <label class="checkbox__label" for="override_cta_label"
-                  >Override the default call to action label</label
-                >
-              </div>
-              <div
-                class="form__group"
-                x-show="ctaLabelOverrideIsChecked"
-                x-transition
-              >
-                <label class="form__label" for="cta_label_override"
-                  >Call to action label</label
-                >
-                <input
-                  class="form__input"
-                  id="cta_label_override"
-                  name="cta_label_override"
-                  value="{{ .Rn.CtaLabelOverride }}"
-                />
-              </div>
-            </div>
-            <div>
-              <div class="checkbox" x-show="!hideCtaIsChecked" x-transition>
-                <input
-                  class="checkbox__input"
-                  type="checkbox"
-                  id="override_cta_url"
-                  name="override_cta_url"
-                  x-model="ctaUrlOverrideIsChecked"
-                />
-                <label class="checkbox__label" for="override_cta_url"
-                  >Override the default call to action link</label
-                >
-              </div>
-              <div
-                class="form__group"
-                x-show="ctaUrlOverrideIsChecked"
-                x-transition
-              >
-                <label class="form__label" for="cta_url_override"
-                  >Call to action link</label
-                >
-                <input
-                  class="form__input"
-                  id="cta_url_override"
-                  type="url"
-                  name="cta_url_override"
-                  value="{{ .Rn.CtaUrlOverride }}"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="form__group">
-          <div class="form__label">Attention mechanism</div>
-          <div class="form__group__list">
+        <div class="form__group form__group--no-mt">
+          <div class="form__label">Media Type</div>
+          <div class="rn-form__radio-row">
             <div class="checkbox">
               <input
                 class="checkbox__input"
                 type="radio"
-                id="show_indicator"
-                name="attention_mechanism"
-                value="show_indicator"
-                {{ if or (not .Rn) (not .Rn.AttentionMechanism) (eq .Rn.AttentionMechanism "show_indicator") }}
-                  checked
-                {{ end }}
+                id="media_type_image"
+                name="media_type"
+                value="image"
+                x-model="mediaType"
               />
-              <label class="checkbox__label" for="show_indicator"
-                >Show indicator on trigger element</label
-              >
+              <label class="checkbox__label" for="media_type_image">Image</label>
             </div>
             <div class="checkbox">
               <input
                 class="checkbox__input"
                 type="radio"
-                id="instant_open"
-                name="attention_mechanism"
-                value="instant_open"
-                {{ if eq .Rn.AttentionMechanism "instant_open" }}
-                  checked
-                {{ end }}
+                id="media_type_embed"
+                name="media_type"
+                value="embed"
+                x-model="mediaType"
               />
-              <label class="checkbox__label" for="instant_open"
-                >Instantly open widget on page load</label
-              >
-            </div>
-          </div>
-        </div>
-        <div class="form__group form__group--no-mb">
-          <div class="form__label">Visibility</div>
-          <div class="form__group__list">
-            <div class="checkbox">
-              <input
-                class="checkbox__input"
-                type="checkbox"
-                id="hide_on_widget"
-                name="hide_on_widget"
-                {{ if or (not .Rn) (.Rn.HideOnWidget) }}
-                  checked
-                {{ end }}
-              />
-              <label class="checkbox__label" for="hide_on_widget"
-                >Hide this release note on the widget</label
-              >
-            </div>
-            <div class="checkbox">
-              <input
-                class="checkbox__input"
-                type="checkbox"
-                id="hide_on_release_page"
-                name="hide_on_release_page"
-                {{ if or (not .Rn) (.Rn.HideOnReleasePage) }}
-                  checked
-                {{ end }}
-              />
-              <label class="checkbox__label" for="instant_open"
-                >Hide this release note on the release page</label
-              >
+              <label class="checkbox__label" for="media_type_embed">Embed (YouTube/Loom)</label>
             </div>
           </div>
         </div>
       </div>
-    </form>
-  </div>
+
+      <!-- Media -->
+      <div class="form__group form__group--no-mt" x-show="mediaType === 'image'" x-transition>
+        <label class="form__label" for="image">Image</label>
+        <div
+          class="file-input"
+          x-data="fileInput('{{ .Rn.ImageUrl }}')"
+          @click="$refs.imgUpload.click()"
+        >
+          <input
+            class="file-input__input"
+            type="file"
+            id="image"
+            name="image"
+            accept="image/*"
+            x-ref="imgUpload"
+            @change="onImgChange"
+          />
+          <input
+            class="file-input__delete"
+            type="checkbox"
+            id="delete_image"
+            name="delete_image"
+            x-model="deleteImg"
+          />
+          <span class="file-input__placeholder">Click to upload</span>
+          <div x-show="imgUrl && imgUrl !== ''" class="file-input__preview">
+            <button
+              type="button"
+              class="file-input__preview__delete button button--sm button--square button--ghost"
+              @click="onImgDelete"
+            >
+              <i data-feather="x"></i>
+            </button>
+            <img :src="imgUrl" class="file-input__preview__img" />
+          </div>
+        </div>
+      </div>
+      <div class="form__group form__group--no-mt" x-show="mediaType === 'embed'" x-transition>
+        <label class="form__label" for="media_link">Media Link</label>
+        <input
+          class="form__input"
+          type="url"
+          id="media_link"
+          name="media_link"
+          x-ref="mediaLink"
+          placeholder="https://www.youtube.com/watch?v=... or https://www.loom.com/share/..."
+          value="{{ .Rn.MediaLink }}"
+        />
+        <div
+          x-ref="mediaPreview"
+          class="form__media-preview form__media-preview--mt"
+          x-show="$refs.mediaLink.value"
+          x-transition
+        >
+          <template x-if="$refs.mediaLink.value.includes('youtube.com')">
+            <iframe
+              :src="'https://www.youtube.com/embed/' + $refs.mediaLink.value.split('v=')[1]?.split('&')[0]"
+              style="width: 100%; aspect-ratio: 16/9; border: none; border-radius: 4px;"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen
+            ></iframe>
+          </template>
+          <template x-if="$refs.mediaLink.value.includes('loom.com')">
+            <iframe
+              :src="$refs.mediaLink.value.replace('share', 'embed')"
+              style="width: 100%; aspect-ratio: 16/9; border: none; border-radius: 4px;"
+              allowfullscreen
+            ></iframe>
+          </template>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="form__group">
+        <label class="form__label" for="description_short">Description</label>
+        <textarea
+          class="form__input"
+          id="description_short"
+          name="description_short"
+          required
+        >{{ .Rn.DescriptionShort }}</textarea>
+      </div>
+      <div>
+        <div class="checkbox">
+          <input
+            class="checkbox__input"
+            type="checkbox"
+            id="text_website_override"
+            name="text_website_override"
+            x-model="textWebsiteOverrideIsChecked"
+            {{ if .Rn.DescriptionLong }}checked{{ end }}
+          />
+          <label class="checkbox__label" for="text_website_override"
+            >Use a different description on the release notes website</label
+          >
+        </div>
+        <div
+          class="form__group form__group--no-mb"
+          x-show="textWebsiteOverrideIsChecked"
+          x-transition
+        >
+          <label class="form__label" for="description_long">Description (Website)</label>
+          <textarea
+            class="form__input"
+            id="description_long"
+            name="description_long"
+          >{{ .Rn.DescriptionLong }}</textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Options Card -->
+    <div class="card">
+      <div class="card__title">Options</div>
+
+      <!-- Call to Action -->
+      <div class="rn-form__option-group">
+        <div class="form__section-title">Call to Action</div>
+        <div class="form__group__list">
+          <div class="checkbox">
+            <input
+              class="checkbox__input"
+              type="checkbox"
+              id="hide_cta"
+              name="hide_cta"
+              x-ref="hideCta"
+              x-model="hideCtaIsChecked"
+            />
+            <label class="checkbox__label" for="hide_cta">Hide call to action</label>
+          </div>
+          <div>
+            <div class="checkbox" x-show="!hideCtaIsChecked" x-transition>
+              <input
+                class="checkbox__input"
+                type="checkbox"
+                id="override_cta_label"
+                name="override_cta_label"
+                x-model="ctaLabelOverrideIsChecked"
+              />
+              <label class="checkbox__label" for="override_cta_label"
+                >Override the default call to action label</label
+              >
+            </div>
+            <div class="form__group" x-show="ctaLabelOverrideIsChecked" x-transition>
+              <label class="form__label" for="cta_label_override">Call to action label</label>
+              <input
+                class="form__input"
+                id="cta_label_override"
+                name="cta_label_override"
+                value="{{ .Rn.CtaLabelOverride }}"
+              />
+            </div>
+          </div>
+          <div>
+            <div class="checkbox" x-show="!hideCtaIsChecked" x-transition>
+              <input
+                class="checkbox__input"
+                type="checkbox"
+                id="override_cta_url"
+                name="override_cta_url"
+                x-model="ctaUrlOverrideIsChecked"
+              />
+              <label class="checkbox__label" for="override_cta_url"
+                >Override the default call to action link</label
+              >
+            </div>
+            <div class="form__group" x-show="ctaUrlOverrideIsChecked" x-transition>
+              <label class="form__label" for="cta_url_override">Call to action link</label>
+              <input
+                class="form__input"
+                id="cta_url_override"
+                type="url"
+                name="cta_url_override"
+                value="{{ .Rn.CtaUrlOverride }}"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Attention Mechanism -->
+      <div class="rn-form__option-group">
+        <div class="form__section-title">Attention Mechanism</div>
+        <div class="form__group__list">
+          <div class="checkbox">
+            <input
+              class="checkbox__input"
+              type="radio"
+              id="show_indicator"
+              name="attention_mechanism"
+              value="show_indicator"
+              {{ if or (not .Rn) (not .Rn.AttentionMechanism) (eq .Rn.AttentionMechanism "show_indicator") }}
+                checked
+              {{ end }}
+            />
+            <label class="checkbox__label" for="show_indicator"
+              >Show indicator on trigger element</label
+            >
+          </div>
+          <div class="checkbox">
+            <input
+              class="checkbox__input"
+              type="radio"
+              id="instant_open"
+              name="attention_mechanism"
+              value="instant_open"
+              {{ if eq .Rn.AttentionMechanism "instant_open" }}
+                checked
+              {{ end }}
+            />
+            <label class="checkbox__label" for="instant_open"
+              >Instantly open widget on page load</label
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- Visibility -->
+      <div class="rn-form__option-group">
+        <div class="form__section-title">Visibility</div>
+        <div class="form__group__list">
+          <div class="checkbox">
+            <input
+              class="checkbox__input"
+              type="checkbox"
+              id="hide_on_widget"
+              name="hide_on_widget"
+              {{ if or (not .Rn) (.Rn.HideOnWidget) }}
+                checked
+              {{ end }}
+            />
+            <label class="checkbox__label" for="hide_on_widget"
+              >Hide this release note on the widget</label
+            >
+          </div>
+          <div class="checkbox">
+            <input
+              class="checkbox__input"
+              type="checkbox"
+              id="hide_on_release_page"
+              name="hide_on_release_page"
+              {{ if or (not .Rn) (.Rn.HideOnReleasePage) }}
+                checked
+              {{ end }}
+            />
+            <label class="checkbox__label" for="hide_on_release_page"
+              >Hide this release note on the release page</label
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
 {{ end }}
