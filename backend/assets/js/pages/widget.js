@@ -18,8 +18,8 @@ const releaseNoteTextColorChangeEventName = "release-notes-text-color-change";
 const enableLikesChangeEventName = "enable-likes-change";
 const likeButtonTextChangeEventName = "like-button-text-change";
 
-document.addEventListener("alpine:init", () => {
-  Alpine.data("form", () => ({
+// Alpine.js is loaded before this script, so we can register directly
+Alpine.data("form", () => ({
     onSubmitError: function (event) {
       toastError(event.detail.xhr.response);
     },
@@ -270,7 +270,6 @@ document.addEventListener("alpine:init", () => {
       },
     }),
   );
-});
 
 function decodeHtml(html) {
   const txt = document.createElement("textarea");

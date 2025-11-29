@@ -6,8 +6,8 @@ const textColorMutedChangeEventName = "text-color-muted-change";
 const brandPositionChangeEventName = "brand-position-change";
 const backLinkLabelChangeEventName = "back-link-label-change";
 
-document.addEventListener("alpine:init", () => {
-  Alpine.data("form", () => ({
+// Alpine.js is loaded before this script, so we can register directly
+Alpine.data("form", () => ({
     onSubmitError: function (event) {
       toastError(event.detail.xhr.response);
     },
@@ -166,7 +166,6 @@ document.addEventListener("alpine:init", () => {
       },
     }),
   );
-});
 
 function decodeHtml(html) {
   const txt = document.createElement("textarea");

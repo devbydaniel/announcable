@@ -7,12 +7,13 @@
   },
   "dependencies": {
     "alpinejs": "^3.14.1",
+    "feather-icons": "^4.29.2",
     "htmx.org": "^2.0.4",
-    "toastify-js": "^1.12.0",
     "sweetalert": "^2.1.2",
-    "feather-icons": "^4.29.2"
+    "toastify-js": "^1.12.0"
   },
   "devDependencies": {
+    "terser": "^5.44.1",
     "vite": "^7.2.2"
   }
 }

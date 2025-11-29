@@ -58,10 +58,20 @@ export default defineConfig({
   build: {
     outDir: 'static/dist',
     emptyOutDir: true,
+    // Use terser for minification to avoid conflicts with global $ (jQuery, etc.)
+    minify: 'terser',
+    terserOptions: {
+      mangle: {
+        reserved: ['$', 'jQuery', 'Alpine']
+      }
+    },
     rollupOptions: {
       // Only set input if we have entries, otherwise use empty object
       input: Object.keys(allEntries).length > 0 ? allEntries : undefined,
       output: {
+        // Wrap JS in IIFE to avoid global scope conflicts
+        banner: '(function() {',
+        footer: '})();',
         // Prevent code splitting for vendor bundle
         manualChunks: undefined,
         // JS files: use the original path from sourceTypes
@@ -95,7 +105,6 @@ export default defineConfig({
         }
       }
     },
-    minify: true,
     cssMinify: true,
   }
 })

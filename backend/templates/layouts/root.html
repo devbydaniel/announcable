@@ -36,9 +36,6 @@
       <script src="/static/dist/app/confirmDialog.js"></script>
       <script src="/static/dist/app/successMsg.js"></script>
       
-      <!-- Alpine.js from CDN with defer -->
-      <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-      
       <!-- Plausible Analytics -->
       <script
         defer
@@ -57,7 +54,14 @@
         feather.replace();
       </script>
       {{ block "layout-js" . }}{{ end }}
+
+      <!-- Alpine.js bundle - load before page JS so window.Alpine exists for component registration -->
+      <script src="/static/dist/alpine.js"></script>
+
       {{ block "page-js" . }}{{ end }}
+
+      <!-- Start Alpine after all components are registered -->
+      <script>Alpine.start();</script>
     </body>
   </html>
 {{ end }}
