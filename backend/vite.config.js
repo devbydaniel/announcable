@@ -58,13 +58,6 @@ export default defineConfig({
   build: {
     outDir: 'static/dist',
     emptyOutDir: true,
-    // Use terser for minification to avoid conflicts with global $ (jQuery, etc.)
-    minify: 'terser',
-    terserOptions: {
-      mangle: {
-        reserved: ['$', 'jQuery', 'Alpine']
-      }
-    },
     rollupOptions: {
       // Only set input if we have entries, otherwise use empty object
       input: Object.keys(allEntries).length > 0 ? allEntries : undefined,
