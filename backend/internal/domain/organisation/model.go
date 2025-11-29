@@ -4,9 +4,9 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/devbydaniel/release-notes-go/internal/database"
-	"github.com/devbydaniel/release-notes-go/internal/domain/rbac"
-	"github.com/devbydaniel/release-notes-go/internal/domain/user"
+	"github.com/devbydaniel/announcable/internal/database"
+	"github.com/devbydaniel/announcable/internal/domain/rbac"
+	"github.com/devbydaniel/announcable/internal/domain/user"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )

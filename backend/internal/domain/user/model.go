@@ -4,7 +4,7 @@ import (
 	"errors"
 	"regexp"
 
-	"github.com/devbydaniel/release-notes-go/internal/database"
+	"github.com/devbydaniel/announcable/internal/database"
 )
 
 type User struct {

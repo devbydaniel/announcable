@@ -7,10 +7,10 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/devbydaniel/release-notes-go/config"
-	"github.com/devbydaniel/release-notes-go/internal/domain/organisation"
-	"github.com/devbydaniel/release-notes-go/internal/domain/rbac"
-	"github.com/devbydaniel/release-notes-go/internal/domain/session"
+	"github.com/devbydaniel/announcable/config"
+	"github.com/devbydaniel/announcable/internal/domain/organisation"
+	"github.com/devbydaniel/announcable/internal/domain/rbac"
+	"github.com/devbydaniel/announcable/internal/domain/session"
 )
 
 type contextKey string

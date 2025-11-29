@@ -4,8 +4,8 @@ import (
 	"io"
 	"math"
 
-	"github.com/devbydaniel/release-notes-go/internal/database"
-	"github.com/devbydaniel/release-notes-go/internal/objstore"
+	"github.com/devbydaniel/announcable/internal/database"
+	"github.com/devbydaniel/announcable/internal/objstore"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )

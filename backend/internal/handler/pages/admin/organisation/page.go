@@ -3,11 +3,11 @@ package organisation
 import (
 	"net/http"
 
-	"github.com/devbydaniel/release-notes-go/internal/domain/admin"
-	releasepageconfig "github.com/devbydaniel/release-notes-go/internal/domain/release-page-configs"
-	"github.com/devbydaniel/release-notes-go/internal/handler/shared"
-	mw "github.com/devbydaniel/release-notes-go/internal/middleware"
-	"github.com/devbydaniel/release-notes-go/templates"
+	"github.com/devbydaniel/announcable/internal/domain/admin"
+	releasepageconfig "github.com/devbydaniel/announcable/internal/domain/release-page-configs"
+	"github.com/devbydaniel/announcable/internal/handler/shared"
+	mw "github.com/devbydaniel/announcable/internal/middleware"
+	"github.com/devbydaniel/announcable/templates"
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 )

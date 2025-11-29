@@ -5,11 +5,11 @@ import (
 	"regexp"
 	"time"
 
-	"github.com/devbydaniel/release-notes-go/config"
-	"github.com/devbydaniel/release-notes-go/internal/domain/rbac"
-	"github.com/devbydaniel/release-notes-go/internal/domain/user"
-	"github.com/devbydaniel/release-notes-go/internal/email"
-	"github.com/devbydaniel/release-notes-go/internal/random"
+	"github.com/devbydaniel/announcable/config"
+	"github.com/devbydaniel/announcable/internal/domain/rbac"
+	"github.com/devbydaniel/announcable/internal/domain/user"
+	"github.com/devbydaniel/announcable/internal/email"
+	"github.com/devbydaniel/announcable/internal/random"
 	"github.com/google/uuid"
 )
 

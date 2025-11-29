@@ -3,9 +3,9 @@ package config
 import (
 	"net/http"
 
-	releasepageconfig "github.com/devbydaniel/release-notes-go/internal/domain/release-page-configs"
-	"github.com/devbydaniel/release-notes-go/internal/imgUtil"
-	mw "github.com/devbydaniel/release-notes-go/internal/middleware"
+	releasepageconfig "github.com/devbydaniel/announcable/internal/domain/release-page-configs"
+	"github.com/devbydaniel/announcable/internal/imgUtil"
+	mw "github.com/devbydaniel/announcable/internal/middleware"
 	"github.com/go-playground/validator"
 	"github.com/google/uuid"
 )

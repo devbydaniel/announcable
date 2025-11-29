@@ -5,10 +5,10 @@ import (
 	"html"
 	"net/http"
 
-	widgetconfigs "github.com/devbydaniel/release-notes-go/internal/domain/widget-configs"
-	"github.com/devbydaniel/release-notes-go/internal/handler/shared"
-	mw "github.com/devbydaniel/release-notes-go/internal/middleware"
-	"github.com/devbydaniel/release-notes-go/templates"
+	widgetconfigs "github.com/devbydaniel/announcable/internal/domain/widget-configs"
+	"github.com/devbydaniel/announcable/internal/handler/shared"
+	mw "github.com/devbydaniel/announcable/internal/middleware"
+	"github.com/devbydaniel/announcable/templates"
 	"github.com/google/uuid"
 )
 

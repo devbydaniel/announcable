@@ -5,12 +5,12 @@ import (
 	"strconv"
 	"time"
 
-	releasenotelikes "github.com/devbydaniel/release-notes-go/internal/domain/release-note-likes"
-	releasenotemetrics "github.com/devbydaniel/release-notes-go/internal/domain/release-note-metrics"
-	releasenotes "github.com/devbydaniel/release-notes-go/internal/domain/release-notes"
-	"github.com/devbydaniel/release-notes-go/internal/handler/shared"
-	mw "github.com/devbydaniel/release-notes-go/internal/middleware"
-	"github.com/devbydaniel/release-notes-go/templates"
+	releasenotelikes "github.com/devbydaniel/announcable/internal/domain/release-note-likes"
+	releasenotemetrics "github.com/devbydaniel/announcable/internal/domain/release-note-metrics"
+	releasenotes "github.com/devbydaniel/announcable/internal/domain/release-notes"
+	"github.com/devbydaniel/announcable/internal/handler/shared"
+	mw "github.com/devbydaniel/announcable/internal/middleware"
+	"github.com/devbydaniel/announcable/templates"
 )
 
 // Handlers holds the dependencies for release notes list handlers

@@ -6,10 +6,10 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/devbydaniel/release-notes-go/internal/domain/session"
-	"github.com/devbydaniel/release-notes-go/internal/domain/user"
-	"github.com/devbydaniel/release-notes-go/internal/handler/shared"
-	"github.com/devbydaniel/release-notes-go/templates"
+	"github.com/devbydaniel/announcable/internal/domain/session"
+	"github.com/devbydaniel/announcable/internal/domain/user"
+	"github.com/devbydaniel/announcable/internal/handler/shared"
+	"github.com/devbydaniel/announcable/templates"
 )
 
 // Handlers holds the dependencies for verify email handlers

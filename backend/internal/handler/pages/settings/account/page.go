@@ -3,12 +3,12 @@ package account
 import (
 	"net/http"
 
-	"github.com/devbydaniel/release-notes-go/internal/domain/organisation"
-	releasepageconfig "github.com/devbydaniel/release-notes-go/internal/domain/release-page-configs"
-	widgetconfigs "github.com/devbydaniel/release-notes-go/internal/domain/widget-configs"
-	"github.com/devbydaniel/release-notes-go/internal/handler/shared"
-	mw "github.com/devbydaniel/release-notes-go/internal/middleware"
-	"github.com/devbydaniel/release-notes-go/templates"
+	"github.com/devbydaniel/announcable/internal/domain/organisation"
+	releasepageconfig "github.com/devbydaniel/announcable/internal/domain/release-page-configs"
+	widgetconfigs "github.com/devbydaniel/announcable/internal/domain/widget-configs"
+	"github.com/devbydaniel/announcable/internal/handler/shared"
+	mw "github.com/devbydaniel/announcable/internal/middleware"
+	"github.com/devbydaniel/announcable/templates"
 	"github.com/google/uuid"
 )
 

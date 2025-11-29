@@ -3,9 +3,9 @@ package organisation
 import (
 	"net/http"
 
-	"github.com/devbydaniel/release-notes-go/internal/domain/admin"
-	releasepageconfig "github.com/devbydaniel/release-notes-go/internal/domain/release-page-configs"
-	mw "github.com/devbydaniel/release-notes-go/internal/middleware"
+	"github.com/devbydaniel/announcable/internal/domain/admin"
+	releasepageconfig "github.com/devbydaniel/announcable/internal/domain/release-page-configs"
+	mw "github.com/devbydaniel/announcable/internal/middleware"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-playground/validator"
 	"github.com/google/uuid"

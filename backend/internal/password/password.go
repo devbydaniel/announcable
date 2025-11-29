@@ -4,7 +4,7 @@ import (
 	"errors"
 	"regexp"
 
-	"github.com/devbydaniel/release-notes-go/internal/logger"
+	"github.com/devbydaniel/announcable/internal/logger"
 	"golang.org/x/crypto/bcrypt"
 )
 

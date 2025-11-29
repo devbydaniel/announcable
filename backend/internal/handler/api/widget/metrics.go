@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/devbydaniel/release-notes-go/internal/domain/organisation"
-	releasenotemetrics "github.com/devbydaniel/release-notes-go/internal/domain/release-note-metrics"
+	"github.com/devbydaniel/announcable/internal/domain/organisation"
+	releasenotemetrics "github.com/devbydaniel/announcable/internal/domain/release-note-metrics"
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 )

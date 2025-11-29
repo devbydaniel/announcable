@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/devbydaniel/release-notes-go/internal/domain/session"
-	"github.com/devbydaniel/release-notes-go/internal/domain/user"
-	"github.com/devbydaniel/release-notes-go/internal/password"
+	"github.com/devbydaniel/announcable/internal/domain/session"
+	"github.com/devbydaniel/announcable/internal/domain/user"
+	"github.com/devbydaniel/announcable/internal/password"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-playground/validator"
 )

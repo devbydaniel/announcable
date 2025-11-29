@@ -3,9 +3,9 @@ package detail
 import (
 	"net/http"
 
-	releasenotes "github.com/devbydaniel/release-notes-go/internal/domain/release-notes"
-	"github.com/devbydaniel/release-notes-go/internal/imgUtil"
-	mw "github.com/devbydaniel/release-notes-go/internal/middleware"
+	releasenotes "github.com/devbydaniel/announcable/internal/domain/release-notes"
+	"github.com/devbydaniel/announcable/internal/imgUtil"
+	mw "github.com/devbydaniel/announcable/internal/middleware"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-playground/validator"
 	"github.com/google/uuid"

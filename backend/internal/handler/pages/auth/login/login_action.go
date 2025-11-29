@@ -4,10 +4,10 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/devbydaniel/release-notes-go/internal/domain/session"
-	"github.com/devbydaniel/release-notes-go/internal/domain/user"
-	"github.com/devbydaniel/release-notes-go/internal/password"
-	"github.com/devbydaniel/release-notes-go/internal/ratelimit"
+	"github.com/devbydaniel/announcable/internal/domain/session"
+	"github.com/devbydaniel/announcable/internal/domain/user"
+	"github.com/devbydaniel/announcable/internal/password"
+	"github.com/devbydaniel/announcable/internal/ratelimit"
 )
 
 type loginForm struct {

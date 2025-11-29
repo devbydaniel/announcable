@@ -1,8 +1,8 @@
 package admin
 
 import (
-	"github.com/devbydaniel/release-notes-go/internal/database"
-	"github.com/devbydaniel/release-notes-go/internal/domain/organisation"
+	"github.com/devbydaniel/announcable/internal/database"
+	"github.com/devbydaniel/announcable/internal/domain/organisation"
 	"github.com/google/uuid"
 )
 

@@ -6,9 +6,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/devbydaniel/release-notes-go/internal/domain/organisation"
-	releasenotes "github.com/devbydaniel/release-notes-go/internal/domain/release-notes"
-	"github.com/devbydaniel/release-notes-go/internal/util"
+	"github.com/devbydaniel/announcable/internal/domain/organisation"
+	releasenotes "github.com/devbydaniel/announcable/internal/domain/release-notes"
+	"github.com/devbydaniel/announcable/internal/util"
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 )

@@ -3,8 +3,8 @@ package account
 import (
 	"net/http"
 
-	widgetconfigs "github.com/devbydaniel/release-notes-go/internal/domain/widget-configs"
-	mw "github.com/devbydaniel/release-notes-go/internal/middleware"
+	widgetconfigs "github.com/devbydaniel/announcable/internal/domain/widget-configs"
+	mw "github.com/devbydaniel/announcable/internal/middleware"
 	"github.com/go-playground/validator"
 	"github.com/google/uuid"
 )

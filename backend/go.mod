@@ -1,4 +1,4 @@
-module github.com/devbydaniel/release-notes-go
+module github.com/devbydaniel/announcable
 
 go 1.23.0
 

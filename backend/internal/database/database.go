@@ -3,8 +3,8 @@ package database
 import (
 	"fmt"
 
-	"github.com/devbydaniel/release-notes-go/config"
-	"github.com/devbydaniel/release-notes-go/internal/logger"
+	"github.com/devbydaniel/announcable/config"
+	"github.com/devbydaniel/announcable/internal/logger"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )

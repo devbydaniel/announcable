@@ -5,7 +5,7 @@ import (
 	"os"
 
 	adapter "github.com/axiomhq/axiom-go/adapters/zerolog"
-	"github.com/devbydaniel/release-notes-go/config"
+	"github.com/devbydaniel/announcable/config"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )

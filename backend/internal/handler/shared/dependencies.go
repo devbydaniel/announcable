@@ -1,9 +1,9 @@
 package shared
 
 import (
-	"github.com/devbydaniel/release-notes-go/internal/database"
-	"github.com/devbydaniel/release-notes-go/internal/logger"
-	"github.com/devbydaniel/release-notes-go/internal/objstore"
+	"github.com/devbydaniel/announcable/internal/database"
+	"github.com/devbydaniel/announcable/internal/logger"
+	"github.com/devbydaniel/announcable/internal/objstore"
 	"github.com/gorilla/schema"
 	"github.com/rs/zerolog"
 )

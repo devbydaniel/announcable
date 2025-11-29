@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"html/template"
 
-	"github.com/devbydaniel/release-notes-go/config"
+	"github.com/devbydaniel/announcable/config"
 	"gopkg.in/gomail.v2"
 )
 

@@ -13,7 +13,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/devbydaniel/release-notes-go/internal/logger"
+	"github.com/devbydaniel/announcable/internal/logger"
 	"github.com/kolesa-team/go-webp/encoder"
 	"github.com/kolesa-team/go-webp/webp"
 	"github.com/nfnt/resize"

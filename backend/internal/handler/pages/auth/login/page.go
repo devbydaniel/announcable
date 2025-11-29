@@ -3,8 +3,8 @@ package login
 import (
 	"net/http"
 
-	"github.com/devbydaniel/release-notes-go/internal/handler/shared"
-	"github.com/devbydaniel/release-notes-go/templates"
+	"github.com/devbydaniel/announcable/internal/handler/shared"
+	"github.com/devbydaniel/announcable/templates"
 )
 
 // Handlers holds the dependencies for login handlers

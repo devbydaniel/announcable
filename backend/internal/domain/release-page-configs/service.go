@@ -6,8 +6,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/devbydaniel/release-notes-go/config"
-	"github.com/devbydaniel/release-notes-go/internal/imgUtil"
+	"github.com/devbydaniel/announcable/config"
+	"github.com/devbydaniel/announcable/internal/imgUtil"
 	"github.com/google/uuid"
 )
 

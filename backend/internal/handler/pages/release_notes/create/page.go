@@ -3,9 +3,9 @@ package create
 import (
 	"net/http"
 
-	releasenotes "github.com/devbydaniel/release-notes-go/internal/domain/release-notes"
-	"github.com/devbydaniel/release-notes-go/internal/handler/shared"
-	"github.com/devbydaniel/release-notes-go/templates"
+	releasenotes "github.com/devbydaniel/announcable/internal/domain/release-notes"
+	"github.com/devbydaniel/announcable/internal/handler/shared"
+	"github.com/devbydaniel/announcable/templates"
 )
 
 // Handlers holds the dependencies for release note create handlers

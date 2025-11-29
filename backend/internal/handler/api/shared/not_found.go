@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/devbydaniel/release-notes-go/templates"
+	"github.com/devbydaniel/announcable/templates"
 )
 
 var notFoundTmpl = templates.Construct(

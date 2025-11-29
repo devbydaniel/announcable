@@ -1,5 +1,5 @@
 package releasepageconfig
 
-import "github.com/devbydaniel/release-notes-go/internal/logger"
+import "github.com/devbydaniel/announcable/internal/logger"
 
 var log = logger.Get()

@@ -3,8 +3,8 @@ package widget_script
 import (
 	"net/http"
 
-	"github.com/devbydaniel/release-notes-go/internal/handler/shared"
-	"github.com/devbydaniel/release-notes-go/static"
+	"github.com/devbydaniel/announcable/internal/handler/shared"
+	"github.com/devbydaniel/announcable/static"
 )
 
 // Handlers provides widget script handlers

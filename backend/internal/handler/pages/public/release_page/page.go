@@ -6,12 +6,12 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/devbydaniel/release-notes-go/internal/domain/organisation"
-	releasenotes "github.com/devbydaniel/release-notes-go/internal/domain/release-notes"
-	releasepageconfig "github.com/devbydaniel/release-notes-go/internal/domain/release-page-configs"
-	"github.com/devbydaniel/release-notes-go/internal/handler/shared"
-	"github.com/devbydaniel/release-notes-go/internal/util"
-	"github.com/devbydaniel/release-notes-go/templates"
+	"github.com/devbydaniel/announcable/internal/domain/organisation"
+	releasenotes "github.com/devbydaniel/announcable/internal/domain/release-notes"
+	releasepageconfig "github.com/devbydaniel/announcable/internal/domain/release-page-configs"
+	"github.com/devbydaniel/announcable/internal/handler/shared"
+	"github.com/devbydaniel/announcable/internal/util"
+	"github.com/devbydaniel/announcable/templates"
 	"github.com/go-chi/chi/v5"
 )
 

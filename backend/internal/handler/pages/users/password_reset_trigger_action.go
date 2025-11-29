@@ -7,12 +7,12 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/devbydaniel/release-notes-go/config"
-	"github.com/devbydaniel/release-notes-go/internal/domain/organisation"
-	"github.com/devbydaniel/release-notes-go/internal/domain/session"
-	"github.com/devbydaniel/release-notes-go/internal/domain/user"
-	mw "github.com/devbydaniel/release-notes-go/internal/middleware"
-	"github.com/devbydaniel/release-notes-go/internal/ratelimit"
+	"github.com/devbydaniel/announcable/config"
+	"github.com/devbydaniel/announcable/internal/domain/organisation"
+	"github.com/devbydaniel/announcable/internal/domain/session"
+	"github.com/devbydaniel/announcable/internal/domain/user"
+	mw "github.com/devbydaniel/announcable/internal/middleware"
+	"github.com/devbydaniel/announcable/internal/ratelimit"
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 )

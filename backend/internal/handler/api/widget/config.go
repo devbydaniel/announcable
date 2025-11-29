@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/devbydaniel/release-notes-go/internal/domain/organisation"
-	releasepageconfig "github.com/devbydaniel/release-notes-go/internal/domain/release-page-configs"
-	widgetconfigs "github.com/devbydaniel/release-notes-go/internal/domain/widget-configs"
+	"github.com/devbydaniel/announcable/internal/domain/organisation"
+	releasepageconfig "github.com/devbydaniel/announcable/internal/domain/release-page-configs"
+	widgetconfigs "github.com/devbydaniel/announcable/internal/domain/widget-configs"
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 )

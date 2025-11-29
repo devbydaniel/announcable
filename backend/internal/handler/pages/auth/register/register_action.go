@@ -4,14 +4,14 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/devbydaniel/release-notes-go/config"
-	"github.com/devbydaniel/release-notes-go/internal/domain/organisation"
-	releasepageconfig "github.com/devbydaniel/release-notes-go/internal/domain/release-page-configs"
-	"github.com/devbydaniel/release-notes-go/internal/domain/session"
-	"github.com/devbydaniel/release-notes-go/internal/domain/user"
-	widgetconfigs "github.com/devbydaniel/release-notes-go/internal/domain/widget-configs"
-	"github.com/devbydaniel/release-notes-go/internal/password"
-	"github.com/devbydaniel/release-notes-go/internal/ratelimit"
+	"github.com/devbydaniel/announcable/config"
+	"github.com/devbydaniel/announcable/internal/domain/organisation"
+	releasepageconfig "github.com/devbydaniel/announcable/internal/domain/release-page-configs"
+	"github.com/devbydaniel/announcable/internal/domain/session"
+	"github.com/devbydaniel/announcable/internal/domain/user"
+	widgetconfigs "github.com/devbydaniel/announcable/internal/domain/widget-configs"
+	"github.com/devbydaniel/announcable/internal/password"
+	"github.com/devbydaniel/announcable/internal/ratelimit"
 )
 
 type registerForm struct {

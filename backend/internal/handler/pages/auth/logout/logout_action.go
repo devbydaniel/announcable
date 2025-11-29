@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/devbydaniel/release-notes-go/internal/domain/session"
-	"github.com/devbydaniel/release-notes-go/internal/handler/shared"
-	mw "github.com/devbydaniel/release-notes-go/internal/middleware"
+	"github.com/devbydaniel/announcable/internal/domain/session"
+	"github.com/devbydaniel/announcable/internal/handler/shared"
+	mw "github.com/devbydaniel/announcable/internal/middleware"
 	"github.com/google/uuid"
 )
 

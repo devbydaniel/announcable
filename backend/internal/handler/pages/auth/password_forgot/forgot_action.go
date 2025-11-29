@@ -4,10 +4,10 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/devbydaniel/release-notes-go/internal/domain/session"
-	"github.com/devbydaniel/release-notes-go/internal/domain/user"
-	"github.com/devbydaniel/release-notes-go/internal/ratelimit"
-	"github.com/devbydaniel/release-notes-go/templates"
+	"github.com/devbydaniel/announcable/internal/domain/session"
+	"github.com/devbydaniel/announcable/internal/domain/user"
+	"github.com/devbydaniel/announcable/internal/ratelimit"
+	"github.com/devbydaniel/announcable/templates"
 	"github.com/go-playground/validator"
 )
 

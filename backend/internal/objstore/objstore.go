@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/devbydaniel/release-notes-go/config"
-	"github.com/devbydaniel/release-notes-go/internal/logger"
+	"github.com/devbydaniel/announcable/config"
+	"github.com/devbydaniel/announcable/internal/logger"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 )

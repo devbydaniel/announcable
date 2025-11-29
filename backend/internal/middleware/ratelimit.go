@@ -3,7 +3,7 @@ package mw
 import (
 	"net/http"
 
-	"github.com/devbydaniel/release-notes-go/internal/ratelimit"
+	"github.com/devbydaniel/announcable/internal/ratelimit"
 )
 
 const (

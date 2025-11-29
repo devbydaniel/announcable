@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"net/url"
 
-	releasenotes "github.com/devbydaniel/release-notes-go/internal/domain/release-notes"
+	releasenotes "github.com/devbydaniel/announcable/internal/domain/release-notes"
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 )

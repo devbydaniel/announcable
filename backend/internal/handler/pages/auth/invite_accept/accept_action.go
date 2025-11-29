@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/devbydaniel/release-notes-go/internal/domain/organisation"
-	"github.com/devbydaniel/release-notes-go/internal/domain/user"
-	"github.com/devbydaniel/release-notes-go/internal/password"
+	"github.com/devbydaniel/announcable/internal/domain/organisation"
+	"github.com/devbydaniel/announcable/internal/domain/user"
+	"github.com/devbydaniel/announcable/internal/password"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-playground/validator"
 	"github.com/gorilla/schema"

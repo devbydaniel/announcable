@@ -5,7 +5,7 @@ import (
 	"html/template"
 	"net/http"
 
-	"github.com/devbydaniel/release-notes-go/internal/logger"
+	"github.com/devbydaniel/announcable/internal/logger"
 )
 
 var log = logger.Get()

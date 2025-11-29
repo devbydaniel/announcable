@@ -3,8 +3,8 @@ package password_reset
 import (
 	"net/http"
 
-	"github.com/devbydaniel/release-notes-go/internal/handler/shared"
-	"github.com/devbydaniel/release-notes-go/templates"
+	"github.com/devbydaniel/announcable/internal/handler/shared"
+	"github.com/devbydaniel/announcable/templates"
 	"github.com/go-chi/chi/v5"
 )
 

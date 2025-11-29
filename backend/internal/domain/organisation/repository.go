@@ -1,7 +1,7 @@
 package organisation
 
 import (
-	"github.com/devbydaniel/release-notes-go/internal/database"
+	"github.com/devbydaniel/announcable/internal/database"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )

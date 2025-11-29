@@ -1,7 +1,7 @@
 package shared
 
 import (
-	sharedDeps "github.com/devbydaniel/release-notes-go/internal/handler/shared"
+	sharedDeps "github.com/devbydaniel/announcable/internal/handler/shared"
 )
 
 // Handlers provides shared API handlers

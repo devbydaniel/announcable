@@ -3,9 +3,9 @@ package user
 import (
 	"fmt"
 
-	"github.com/devbydaniel/release-notes-go/config"
-	"github.com/devbydaniel/release-notes-go/internal/email"
-	"github.com/devbydaniel/release-notes-go/internal/password"
+	"github.com/devbydaniel/announcable/config"
+	"github.com/devbydaniel/announcable/internal/email"
+	"github.com/devbydaniel/announcable/internal/password"
 	"github.com/google/uuid"
 )
 

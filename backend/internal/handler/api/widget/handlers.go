@@ -1,7 +1,7 @@
 package widget
 
 import (
-	"github.com/devbydaniel/release-notes-go/internal/handler/shared"
+	"github.com/devbydaniel/announcable/internal/handler/shared"
 )
 
 // Handlers provides widget API handlers

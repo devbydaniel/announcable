@@ -3,9 +3,9 @@ package account
 import (
 	"net/http"
 
-	"github.com/devbydaniel/release-notes-go/internal/domain/user"
-	mw "github.com/devbydaniel/release-notes-go/internal/middleware"
-	"github.com/devbydaniel/release-notes-go/internal/password"
+	"github.com/devbydaniel/announcable/internal/domain/user"
+	mw "github.com/devbydaniel/announcable/internal/middleware"
+	"github.com/devbydaniel/announcable/internal/password"
 	"github.com/go-playground/validator"
 	"github.com/google/uuid"
 )

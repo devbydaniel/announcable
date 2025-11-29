@@ -2,7 +2,7 @@
 
 ## Runtime & Entry Point
 
-- Module `github.com/devbydaniel/release-notes-go`, targeting Go 1.23 with toolchain 1.23.4 (`go.mod`).
+- Module `github.com/devbydaniel/announcable`, targeting Go 1.23 with toolchain 1.23.4 (`go.mod`).
 - `main.go` loads `.env` via `godotenv`, builds global config (`config.New()`), connects to Postgres through `internal/database`, configures Stripe (`internal/stripeUtil`) and MinIO-backed object storage (`internal/objstore`), then wires a `chi` router.
 - Global logging is handled by `internal/logger` which bootstraps Zerolog with both console and Axiom writers; the logger must be cleaned up on shutdown.
 - HTTP stack layers `chi` middlewares (logger, recoverer) plus custom middleware from `internal/middleware` before delegating to handlers.

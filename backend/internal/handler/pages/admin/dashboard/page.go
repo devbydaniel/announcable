@@ -3,10 +3,10 @@ package dashboard
 import (
 	"net/http"
 
-	"github.com/devbydaniel/release-notes-go/internal/domain/admin"
-	"github.com/devbydaniel/release-notes-go/internal/handler/shared"
-	mw "github.com/devbydaniel/release-notes-go/internal/middleware"
-	"github.com/devbydaniel/release-notes-go/templates"
+	"github.com/devbydaniel/announcable/internal/domain/admin"
+	"github.com/devbydaniel/announcable/internal/handler/shared"
+	mw "github.com/devbydaniel/announcable/internal/middleware"
+	"github.com/devbydaniel/announcable/templates"
 	"github.com/google/uuid"
 )
 

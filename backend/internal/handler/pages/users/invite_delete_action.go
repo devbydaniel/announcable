@@ -3,7 +3,7 @@ package users
 import (
 	"net/http"
 
-	"github.com/devbydaniel/release-notes-go/internal/domain/organisation"
+	"github.com/devbydaniel/announcable/internal/domain/organisation"
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 )
