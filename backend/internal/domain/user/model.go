@@ -3,35 +3,15 @@ package user
 import (
 	"errors"
 	"regexp"
-	"time"
 
 	"github.com/devbydaniel/release-notes-go/internal/database"
-	"github.com/google/uuid"
 )
 
 type User struct {
-	database.BaseModel    `gorm:"embedded"`
-	Email                 string `gorm:"unique"`
-	Password              string
-	EmailVerified         bool                   `gorm:"default:false"`
-	TosConfirms           []TosConfirm           `gorm:"foreignKey:UserID"`
-	PrivacyPolicyConfirms []PrivacyPolicyConfirm `gorm:"foreignKey:UserID"`
-}
-
-type TosConfirm struct {
 	database.BaseModel `gorm:"embedded"`
-	UserID             uuid.UUID
-	User               User
-	Version            string    `gorm:"type:varchar(255)"`
-	ConfirmedAt        time.Time `gorm:"type:timestamptz"`
-}
-
-type PrivacyPolicyConfirm struct {
-	database.BaseModel `gorm:"embedded"`
-	UserID             uuid.UUID
-	User               User
-	Version            string    `gorm:"type:varchar(255)"`
-	ConfirmedAt        time.Time `gorm:"type:timestamptz"`
+	Email              string `gorm:"unique"`
+	Password           string
+	EmailVerified      bool `gorm:"default:false"`
 }
 
 func New(email, password string) (*User, error) {

@@ -44,7 +44,6 @@ func SendEmailConfirm(c *EmailConfirmConfig) error {
 	data := map[string]string{
 		"action_url":      c.ActionURL,
 		"product_url":     cfg.BaseURL,
-		"sender_name":     cfg.ProductInfo.PersonalName,
 		"product_name":    cfg.ProductInfo.ProductName,
 		"support_email":   cfg.ProductInfo.SupportEmail,
 		"company_name":    cfg.ProductInfo.CompanyName,

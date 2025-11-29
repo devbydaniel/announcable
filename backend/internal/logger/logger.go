@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"io"
 	"os"
 
 	adapter "github.com/axiomhq/axiom-go/adapters/zerolog"
@@ -18,19 +19,29 @@ func init() {
 	// Set global log level to trace
 	zerolog.SetGlobalLevel(zerolog.TraceLevel)
 
-	env := config.New().Env
-	var err error
-	axiomWriter, err = adapter.New()
-	if err != nil {
-		log.Fatal().Err(err).Msg("Failed to create Axiom writer")
+	cfg := config.New()
+	consoleWriter := zerolog.ConsoleWriter{Out: os.Stderr}
+
+	var writers []io.Writer
+	writers = append(writers, consoleWriter)
+
+	// Only initialize Axiom if credentials are provided
+	if cfg.Axiom.Token != "" && cfg.Axiom.Dataset != "" {
+		var err error
+		axiomWriter, err = adapter.New()
+		if err != nil {
+			// Log warning but don't crash - fall back to console only
+			log.Warn().Err(err).Msg("Failed to create Axiom writer, using console logging only")
+		} else {
+			writers = append(writers, axiomWriter)
+		}
 	}
 
-	consoleWriter := zerolog.ConsoleWriter{Out: os.Stderr}
-	logger = zerolog.New(zerolog.MultiLevelWriter(axiomWriter, consoleWriter)).
+	logger = zerolog.New(zerolog.MultiLevelWriter(writers...)).
 		With().
 		Timestamp().
 		Caller().
-		Str("env", env).
+		Str("env", cfg.Env).
 		Logger()
 
 	// Replace the global logger instance

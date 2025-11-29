@@ -10,7 +10,6 @@ type productInfo struct {
 	CompanyName    string
 	CompanyAddress string
 	SupportEmail   string
-	PersonalName   string
 }
 
 type postgresConfig struct {
@@ -44,11 +43,6 @@ type emailConfig struct {
 	SMTPTLS     bool
 }
 
-type legal struct {
-	ToSVersion string
-	PPVersion  string
-}
-
 type payment struct {
 	StripeKey     string
 	WebhookSecret string
@@ -68,11 +62,10 @@ type config struct {
 	Postgres       postgresConfig
 	ObjStorage     objStorageConfig
 	PgAdmin        pgAdminConfig
-	Email          emailConfig
-	ProductInfo    productInfo
-	Legal          legal
-	Payment        payment
-	Axiom          axiomConfig
+	Email       emailConfig
+	ProductInfo productInfo
+	Payment     payment
+	Axiom       axiomConfig
 }
 
 func New() *config {
@@ -81,11 +74,7 @@ func New() *config {
 		AppEnvironment: getEnvWithDefault("APP_ENVIRONMENT", "self-hosted"),
 		BaseURL:        getEnv("BASE_URL"),
 		Port:           getEnvAsInt("PORT"),
-		AdminUserId:    getEnv("ADMIN_USER_ID"),
-		Legal: legal{
-			ToSVersion: getEnv("TOS_VERSION"),
-			PPVersion:  getEnv("PP_VERSION"),
-		},
+		AdminUserId: getEnv("ADMIN_USER_ID"),
 		Payment: payment{
 			StripeKey:     getEnv("STRIPE_KEY"),
 			WebhookSecret: getEnv("STRIPE_WEBHOOK_SECRET"),
@@ -119,14 +108,13 @@ func New() *config {
 		},
 		ProductInfo: productInfo{
 			ProductName:    "Announcable",
-			CompanyName:    "Announcable",
-			CompanyAddress: "Kameterstraße 52, 85579 Neubiberg",
-			SupportEmail:   "support@announcable.me",
-			PersonalName:   "Daniel",
+			CompanyName:    getEnvWithDefault("COMPANY_NAME", ""),
+			CompanyAddress: getEnvWithDefault("COMPANY_ADDRESS", ""),
+			SupportEmail:   getEnvWithDefault("SUPPORT_EMAIL", ""),
 		},
 		Axiom: axiomConfig{
-			Dataset: getEnv("AXIOM_DATASET"),
-			Token:   getEnv("AXIOM_TOKEN"),
+			Dataset: getEnvWithDefault("AXIOM_DATASET", ""),
+			Token:   getEnvWithDefault("AXIOM_TOKEN", ""),
 		},
 	}
 

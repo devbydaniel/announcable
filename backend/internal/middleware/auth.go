@@ -11,7 +11,6 @@ import (
 	"github.com/devbydaniel/release-notes-go/internal/domain/organisation"
 	"github.com/devbydaniel/release-notes-go/internal/domain/rbac"
 	"github.com/devbydaniel/release-notes-go/internal/domain/session"
-	"github.com/devbydaniel/release-notes-go/internal/domain/user"
 )
 
 type contextKey string
@@ -23,15 +22,12 @@ const (
 	OrgIDKey              contextKey = "orgId"
 	OrgNameKey            contextKey = "orgName"
 	EmailVerifiedKey      contextKey = "emailVerified"
-	TosVersionKey         contextKey = "tosVersion"
-	PrivacyPolicyKey      contextKey = "privacyPolicy"
 	HasActiveSubscription contextKey = "hasActiveSubscription"
 )
 
 func (h *Handler) Authenticate(next http.Handler) http.Handler {
 	sessionService := session.NewService(*session.NewRepository(h.DB))
 	orgService := organisation.NewService(*organisation.NewRepository(h.DB))
-	userService := user.NewService(*user.NewRepository(h.DB))
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		h.log.Trace().Msg("mw Authenticate")
@@ -70,18 +66,6 @@ func (h *Handler) Authenticate(next http.Handler) http.Handler {
 		}
 		h.log.Debug().Interface("ou", ou).Msg("OrganisationUser")
 
-		tosVersion, err := userService.GetLatestTosVersion(ou.UserID)
-		if err != nil {
-			http.Error(w, "Error getting latest TOS version", http.StatusInternalServerError)
-			return
-		}
-
-		privatePolicyVersion, err := userService.GetLatestPrivacyPolicyVersion(ou.UserID)
-		if err != nil {
-			http.Error(w, "Error getting latest private policy version", http.StatusInternalServerError)
-			return
-		}
-
 		ctx := r.Context()
 		ctx = context.WithValue(ctx, SessionIdKey, session.ID.String())
 		ctx = context.WithValue(ctx, EmailVerifiedKey, ou.User.EmailVerified)
@@ -89,8 +73,6 @@ func (h *Handler) Authenticate(next http.Handler) http.Handler {
 		ctx = context.WithValue(ctx, OrgRoleKey, ou.Role)
 		ctx = context.WithValue(ctx, OrgIDKey, ou.OrganisationID.String())
 		ctx = context.WithValue(ctx, OrgNameKey, ou.Organisation.Name)
-		ctx = context.WithValue(ctx, TosVersionKey, tosVersion)
-		ctx = context.WithValue(ctx, PrivacyPolicyKey, privatePolicyVersion)
 
 		r = r.WithContext(ctx)
 		h.log.Trace().

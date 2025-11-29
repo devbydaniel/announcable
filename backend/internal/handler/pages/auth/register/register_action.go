@@ -18,7 +18,6 @@ type registerForm struct {
 	Email           string
 	Password        string
 	ConfirmPassword string
-	Legal           string
 }
 
 var registerRateLimiter = ratelimit.New(60, 5)
@@ -43,7 +42,6 @@ func (h *Handlers) HandleRegister(w http.ResponseWriter, r *http.Request) {
 		Email:           r.FormValue("email"),
 		Password:        r.FormValue("password"),
 		ConfirmPassword: r.FormValue("confirm"),
-		Legal:           r.FormValue("legal"),
 	}
 	h.deps.Log.Debug().Interface("req", req).Msg("Register request")
 
@@ -77,12 +75,6 @@ func (h *Handlers) HandleRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if req.Legal != "on" {
-		h.deps.Log.Debug().Msg("Legal not accepted")
-		http.Error(w, "Legal terms not accepted", http.StatusBadRequest)
-		return
-	}
-
 	// check if user already exists
 	existing, err := userService.GetByEmail(req.Email)
 	if err != nil && !errors.Is(err, h.deps.DB.ErrRecordNotFound) {
@@ -96,23 +88,11 @@ func (h *Handlers) HandleRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// create user and confirm privacy policy and tos
+	// create user
 	user, err := userService.Create(req.Email, req.Password, false)
 	if err != nil {
 		h.deps.Log.Error().Err(err).Msg("Error creating user")
 		http.Error(w, "Error creating user", http.StatusInternalServerError)
-		return
-	}
-	if _, err := userService.ConfirmPrivacyPolicyNow(user.ID); err != nil {
-		h.deps.Log.Error().Err(err).Msg("Error creating user")
-		userService.Delete(user.ID)
-		http.Error(w, "Error confirming privacy policy", http.StatusInternalServerError)
-		return
-	}
-	if _, err := userService.ConfirmTosNow(user.ID); err != nil {
-		h.deps.Log.Error().Err(err).Msg("Error creating user")
-		userService.Delete(user.ID)
-		http.Error(w, "Error confirming terms of service", http.StatusInternalServerError)
 		return
 	}
 
