@@ -3,20 +3,143 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Widget Test</title>
+    <title>Widget Lit Test - Development</title>
+    <style>
+      /* Host page styles to test Shadow DOM isolation */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: Georgia, serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 40px;
+        line-height: 1.6;
+      }
+
+      h1 {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        font-weight: bold;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      p {
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      button {
+        background: white;
+        color: #667eea;
+        border: none;
+        padding: 15px 30px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        border-radius: 8px;
+        cursor: pointer;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+        margin: 10px;
+      }
+
+      button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+      }
+
+      .info-box {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        padding: 20px;
+        margin: 20px 0;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .info-box h2 {
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+      }
+
+      .info-box ul {
+        list-style-position: inside;
+        margin-left: 20px;
+      }
+
+      .info-box li {
+        margin: 5px 0;
+      }
+    </style>
   </head>
   <body>
-    <p>Hello</p>
-    <button class="widgetButton" style="position: relative">Click!</button>
-    <button class="widgetButton" style="position: relative">Click!</button>
-    <p class="text-xl text-red">HELLO</p>
+    <div class="container">
+      <h1>🎨 Widget Lit Test - Development</h1>
+      <p>
+        Testing Lit-based widget with Vite dev server and Shadow DOM isolation
+      </p>
+
+      <div class="info-box">
+        <h2>📦 Test Features</h2>
+        <ul>
+          <li>
+            <strong>Shadow DOM Isolation:</strong> Widget styles should not be
+            affected by host page
+          </li>
+          <li><strong>Custom Fonts:</strong> Widget uses Inter font family</li>
+          <li>
+            <strong>Multiple Anchors:</strong> Two buttons should open the same
+            widget
+          </li>
+          <li>
+            <strong>Indicators:</strong> Red dot should appear on new release
+            notes
+          </li>
+          <li>
+            <strong>Host Page Styles:</strong> Gradient background, Georgia
+            serif font
+          </li>
+        </ul>
+      </div>
+
+      <div style="margin: 30px 0">
+        <button data-announcable>📢 What's New?</button>
+
+        <button data-announcable>🎁 Check Updates</button>
+      </div>
+
+      <div class="info-box">
+        <h2>🔍 What to Test</h2>
+        <ul>
+          <li>Click either button to open widget</li>
+          <li>Widget should use Inter font (not Georgia)</li>
+          <li>Widget background should be white (not purple gradient)</li>
+          <li>Widget should render in bottom-right corner</li>
+          <li>Release notes should load and display correctly</li>
+          <li>Like buttons and CTA links should work</li>
+          <li>Close button should work</li>
+          <li>No style leakage between host page and widget</li>
+        </ul>
+      </div>
+    </div>
+
     <script>
-      var release_beacon_widget_init = {
+      // Use the newer announcable_init variable
+      window.announcable_init = {
         org_id: "d038adca-3231-4dfd-afc9-69244b93d59e",
-        anchor_query_selector: ".widgetButton",
-        font_family: ["monospace"],
+        anchor_query_selector: "[data-announcable]",
+        hide_indicator: false,
+        font_family: ["Inter", "system-ui", "sans-serif"],
       };
     </script>
-    <script type="text/javascript" src="http://localhost:3000/widget"></script>
+    <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

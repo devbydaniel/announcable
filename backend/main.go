@@ -262,21 +262,6 @@ func main() {
 
 	r.Route("/widget", func(r chi.Router) {
 		r.Use(cors.Handler(cors.Options{
-			// AllowedOrigins:   []string{"https://foo.com"}, // Use this to allow specific origin hosts
-			AllowedOrigins:   []string{"*"},
-			AllowedMethods:   []string{"GET", "OPTIONS"},
-			AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
-			ExposedHeaders:   []string{"Link"},
-			AllowCredentials: false,
-			MaxAge:           300, // Maximum value not ignored by any of major browsers
-		}))
-		r.Get("/", widgetScriptHandler.ServeWidgetScript)
-	})
-
-	// WIDGET-LIT SCRIPT (Lit version of widget)
-
-	r.Route("/widget-lit", func(r chi.Router) {
-		r.Use(cors.Handler(cors.Options{
 			AllowedOrigins:   []string{"*"},
 			AllowedMethods:   []string{"GET", "OPTIONS"},
 			AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
@@ -284,7 +269,7 @@ func main() {
 			AllowCredentials: false,
 			MaxAge:           300,
 		}))
-		r.Get("/", widgetScriptHandler.ServeWidgetLitScript)
+		r.Get("/", widgetScriptHandler.ServeWidgetScript)
 	})
 
 	// RELEASE PAGE

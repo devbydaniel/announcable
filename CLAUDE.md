@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 This is a monorepo for Announcable, a release notes and announcement platform. It consists of two main components:
 
 - **Backend**: Go web application using Chi router, GORM, PostgreSQL, Stripe, and Minio for object storage
-- **Widget**: React/TypeScript embeddable widget built with Vite that displays release notes
+- **Widget**: Lit/TypeScript embeddable widget built with Vite that displays release notes
 
 ## Development Commands
 
@@ -209,14 +209,15 @@ All static assets are embedded in the binary via `//go:embed` in `backend/static
 
 ### Widget Structure
 
-The widget is a self-contained React application built as a UMD bundle:
+The widget is a self-contained Lit web component application built as a UMD bundle:
 
-- **`src/main.tsx`**: Widget entry point that mounts to a container element
-- **`src/App.tsx`**: Main widget component
-- **`src/components/`**: React components
-- **`src/hooks/`**: Custom React hooks
+- **`src/main.ts`**: Widget entry point that registers the custom element
+- **`src/app.ts`**: Main widget web component (LitElement)
+- **`src/components/`**: Lit components
+- **`src/controllers/`**: Lit reactive controllers
+- **`src/tasks/`**: Async task handlers for data fetching
 - **`src/lib/`**: Utilities and helpers
-- **`vite.config.ts`**: Builds as UMD library with CSS namespaced to `.announcable-widget`
+- **`vite.config.ts`**: Builds as UMD library
 
 The widget is embedded in customer websites via a script tag and displays release notes fetched from the backend API.
 
