@@ -1,5 +1,8 @@
 .env
 !.env.example
+
+# Internal development docs
+_docs/
 # Logs
 logs
 *.log

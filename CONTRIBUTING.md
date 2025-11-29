@@ -72,10 +72,10 @@ npm run dev
 - Use `gofmt` for formatting
 - Handler files follow the naming pattern `handle-<action>.go`
 
-### TypeScript/React (Widget)
+### TypeScript/Lit (Widget)
 
 - Use TypeScript for all new code
-- Follow the existing component patterns
+- Follow the existing Lit web component patterns
 - Run `npm run lint` before submitting
 
 ### CSS

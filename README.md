@@ -60,7 +60,7 @@ Announcable is designed for self-hosting. No external services required except e
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/your-org/announcable.git
+   git clone https://github.com/devbydaniel/announcable.git
    cd announcable
    ```
 
@@ -256,8 +256,12 @@ announcable/
 
 ## License
 
-[Add your license here]
+This project is licensed under the [GNU Affero General Public License v3.0 (AGPL-3.0)](LICENSE.md).
 
 ## Contributing
 
-[Add contribution guidelines here]
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+## Security
+
+To report security vulnerabilities, please see [SECURITY.md](SECURITY.md).
