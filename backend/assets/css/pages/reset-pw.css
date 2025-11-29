@@ -4,3 +4,6 @@
 @import '../components/button.css';
 
 /* Reset password page styles */
+.reset-pw-placeholder {
+  display: block;
+}

@@ -2,3 +2,6 @@
 @import '../components/card.css';
 
 /* Password reset token invalid page styles */
+.pw-reset-token-invalid-placeholder {
+  display: block;
+}

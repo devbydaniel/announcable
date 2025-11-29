@@ -2,3 +2,6 @@
 @import '../components/card.css';
 
 /* Invite invalid page styles */
+.invite-invalid-placeholder {
+  display: block;
+}
