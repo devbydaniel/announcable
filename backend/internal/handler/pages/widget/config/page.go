@@ -5,7 +5,6 @@ import (
 	"html"
 	"net/http"
 
-	"github.com/devbydaniel/release-notes-go/config"
 	widgetconfigs "github.com/devbydaniel/release-notes-go/internal/domain/widget-configs"
 	"github.com/devbydaniel/release-notes-go/internal/handler/shared"
 	mw "github.com/devbydaniel/release-notes-go/internal/middleware"
@@ -51,13 +50,6 @@ func (h *Handlers) ServeWidgetConfigPage(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	hasActiveSubscription, ok := r.Context().Value(mw.HasActiveSubscription).(bool)
-	if !ok {
-		h.deps.Log.Error().Msg("Subscription status not found in context")
-		http.Error(w, "Error checking subscription status", http.StatusInternalServerError)
-		return
-	}
-
 	// get widget config
 	var cfg *widgetconfigs.WidgetConfig
 	cfg, err := widgetService.Get(uuid.MustParse(orgId))
@@ -77,13 +69,9 @@ func (h *Handlers) ServeWidgetConfigPage(w http.ResponseWriter, r *http.Request)
 		}
 	}
 
-	appCfg := config.New()
-
 	data := pageData{
 		BaseTemplateData: shared.BaseTemplateData{
-			Title:                 "Widget Config",
-			HasActiveSubscription: hasActiveSubscription,
-			ShowSubscriptionUI:    appCfg.IsCloud(),
+			Title: "Widget Config",
 		},
 		Cfg:                    cfg,
 		SafeTitle:              html.EscapeString(cfg.Title),

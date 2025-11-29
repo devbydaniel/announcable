@@ -3,10 +3,8 @@ package account
 import (
 	"net/http"
 
-	"github.com/devbydaniel/release-notes-go/config"
 	"github.com/devbydaniel/release-notes-go/internal/domain/organisation"
 	releasepageconfig "github.com/devbydaniel/release-notes-go/internal/domain/release-page-configs"
-	"github.com/devbydaniel/release-notes-go/internal/domain/subscription"
 	widgetconfigs "github.com/devbydaniel/release-notes-go/internal/domain/widget-configs"
 	"github.com/devbydaniel/release-notes-go/internal/handler/shared"
 	mw "github.com/devbydaniel/release-notes-go/internal/middleware"
@@ -27,10 +25,9 @@ func New(deps *shared.Dependencies) *Handlers {
 // pageData represents the template data for settings page
 type pageData struct {
 	shared.BaseTemplateData
-	WidgetID            string
-	ReleasePageUrl      string
-	CustomUrl           *string
-	HasPaidSubscription bool
+	WidgetID       string
+	ReleasePageUrl string
+	CustomUrl      *string
 }
 
 var pageTmpl = templates.Construct(
@@ -50,16 +47,9 @@ func (h *Handlers) ServeSettingsPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	hasActiveSubscription, ok := ctx.Value(mw.HasActiveSubscription).(bool)
-	if !ok {
-		h.deps.Log.Error().Msg("Subscription status not found in context")
-		http.Error(w, "Error checking subscription status", http.StatusInternalServerError)
-		return
-	}
 	organisationService := organisation.NewService(*organisation.NewRepository(h.deps.DB))
 	widgetConfigService := widgetconfigs.NewService(*widgetconfigs.NewRepository(h.deps.DB))
 	releasePageConfigService := releasepageconfig.NewService(*releasepageconfig.NewRepository(h.deps.DB, h.deps.ObjStore))
-	subscriptionService := subscription.NewService(*subscription.NewRepository(h.deps.DB))
 
 	widgetConfig, err := widgetConfigService.Get(uuid.MustParse(orgId))
 	if err != nil {
@@ -82,28 +72,12 @@ func (h *Handlers) ServeSettingsPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	orgName := ctx.Value(mw.OrgNameKey).(string)
-	cfg := config.New()
-
-	isFree := false
-	// Only check subscription tier in cloud mode
-	if cfg.IsCloud() && hasActiveSubscription {
-		var err error
-		isFree, err = subscriptionService.IsFreeSubscription(uuid.MustParse(orgId))
-		if err != nil {
-			h.deps.Log.Error().Err(err).Msg("Error checking if subscription is free")
-			http.Error(w, "Error checking subscription status", http.StatusInternalServerError)
-			return
-		}
-	}
 
 	data := pageData{
 		BaseTemplateData: shared.BaseTemplateData{
-			Title:                 "Settings for " + orgName,
-			HasActiveSubscription: hasActiveSubscription,
-			ShowSubscriptionUI:    cfg.IsCloud(),
+			Title: "Settings for " + orgName,
 		},
-		WidgetID:            externalId.String(),
-		HasPaidSubscription: hasActiveSubscription && !isFree,
+		WidgetID: externalId.String(),
 	}
 	if releasePageUrl != "" {
 		data.ReleasePageUrl = releasePageUrl

@@ -5,7 +5,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/devbydaniel/release-notes-go/config"
 	releasenotelikes "github.com/devbydaniel/release-notes-go/internal/domain/release-note-likes"
 	releasenotemetrics "github.com/devbydaniel/release-notes-go/internal/domain/release-note-metrics"
 	releasenotes "github.com/devbydaniel/release-notes-go/internal/domain/release-notes"
@@ -55,12 +54,6 @@ func (h *Handlers) ServeReleaseNotesListPage(w http.ResponseWriter, r *http.Requ
 	if !ok {
 		h.deps.Log.Error().Msg("Organisation ID not found in context")
 		http.Error(w, "Failed to authenticate", http.StatusInternalServerError)
-		return
-	}
-	hasActiveSubscription, ok := ctx.Value(mw.HasActiveSubscription).(bool)
-	if !ok {
-		h.deps.Log.Error().Msg("Subscription status not found in context")
-		http.Error(w, "Error checking subscription status", http.StatusInternalServerError)
 		return
 	}
 	releaseNotesService := releasenotes.NewService(*releasenotes.NewRepository(h.deps.DB, h.deps.ObjStore))
@@ -150,13 +143,10 @@ func (h *Handlers) ServeReleaseNotesListPage(w http.ResponseWriter, r *http.Requ
 	if releaseNotes.Page > 1 {
 		prevPageLink = "/release-notes?page=" + strconv.Itoa(releaseNotes.Page-1) + "&pageSize=" + pageSize
 	}
-	cfg := config.New()
 
 	data := pageData{
 		BaseTemplateData: shared.BaseTemplateData{
-			Title:                 "Release Notes",
-			HasActiveSubscription: hasActiveSubscription,
-			ShowSubscriptionUI:    cfg.IsCloud(),
+			Title: "Release Notes",
 		},
 		ReleaseNotes: releaseNotesWithMetrics,
 		NextPageLink: nextPageLink,

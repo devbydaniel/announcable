@@ -43,27 +43,6 @@
     </ul>
     <div class="nav__divider"></div>
     <ul class="nav__list">
-      {{ if and (not .HasActiveSubscription) .ShowSubscriptionUI }}
-        <li class="nav__list__item nav__list__item--highlight">
-          <form
-            x-data
-            x-ref="subscribe_form"
-            action="/payment/create-checkout-session"
-            method="POST"
-          >
-            <!-- Change this in case of an additional product or new pricing -->
-            <input type="hidden" name="lookup_key" value="pro_monthly" />
-            <a
-              @click="$refs.subscribe_form.submit()"
-              id="checkout-and-portal-button"
-              type="submit"
-              class=""
-              ><i data-feather="star" width="16" height="16"></i>
-              <span>Subscribe</span>
-            </a>
-          </form>
-        </li>
-      {{ end }}
       <li class="nav__list__item">
         <a href="/logout"
           ><i data-feather="log-out" width="16" height="16"></i

@@ -5,7 +5,6 @@ import (
 	"html"
 	"net/http"
 
-	"github.com/devbydaniel/release-notes-go/config"
 	releasepageconfig "github.com/devbydaniel/release-notes-go/internal/domain/release-page-configs"
 	widgetconfigs "github.com/devbydaniel/release-notes-go/internal/domain/widget-configs"
 	"github.com/devbydaniel/release-notes-go/internal/handler/shared"
@@ -54,13 +53,6 @@ func (h *Handlers) ServeReleasePageConfigPage(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	hasActiveSubscription, ok := r.Context().Value(mw.HasActiveSubscription).(bool)
-	if !ok {
-		h.deps.Log.Error().Msg("Subscription status not found in context")
-		http.Error(w, "Error checking subscription status", http.StatusInternalServerError)
-		return
-	}
-
 	// get release page config
 	var cfg *releasepageconfig.ReleasePageConfig
 	cfg, err := releasePageConfigService.Get(uuid.MustParse(orgId))
@@ -95,13 +87,9 @@ func (h *Handlers) ServeReleasePageConfigPage(w http.ResponseWriter, r *http.Req
 	}
 	h.deps.Log.Debug().Str("releasePageUrl", releasePageUrl).Msg("Release page URL")
 
-	appCfg := config.New()
-
 	data := pageData{
 		BaseTemplateData: shared.BaseTemplateData{
-			Title:                 "Release Page Config",
-			HasActiveSubscription: hasActiveSubscription,
-			ShowSubscriptionUI:    appCfg.IsCloud(),
+			Title: "Release Page Config",
 		},
 		Cfg:               cfg,
 		SafeTitle:         html.EscapeString(cfg.Title),

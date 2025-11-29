@@ -3,7 +3,6 @@ package organisation
 import (
 	"net/http"
 
-	"github.com/devbydaniel/release-notes-go/config"
 	"github.com/devbydaniel/release-notes-go/internal/domain/admin"
 	releasepageconfig "github.com/devbydaniel/release-notes-go/internal/domain/release-page-configs"
 	"github.com/devbydaniel/release-notes-go/internal/handler/shared"
@@ -26,10 +25,9 @@ func New(deps *shared.Dependencies) *Handlers {
 // OrganisationDetailsData represents the organisation details template data
 type OrganisationDetailsData struct {
 	shared.BaseTemplateData
-	Organisation  *OrganisationDetailData
-	ReleasePage   *ReleasePageData
-	Users         []*OrganisationUserData
-	Subscriptions []*SubscriptionData
+	Organisation *OrganisationDetailData
+	ReleasePage  *ReleasePageData
+	Users        []*OrganisationUserData
 }
 
 // OrganisationDetailData represents organisation detail info
@@ -50,15 +48,6 @@ type OrganisationUserData struct {
 	Email     string
 	Role      string
 	CreatedAt string
-}
-
-// SubscriptionData represents subscription info
-type SubscriptionData struct {
-	ID                   string
-	CreatedAt            string
-	IsActive             bool
-	IsFree               bool
-	StripeSubscriptionID string
 }
 
 var orgDetailsTmpl = templates.Construct(
@@ -108,15 +97,6 @@ func (h *Handlers) ServeOrganisationDetailsPage(w http.ResponseWriter, r *http.R
 	}
 	h.Log.Debug().Interface("releasePageConfig", releasePageConfig).Msg("releasePageConfig")
 
-	// Get subscriptions
-	subscriptions, err := adminService.GetSubscriptions(uuid.MustParse(userId), uuid.MustParse(orgId))
-	if err != nil {
-		h.Log.Error().Err(err).Msg("Error getting subscriptions")
-		http.Error(w, "Error getting subscriptions", http.StatusInternalServerError)
-		return
-	}
-	h.Log.Debug().Interface("subscriptions", subscriptions).Msg("subscriptions")
-
 	// Prepare data for the template
 	orgData := &OrganisationDetailData{
 		ID:        org.ID.String(),
@@ -137,29 +117,13 @@ func (h *Handlers) ServeOrganisationDetailsPage(w http.ResponseWriter, r *http.R
 		})
 	}
 
-	subscriptionData := make([]*SubscriptionData, 0, len(subscriptions))
-	for _, s := range subscriptions {
-		subscriptionData = append(subscriptionData, &SubscriptionData{
-			ID:                   s.ID.String(),
-			CreatedAt:            s.CreatedAt.Format("2006-01-02 15:04:05"),
-			IsActive:             s.IsActive,
-			IsFree:               s.IsFree,
-			StripeSubscriptionID: s.StripeSubscriptionID,
-		})
-	}
-
-	cfg := config.New()
-
 	data := OrganisationDetailsData{
 		BaseTemplateData: shared.BaseTemplateData{
-			Title:                 org.Name,
-			HasActiveSubscription: true,
-			ShowSubscriptionUI:    cfg.IsCloud(),
+			Title: org.Name,
 		},
-		Organisation:  orgData,
-		ReleasePage:   releasePageData,
-		Users:         userData,
-		Subscriptions: subscriptionData,
+		Organisation: orgData,
+		ReleasePage:  releasePageData,
+		Users:        userData,
 	}
 
 	// Render the template

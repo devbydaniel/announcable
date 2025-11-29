@@ -3,6 +3,7 @@ package password_forgot
 import (
 	"net/http"
 
+	"github.com/devbydaniel/release-notes-go/config"
 	"github.com/devbydaniel/release-notes-go/internal/handler/shared"
 	"github.com/devbydaniel/release-notes-go/templates"
 )
@@ -20,6 +21,7 @@ func New(deps *shared.Dependencies) *Handlers {
 // pageData holds the template data for the password forgot page
 type pageData struct {
 	shared.BaseTemplateData
+	EmailEnabled bool
 }
 
 var pageTmpl = templates.Construct(
@@ -36,6 +38,7 @@ func (h *Handlers) ServeForgotPasswordPage(w http.ResponseWriter, r *http.Reques
 		BaseTemplateData: shared.BaseTemplateData{
 			Title: "Password reset",
 		},
+		EmailEnabled: config.New().IsEmailEnabled(),
 	}
 	if err := pageTmpl.ExecuteTemplate(w, "root", data); err != nil {
 		h.deps.Log.Error().Err(err).Msg("Error rendering page")

@@ -43,42 +43,30 @@ type emailConfig struct {
 	SMTPTLS     bool
 }
 
-type payment struct {
-	StripeKey     string
-	WebhookSecret string
-}
-
 type axiomConfig struct {
 	Dataset string
 	Token   string
 }
 
 type config struct {
-	Env            string
-	AppEnvironment string
-	BaseURL        string
-	Port           int
-	AdminUserId    string
-	Postgres       postgresConfig
-	ObjStorage     objStorageConfig
-	PgAdmin        pgAdminConfig
+	Env         string
+	BaseURL     string
+	Port        int
+	AdminUserId string
+	Postgres    postgresConfig
+	ObjStorage  objStorageConfig
+	PgAdmin     pgAdminConfig
 	Email       emailConfig
 	ProductInfo productInfo
-	Payment     payment
 	Axiom       axiomConfig
 }
 
 func New() *config {
 	cfg := &config{
-		Env:            getEnv("ENV"),
-		AppEnvironment: getEnvWithDefault("APP_ENVIRONMENT", "self-hosted"),
-		BaseURL:        getEnv("BASE_URL"),
-		Port:           getEnvAsInt("PORT"),
+		Env:         getEnv("ENV"),
+		BaseURL:     getEnv("BASE_URL"),
+		Port:        getEnvAsInt("PORT"),
 		AdminUserId: getEnv("ADMIN_USER_ID"),
-		Payment: payment{
-			StripeKey:     getEnv("STRIPE_KEY"),
-			WebhookSecret: getEnv("STRIPE_WEBHOOK_SECRET"),
-		},
 		Postgres: postgresConfig{
 			Host:     getEnv("POSTGRES_HOST"),
 			Port:     getEnvAsInt("POSTGRES_PORT"),
@@ -99,9 +87,9 @@ func New() *config {
 			Port:     getEnvAsInt("PGADMIN_PORT"),
 		},
 		Email: emailConfig{
-			FromAddress: getEnv("EMAIL_FROM_ADDRESS"),
-			SMTPHost:    getEnv("SMTP_HOST"),
-			SMTPPort:    getEnvAsInt("SMTP_PORT"),
+			FromAddress: getEnvWithDefault("EMAIL_FROM_ADDRESS", ""),
+			SMTPHost:    getEnvWithDefault("SMTP_HOST", ""),
+			SMTPPort:    getEnvAsIntWithDefault("SMTP_PORT", 0),
 			SMTPUser:    getEnvWithDefault("SMTP_USER", ""),
 			SMTPPass:    getEnvWithDefault("SMTP_PASS", ""),
 			SMTPTLS:     getEnvAsBoolWithDefault("SMTP_TLS", false),
@@ -116,11 +104,6 @@ func New() *config {
 			Dataset: getEnvWithDefault("AXIOM_DATASET", ""),
 			Token:   getEnvWithDefault("AXIOM_TOKEN", ""),
 		},
-	}
-
-	// Validate APP_ENVIRONMENT
-	if cfg.AppEnvironment != "cloud" && cfg.AppEnvironment != "self-hosted" {
-		panic("APP_ENVIRONMENT must be either 'cloud' or 'self-hosted', got: " + cfg.AppEnvironment)
 	}
 
 	return cfg
@@ -148,6 +131,16 @@ func getEnvAsInt(name string) int {
 	panic("Environment variable " + name + " is not an integer")
 }
 
+func getEnvAsIntWithDefault(name string, defaultValue int) int {
+	if value, exists := os.LookupEnv(name); exists {
+		if intVal, err := strconv.Atoi(value); err == nil {
+			return intVal
+		}
+		panic("Environment variable " + name + " is not an integer")
+	}
+	return defaultValue
+}
+
 func getEnvAsBool(name string) bool {
 	valStr := getEnv(name)
 	if val, err := strconv.ParseBool(valStr); err == nil {
@@ -166,12 +159,7 @@ func getEnvAsBoolWithDefault(name string, defaultValue bool) bool {
 	return defaultValue
 }
 
-// IsCloud returns true if the application is running in cloud mode
-func (c *config) IsCloud() bool {
-	return c.AppEnvironment == "cloud"
-}
-
-// IsSelfHosted returns true if the application is running in self-hosted mode
-func (c *config) IsSelfHosted() bool {
-	return c.AppEnvironment == "self-hosted"
+// IsEmailEnabled returns true if email is configured
+func (c *config) IsEmailEnabled() bool {
+	return c.Email.SMTPHost != ""
 }

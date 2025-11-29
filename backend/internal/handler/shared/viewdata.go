@@ -2,9 +2,7 @@ package shared
 
 // BaseTemplateData provides common data structure for all page templates
 type BaseTemplateData struct {
-	Title                 string
-	HasActiveSubscription bool
-	ShowSubscriptionUI    bool
+	Title string
 }
 
 // PageData interface allows type-safe access to base template data

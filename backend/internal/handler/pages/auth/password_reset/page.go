@@ -3,9 +3,7 @@ package password_reset
 import (
 	"net/http"
 
-	"github.com/devbydaniel/release-notes-go/config"
 	"github.com/devbydaniel/release-notes-go/internal/handler/shared"
-	mw "github.com/devbydaniel/release-notes-go/internal/middleware"
 	"github.com/devbydaniel/release-notes-go/templates"
 	"github.com/go-chi/chi/v5"
 )
@@ -37,19 +35,10 @@ var pageTmpl = templates.Construct(
 func (h *Handlers) ServeResetPasswordPage(w http.ResponseWriter, r *http.Request) {
 	h.deps.Log.Trace().Msg("ServeResetPasswordPage")
 	token := chi.URLParam(r, "token")
-	hasActiveSubscription, ok := r.Context().Value(mw.HasActiveSubscription).(bool)
-	if !ok {
-		h.deps.Log.Error().Msg("Subscription status not found in context")
-		http.Error(w, "Error checking subscription status", http.StatusInternalServerError)
-		return
-	}
-	cfg := config.New()
 
 	data := pageData{
 		BaseTemplateData: shared.BaseTemplateData{
-			Title:                 "Reset Password",
-			HasActiveSubscription: hasActiveSubscription,
-			ShowSubscriptionUI:    cfg.IsCloud(),
+			Title: "Reset Password",
 		},
 		Token: token,
 	}

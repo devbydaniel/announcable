@@ -3,10 +3,8 @@ package create
 import (
 	"net/http"
 
-	"github.com/devbydaniel/release-notes-go/config"
 	releasenotes "github.com/devbydaniel/release-notes-go/internal/domain/release-notes"
 	"github.com/devbydaniel/release-notes-go/internal/handler/shared"
-	mw "github.com/devbydaniel/release-notes-go/internal/middleware"
 	"github.com/devbydaniel/release-notes-go/templates"
 )
 
@@ -41,19 +39,10 @@ var pageTmpl = templates.Construct(
 // ServeReleaseNoteCreatePage handles GET /release-notes/new
 func (h *Handlers) ServeReleaseNoteCreatePage(w http.ResponseWriter, r *http.Request) {
 	h.deps.Log.Trace().Msg("ServeReleaseNoteCreatePage")
-	hasActiveSubscription, ok := r.Context().Value(mw.HasActiveSubscription).(bool)
-	if !ok {
-		h.deps.Log.Error().Msg("Subscription status not found in context")
-		http.Error(w, "Error checking subscription status", http.StatusInternalServerError)
-		return
-	}
-	cfg := config.New()
 
 	data := pageData{
 		BaseTemplateData: shared.BaseTemplateData{
-			Title:                 "New Release Note",
-			HasActiveSubscription: hasActiveSubscription,
-			ShowSubscriptionUI:    cfg.IsCloud(),
+			Title: "New Release Note",
 		},
 		Rn:                           &releasenotes.ReleaseNote{},
 		IsEdit:                       false,

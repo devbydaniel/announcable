@@ -43,7 +43,7 @@ dev-services:
 
 dev-air:
 	@echo "Loading environment and starting Air..."
-	@set -a; source ../.env; source .env.local; set +a; air
+	@set -a; source ../.env; [ -f .env.local ] && source .env.local; set +a; air
 
 dev-stop:
 	docker compose -f ../compose-base.yml -f ../compose-dev.yml down

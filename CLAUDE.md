@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is a monorepo for Announcable, a release notes and announcement platform. It consists of two main components:
 
-- **Backend**: Go web application using Chi router, GORM, PostgreSQL, Stripe, and Minio for object storage
+- **Backend**: Go web application using Chi router, GORM, PostgreSQL, and Minio for object storage
 - **Widget**: Lit/TypeScript embeddable widget built with Vite that displays release notes
 
 ## Development Commands
@@ -54,8 +54,6 @@ make migrations-down                         # Rollback one migration
 make migration-force version=<version>       # Force to specific version
 make migrations-unfuck                       # Fix migration state issues
 
-# Stripe webhook testing (requires Stripe CLI)
-make stripe-webhook
 ```
 
 ### Widget Development
@@ -88,7 +86,6 @@ The backend follows a handler-based architecture with clean separation of concer
 - **`internal/database/`**: Database layer with GORM setup and model definitions
 - **`internal/middleware/`**: Custom middleware for auth, RBAC, etc.
 - **`internal/objstore/`**: Minio object storage wrapper
-- **`internal/stripeUtil/`**: Stripe payment integration utilities
 - **`templates/`**: Go HTML templates organized into layouts, pages, and partials
 - **`static/`**: Static assets (CSS, JS, media, widget)
 - **`config/`**: Configuration management
@@ -236,7 +233,6 @@ The widget is embedded in customer websites via a script tag and displays releas
 
 ### External Services
 
-- **Stripe**: Payment processing and subscription management
 - **Axiom**: Logging and observability
 - **Postmark/Mailcatcher**: Email delivery (Postmark for production, Mailcatcher for development)
 - **Minio**: S3-compatible object storage
@@ -246,33 +242,9 @@ The widget is embedded in customer websites via a script tag and displays releas
 Copy `.env.example` to `.env` and configure:
 
 - Database credentials (Postgres)
-- Stripe API keys and webhook secret
 - Minio/object storage credentials
 - Email service credentials (Postmark for production, Mailcatcher for dev)
 - Axiom logging token (optional)
-- Legal document versions (TOS_VERSION, PP_VERSION)
-
-### App Environment Modes
-
-The application supports two operational modes controlled by the `APP_ENVIRONMENT` variable. **If not set, defaults to self-hosted mode.**
-
-**Cloud Mode (`APP_ENVIRONMENT=cloud`)**:
-- Full Stripe integration enabled
-- Subscription checks enforce limits (5 release notes for free tier)
-- Subscription UI elements visible in navigation and settings
-- Payment and billing portal accessible
-- Requires Stripe API keys configured
-
-**Self-Hosted Mode (`APP_ENVIRONMENT=self-hosted` or not set)**:
-- No Stripe integration required
-- All subscription checks bypassed - unlimited release notes
-- Subscription UI elements hidden
-- Payment routes return 404
-- Stripe API keys optional (can be left empty)
-
-To configure, set in `.env`:
-- For cloud: `APP_ENVIRONMENT=cloud`
-- For self-hosted: `APP_ENVIRONMENT=self-hosted` (or leave unset)
 
 ## Docker Services
 

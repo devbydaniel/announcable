@@ -3,7 +3,6 @@ package detail
 import (
 	"net/http"
 
-	"github.com/devbydaniel/release-notes-go/config"
 	releasenotes "github.com/devbydaniel/release-notes-go/internal/domain/release-notes"
 	"github.com/devbydaniel/release-notes-go/internal/handler/shared"
 	mw "github.com/devbydaniel/release-notes-go/internal/middleware"
@@ -52,12 +51,6 @@ func (h *Handlers) ServeReleaseNoteDetailPage(w http.ResponseWriter, r *http.Req
 		http.Error(w, "Failed to authenticate", http.StatusInternalServerError)
 		return
 	}
-	hasActiveSubscription, ok := r.Context().Value(mw.HasActiveSubscription).(bool)
-	if !ok {
-		h.deps.Log.Error().Msg("Subscription status not found in context")
-		http.Error(w, "Error checking subscription status", http.StatusInternalServerError)
-		return
-	}
 	h.deps.Log.Debug().Str("id", id).Str("orgId", orgId).Msg("Release note page")
 
 	// get release note
@@ -66,13 +59,9 @@ func (h *Handlers) ServeReleaseNoteDetailPage(w http.ResponseWriter, r *http.Req
 		http.Error(w, "Error getting release note", http.StatusInternalServerError)
 	}
 
-	cfg := config.New()
-
 	data := pageData{
 		BaseTemplateData: shared.BaseTemplateData{
-			Title:                 rn.Title,
-			HasActiveSubscription: hasActiveSubscription,
-			ShowSubscriptionUI:    cfg.IsCloud(),
+			Title: rn.Title,
 		},
 		Rn:                           rn,
 		IsEdit:                       true,

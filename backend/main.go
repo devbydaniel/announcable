@@ -13,7 +13,6 @@ import (
 	"github.com/devbydaniel/release-notes-go/internal/database"
 	"github.com/devbydaniel/release-notes-go/internal/domain/rbac"
 	apiShared "github.com/devbydaniel/release-notes-go/internal/handler/api/shared"
-	apiStripe "github.com/devbydaniel/release-notes-go/internal/handler/api/stripe"
 	apiWidget "github.com/devbydaniel/release-notes-go/internal/handler/api/widget"
 	"github.com/devbydaniel/release-notes-go/internal/handler/pages/admin/dashboard"
 	"github.com/devbydaniel/release-notes-go/internal/handler/pages/admin/organisation"
@@ -24,10 +23,8 @@ import (
 	"github.com/devbydaniel/release-notes-go/internal/handler/pages/auth/password_reset"
 	"github.com/devbydaniel/release-notes-go/internal/handler/pages/auth/register"
 	"github.com/devbydaniel/release-notes-go/internal/handler/pages/auth/verify_email"
-	"github.com/devbydaniel/release-notes-go/internal/handler/pages/payment"
 	"github.com/devbydaniel/release-notes-go/internal/handler/pages/public/home"
 	"github.com/devbydaniel/release-notes-go/internal/handler/pages/public/release_page"
-	"github.com/devbydaniel/release-notes-go/internal/handler/pages/public/subscription"
 	"github.com/devbydaniel/release-notes-go/internal/handler/pages/public/widget_script"
 	rnCreateHandler "github.com/devbydaniel/release-notes-go/internal/handler/pages/release_notes/create"
 	rnDetailHandler "github.com/devbydaniel/release-notes-go/internal/handler/pages/release_notes/detail"
@@ -40,7 +37,6 @@ import (
 	"github.com/devbydaniel/release-notes-go/internal/logger"
 	mw "github.com/devbydaniel/release-notes-go/internal/middleware"
 	"github.com/devbydaniel/release-notes-go/internal/objstore"
-	"github.com/devbydaniel/release-notes-go/internal/stripeUtil"
 	"github.com/devbydaniel/release-notes-go/static"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -57,17 +53,9 @@ func main() {
 	log.Info().Msg("Starting application")
 	initEnv()
 	log.Info().Msg("Environment loaded")
-	log.Info().Msgf("Running in %s mode", cfg.AppEnvironment)
 	db := initDb()
 	defer database.Close(db)
 	defer logger.Cleanup() // Ensure logger is cleaned up on shutdown
-
-	// Only initialize Stripe in cloud mode
-	if cfg.AppEnvironment == "cloud" {
-		initStripe()
-	} else {
-		log.Info().Msg("Skipping Stripe initialization in self-hosted mode")
-	}
 
 	objStore := initObjStore()
 	mwHandler := mw.NewHandler(db)
@@ -105,15 +93,10 @@ func main() {
 	homeHandler := home.New(deps)
 	releasePagePublicHandler := release_page.New(deps)
 	widgetScriptHandler := widget_script.New(deps)
-	subscriptionHandler := subscription.New(deps)
-
-	// Payment handlers
-	paymentHandler := payment.New(deps)
 
 	// API handlers
 	widgetAPIHandler := apiWidget.New(deps)
 	sharedAPIHandler := apiShared.New(deps)
-	stripeAPIHandler := apiStripe.New(deps)
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
@@ -151,6 +134,7 @@ func main() {
 	).Route("/users", func(r chi.Router) {
 		r.Get("/", usersHandler.ServeUsersPage)
 		r.Delete("/{id}", usersHandler.HandleUserDelete)
+		r.Post("/{id}/password-reset", usersHandler.HandlePasswordResetTrigger)
 	})
 
 	r.With(mwHandler.Authenticate, mwHandler.Authorize(rbac.PermissionManageAccess)).Route("/invites", func(r chi.Router) {
@@ -177,7 +161,6 @@ func main() {
 	r.With(
 		mwHandler.Authenticate,
 		mwHandler.Authorize(rbac.PermissionManageReleaseNote),
-		mwHandler.WithSubscriptionStatus,
 	).Route("/release-notes", func(r chi.Router) {
 		r.Get("/", rnListHandler.ServeReleaseNotesListPage)
 		r.Post("/", rnCreateHandler.HandleReleaseNoteCreate)
@@ -193,7 +176,6 @@ func main() {
 	r.With(
 		mwHandler.Authenticate,
 		mwHandler.Authorize(rbac.PermissionManageReleaseNote),
-		mwHandler.WithSubscriptionStatus,
 	).Route("/widget-config", func(r chi.Router) {
 		r.Get("/", widgetHandler.ServeWidgetConfigPage)
 		r.Patch("/", widgetHandler.HandleConfigUpdate)
@@ -204,7 +186,6 @@ func main() {
 	r.With(
 		mwHandler.Authenticate,
 		mwHandler.Authorize(rbac.PermissionManageReleaseNote),
-		mwHandler.WithSubscriptionStatus,
 	).Route("/release-page-config", func(r chi.Router) {
 		r.Get("/", releasePageHandler.ServeReleasePageConfigPage)
 		r.Patch("/", releasePageHandler.HandleConfigUpdate)
@@ -215,7 +196,6 @@ func main() {
 	r.With(
 		mwHandler.Authenticate,
 		mwHandler.Authorize(rbac.PermissionManageAccess),
-		mwHandler.WithSubscriptionStatus,
 	).Route("/settings", func(r chi.Router) {
 		r.Get("/", settingsHandler.ServeSettingsPage)
 		r.Patch("/password", settingsHandler.HandlePasswordUpdate)
@@ -233,8 +213,6 @@ func main() {
 		r.Get("/organisations/{orgId}", adminOrgHandler.ServeOrganisationDetailsPage)
 		r.Patch("/organisations/{orgId}", adminOrgHandler.HandleOrgUpdate)
 		r.Patch("/organisations/{orgId}/release-page", adminOrgHandler.HandleReleasePageUpdate)
-		r.Post("/organisations/{orgId}/subscriptions", adminOrgHandler.HandleSubscriptionCreate)
-		r.Delete("/organisations/{orgId}/subscriptions/{id}", adminOrgHandler.HandleSubscriptionDelete)
 	})
 
 	// API
@@ -287,34 +265,6 @@ func main() {
 
 		}))
 		r.Get("/{orgSlug}", releasePagePublicHandler.ServeReleasePage)
-	})
-
-	// PAYMENT & STRIPE
-	r.With(
-		mwHandler.Authenticate,
-		mwHandler.Authorize(rbac.PermissionManageAccess),
-		mwHandler.CloudOnly,
-	).Route("/payment", func(r chi.Router) {
-		r.Post("/create-checkout-session", paymentHandler.HandleCheckoutSession)
-		r.Post("/create-portal-session", paymentHandler.HandlePortalSession)
-	})
-
-	// Subscription confirmation pages (no auth required, but cloud only)
-	r.With(mwHandler.CloudOnly).Get("/subscription/confirm", subscriptionHandler.HandleSubscriptionConfirm)
-	r.With(mwHandler.CloudOnly).Get("/subscription/cancel", subscriptionHandler.HandleSubscriptionCancel)
-
-	// Stripe webhook (cloud only)
-	r.Route("/stripe", func(r chi.Router) {
-		r.Use(mwHandler.CloudOnly)
-		r.Use(cors.Handler(cors.Options{
-			AllowedOrigins:   []string{"*"},
-			AllowedMethods:   []string{"GET", "POST", "OPTIONS"},
-			AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
-			ExposedHeaders:   []string{"Link"},
-			AllowCredentials: false,
-			MaxAge:           300, // Maximum value not ignored by any of major browsers
-		}))
-		r.Post("/webhook", stripeAPIHandler.HandleWebhook)
 	})
 
 	// STATIC
@@ -400,9 +350,4 @@ func initObjStore() *objstore.ObjStore {
 	}
 	log.Info().Msg("Object store initialized")
 	return store
-}
-
-func initStripe() {
-	log.Trace().Msg("initStripe")
-	stripeUtil.Setup()
 }

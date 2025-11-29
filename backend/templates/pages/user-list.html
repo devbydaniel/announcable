@@ -74,6 +74,28 @@
               <td class="table__td">{{ .Role }}</td>
               <td class="table__td"><span class="badge">active</span></td>
               <td class="table__td table--align-right table__td--no-pad-y">
+                <button
+                  x-data
+                  class="button button--sm button--ghost button--square"
+                  title="Send password reset"
+                  hx-post="/users/{{ .OrgUserID }}/password-reset"
+                  hx-swap="none"
+                  hx-confirm="Send a password reset link to {{ .Email }}?"
+                  @htmx:response-error.camel="toastError($event.detail.xhr.response)"
+                  @htmx:after-request="
+                    if ($event.detail.successful) {
+                      const contentType = $event.detail.xhr.getResponseHeader('Content-Type');
+                      if (contentType && contentType.includes('application/json')) {
+                        const data = JSON.parse($event.detail.xhr.response);
+                        $dispatch('show-reset-url', { url: data.resetUrl, email: '{{ .Email }}' });
+                      } else {
+                        toastSuccess('Password reset email sent');
+                      }
+                    }
+                  "
+                >
+                  <i width="16" height="16" data-feather="key"></i>
+                </button>
                 {{ if not (eq $.OwnID .UserID) }}
                   <button
                     class="button button--sm button--ghost button--square"
@@ -104,7 +126,18 @@
         class="form"
         @form-submit.window="$el.requestSubmit()"
         @htmx:response-error.camel="toastError($event.detail.xhr.response)"
-        @custom:submit-success="toastSuccess('Invite sent')"
+        @htmx:after-request="
+          if ($event.detail.successful) {
+            const contentType = $event.detail.xhr.getResponseHeader('Content-Type');
+            if (contentType && contentType.includes('application/json')) {
+              const data = JSON.parse($event.detail.xhr.response);
+              $dispatch('show-invite-url', { url: data.inviteUrl });
+              $refs.modal.close();
+            } else {
+              toastSuccess('Invite sent');
+            }
+          }
+        "
       >
         <div class="form__group form__group--no-mt">
           <label class="form__label" for="email">E-Mail</label>
@@ -130,6 +163,67 @@
     <div class="modal__footer">
       <button class="button button--primary" @click="$dispatch('form-submit')">
         Send
+      </button>
+    </div>
+  </dialog>
+  <dialog
+    x-data="{ inviteUrl: '' }"
+    @show-invite-url.window="inviteUrl = $event.detail.url; $el.showModal()"
+    x-ref="urlModal"
+    class="modal"
+  >
+    <button
+      class="modal__close button button--sm button--square button--ghost"
+      @click="$refs.urlModal.close()"
+    >
+      <i width="16" height="16" data-feather="x"></i>
+    </button>
+    <h2 class="modal__title">Invite Created</h2>
+    <div class="modal__content">
+      <p class="card__paragraph">Share this link with the user to invite them:</p>
+      <div class="form__group form__group--no-mb">
+        <input type="text" class="form__input" x-model="inviteUrl" readonly />
+      </div>
+    </div>
+    <div class="modal__footer">
+      <button
+        class="button button--primary"
+        @click="navigator.clipboard.writeText(inviteUrl); toastSuccess('Copied to clipboard'); $refs.urlModal.close()"
+      >
+        Copy Link
+      </button>
+    </div>
+  </dialog>
+  <dialog
+    x-data="{ resetUrl: '', userEmail: '' }"
+    @show-reset-url.window="resetUrl = $event.detail.url; userEmail = $event.detail.email; $el.showModal()"
+    x-ref="resetUrlModal"
+    class="modal"
+  >
+    <button
+      class="modal__close button button--sm button--square button--ghost"
+      @click="$refs.resetUrlModal.close()"
+    >
+      <i width="16" height="16" data-feather="x"></i>
+    </button>
+    <h2 class="modal__title">Password Reset Link</h2>
+    <div class="modal__content">
+      <p class="card__paragraph">
+        Share this link with <strong x-text="userEmail"></strong> to let them reset their password:
+      </p>
+      <div class="form__group form__group--no-mb">
+        <input type="text" class="form__input" x-model="resetUrl" readonly />
+      </div>
+      <p class="card__paragraph card__paragraph--small card__paragraph--muted">
+        This link expires in 1 hour.
+      </p>
+    </div>
+    <div class="modal__footer">
+      <button
+        class="button button--primary"
+        @click="navigator.clipboard.writeText(resetUrl); toastSuccess('Copied to clipboard'); $refs.resetUrlModal.close()"
+      >
+        Copy Link
       </button>
     </div>
   </dialog>

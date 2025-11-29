@@ -178,14 +178,5 @@
         <button id="pw-update-submit-button" class="button">Change</button>
       </div>
     </div>
-    {{ if and .HasPaidSubscription .ShowSubscriptionUI }}
-      <div class="card">
-        <h2 class="card__title">Subscription</h2>
-        <div class="card__content"></div>
-        <form action="/payment/create-portal-session" method="POST">
-          <button type="submit" class="button">Manage your subscription</button>
-        </form>
-      </div>
-    {{ end }}
   </div>
 {{ end }}

@@ -1,10 +1,12 @@
 package users
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
 
+	"github.com/devbydaniel/release-notes-go/config"
 	"github.com/devbydaniel/release-notes-go/internal/domain/organisation"
 	"github.com/devbydaniel/release-notes-go/internal/domain/rbac"
 	mw "github.com/devbydaniel/release-notes-go/internal/middleware"
@@ -68,17 +70,27 @@ func (h *Handlers) HandleInviteCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// create invite and send email
+	// create invite and send email (if enabled)
 	orgService := organisation.NewService(*organisation.NewRepository(h.deps.DB))
-	if _, err := orgService.InviteUser(uuid.MustParse(orgId), inviteDTO.Email, inviteDTO.Role); err != nil {
+	inviteUrl, err := orgService.InviteUser(uuid.MustParse(orgId), inviteDTO.Email, inviteDTO.Role)
+	if err != nil {
 		h.deps.Log.Error().Err(err).Msg("Error creating invite")
 		http.Error(w, "Error creating invite", http.StatusInternalServerError)
 		return
 	}
 
-	successMsg := "invite sent"
-	escapedMsg := url.QueryEscape(successMsg)
-	redirectURL := fmt.Sprintf("/users?success=%s", escapedMsg)
-	w.Header().Set("HX-Redirect", redirectURL)
-	w.WriteHeader(http.StatusCreated)
+	cfg := config.New()
+	if cfg.IsEmailEnabled() {
+		// Email enabled: redirect with success message
+		successMsg := "invite sent"
+		escapedMsg := url.QueryEscape(successMsg)
+		redirectURL := fmt.Sprintf("/users?success=%s", escapedMsg)
+		w.Header().Set("HX-Redirect", redirectURL)
+		w.WriteHeader(http.StatusCreated)
+	} else {
+		// Email disabled: return invite URL as JSON
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusCreated)
+		json.NewEncoder(w).Encode(map[string]string{"inviteUrl": inviteUrl})
+	}
 }

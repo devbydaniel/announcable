@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/devbydaniel/release-notes-go/config"
 	"github.com/devbydaniel/release-notes-go/internal/domain/organisation"
 	releasepageconfig "github.com/devbydaniel/release-notes-go/internal/domain/release-page-configs"
 	"github.com/devbydaniel/release-notes-go/internal/domain/session"
@@ -114,17 +115,32 @@ func (h *Handlers) HandleRegister(w http.ResponseWriter, r *http.Request) {
 		h.deps.Log.Warn().Err(err).Msg("Error creating widget config")
 	}
 
-	token := sessionService.CreateToken()
-	if err := sessionService.Create(token, user.ID); err != nil {
-		http.Error(w, "Error creating session", http.StatusInternalServerError)
-		return
+	cfg := config.New()
+
+	if cfg.IsEmailEnabled() {
+		// Email enabled: send verification email
+		token := sessionService.CreateToken()
+		if err := sessionService.Create(token, user.ID); err != nil {
+			http.Error(w, "Error creating session", http.StatusInternalServerError)
+			return
+		}
+
+		if err := userService.SendVerifcationEmail(user, token); err != nil {
+			http.Error(w, "Error sending verification email", http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("HX-Redirect", "/verify-email")
+	} else {
+		// Email disabled: auto-verify and redirect to login
+		if err := userService.VerifyEmail(user.ID); err != nil {
+			h.deps.Log.Error().Err(err).Msg("Error verifying email")
+			http.Error(w, "Error completing registration", http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("HX-Redirect", "/login?success=Registration+successful")
 	}
 
-	if err := userService.SendVerifcationEmail(user, token); err != nil {
-		http.Error(w, "Error sending verification email", http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("HX-Redirect", "/verify-email")
 	w.WriteHeader(http.StatusCreated)
 }

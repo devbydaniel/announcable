@@ -95,18 +95,22 @@ func (s *service) InviteUser(orgId uuid.UUID, emailAddr string, role rbac.Role) 
 		return "", err
 	}
 
-	baseUrl := config.New().BaseURL
-	inviteAcceptUrl := baseUrl + "/invite-accept/" + token
-	emailConfig := email.UserInviteConfig{
-		To:               emailAddr,
-		OrganisationName: org.Name,
-		ActionURL:        inviteAcceptUrl,
-	}
-	if err := email.SendUserInvite(&emailConfig); err != nil {
-		return "", err
+	cfg := config.New()
+	inviteAcceptUrl := cfg.BaseURL + "/invite-accept/" + token
+
+	// Only send email if enabled
+	if cfg.IsEmailEnabled() {
+		emailConfig := email.UserInviteConfig{
+			To:               emailAddr,
+			OrganisationName: org.Name,
+			ActionURL:        inviteAcceptUrl,
+		}
+		if err := email.SendUserInvite(&emailConfig); err != nil {
+			return "", err
+		}
 	}
 
-	return token, nil
+	return inviteAcceptUrl, nil
 }
 
 func (s *service) GetInvites(orgId uuid.UUID) ([]*OrganisationInvite, error) {

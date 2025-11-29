@@ -16,13 +16,12 @@ import (
 type contextKey string
 
 const (
-	SessionIdKey          contextKey = "sessionId"
-	UserIDKey             contextKey = "userId"
-	OrgRoleKey            contextKey = "orgRole"
-	OrgIDKey              contextKey = "orgId"
-	OrgNameKey            contextKey = "orgName"
-	EmailVerifiedKey      contextKey = "emailVerified"
-	HasActiveSubscription contextKey = "hasActiveSubscription"
+	SessionIdKey     contextKey = "sessionId"
+	UserIDKey        contextKey = "userId"
+	OrgRoleKey       contextKey = "orgRole"
+	OrgIDKey         contextKey = "orgId"
+	OrgNameKey       contextKey = "orgName"
+	EmailVerifiedKey contextKey = "emailVerified"
 )
 
 func (h *Handler) Authenticate(next http.Handler) http.Handler {

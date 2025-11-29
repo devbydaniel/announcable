@@ -3,7 +3,6 @@ package admin
 import (
 	"github.com/devbydaniel/release-notes-go/internal/database"
 	"github.com/devbydaniel/release-notes-go/internal/domain/organisation"
-	"github.com/devbydaniel/release-notes-go/internal/domain/subscription"
 	"github.com/google/uuid"
 )
 
@@ -47,29 +46,4 @@ func (r *repository) GetOrganisationWithUsers(orgId uuid.UUID) (*organisation.Or
 	}
 
 	return &org, orgUsers, nil
-}
-
-// GetSubscriptions retrieves all subscriptions for an organisation
-func (r *repository) GetSubscriptions(orgId uuid.UUID) ([]*subscription.Subscription, error) {
-	log.Trace().Str("orgId", orgId.String()).Msg("GetSubscriptions")
-	var subscriptions []*subscription.Subscription
-
-	if err := r.db.Client.Find(&subscriptions, "organisation_id = ?", orgId).Error; err != nil {
-		log.Error().Err(err).Msg("Error finding subscriptions")
-		return nil, err
-	}
-
-	return subscriptions, nil
-}
-
-// DeleteSubscription deletes a subscription by ID
-func (r *repository) DeleteSubscription(subscriptionId uuid.UUID) error {
-	log.Trace().Str("subscriptionId", subscriptionId.String()).Msg("DeleteSubscription")
-
-	if err := r.db.Client.Delete(&subscription.Subscription{}, "id = ?", subscriptionId).Error; err != nil {
-		log.Error().Err(err).Msg("Error deleting subscription")
-		return err
-	}
-
-	return nil
 }

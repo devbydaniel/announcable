@@ -4,9 +4,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/devbydaniel/release-notes-go/config"
 	"github.com/devbydaniel/release-notes-go/internal/domain/organisation"
-	"github.com/devbydaniel/release-notes-go/internal/domain/subscription"
 	"github.com/devbydaniel/release-notes-go/internal/handler/shared"
 	mw "github.com/devbydaniel/release-notes-go/internal/middleware"
 	"github.com/devbydaniel/release-notes-go/templates"
@@ -72,14 +70,6 @@ func (h *Handlers) ServeUsersPage(w http.ResponseWriter, r *http.Request) {
 	}
 	orgService := organisation.NewService(*organisation.NewRepository(h.deps.DB))
 
-	// Get subscription status
-	subscriptionService := subscription.NewService(*subscription.NewRepository(h.deps.DB))
-	sub, err := subscriptionService.Get(uuid.MustParse(orgId))
-	hasActiveSubscription := false
-	if err == nil {
-		hasActiveSubscription = sub.IsActive || sub.IsFree
-	}
-
 	orgUsers, err := orgService.GetOrgUsers(uuid.MustParse(orgId))
 	if err != nil {
 		w.Write([]byte(err.Error()))
@@ -109,13 +99,9 @@ func (h *Handlers) ServeUsersPage(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-	cfg := config.New()
-
 	data := pageData{
 		BaseTemplateData: shared.BaseTemplateData{
-			Title:                 "Users",
-			HasActiveSubscription: hasActiveSubscription,
-			ShowSubscriptionUI:    cfg.IsCloud(),
+			Title: "Users",
 		},
 		Users:   userData,
 		Invites: inviteData,
