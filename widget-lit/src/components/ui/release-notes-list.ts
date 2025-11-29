@@ -133,10 +133,6 @@ export class ReleaseNoteEntry extends LitElement {
       width: 0.75rem;
       height: 0.75rem;
     }
-
-    .icon-filled {
-      fill: currentColor;
-    }
   `;
 
   connectedCallback() {
@@ -241,8 +237,9 @@ export class ReleaseNoteEntry extends LitElement {
                           : this.config.like_button_text}
                       </span>
                       <icon-thumbs-up
-                        class="icon-small ${this.likesController.isLiked ? 'icon-filled' : ''}"
+                        class="icon-small"
                         .size=${12}
+                        ?filled=${this.likesController.isLiked}
                       ></icon-thumbs-up>
                     </button>
                   </div>

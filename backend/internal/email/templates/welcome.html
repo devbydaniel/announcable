@@ -1,0 +1,11 @@
+{{ define "title" }}Welcome to {{ .product_name }}{{ end }}
+
+{{ define "content" }}
+<h1>Welcome to {{ .product_name }}!</h1>
+<p>Hi{{ if .sender_name }} {{ .sender_name }}{{ end }},</p>
+<p>Thanks for signing up. Please confirm your email address to get started.</p>
+<p style="text-align: center; margin: 32px 0;">
+    <a href="{{ .action_url }}" class="button">Confirm Email</a>
+</p>
+<p class="muted">If you didn't create an account, you can safely ignore this email.</p>
+{{ end }}

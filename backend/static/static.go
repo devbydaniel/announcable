@@ -7,3 +7,6 @@ var Assets embed.FS
 
 //go:embed widget/widget.js
 var Widget []byte
+
+//go:embed widget-lit/widget.js
+var WidgetLit []byte

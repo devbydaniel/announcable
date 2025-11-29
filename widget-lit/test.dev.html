@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -83,27 +83,37 @@
   <body>
     <div class="container">
       <h1>🎨 Widget Lit Test - Development</h1>
-      <p>Testing Lit-based widget with Vite dev server and Shadow DOM isolation</p>
+      <p>
+        Testing Lit-based widget with Vite dev server and Shadow DOM isolation
+      </p>
 
       <div class="info-box">
         <h2>📦 Test Features</h2>
         <ul>
-          <li><strong>Shadow DOM Isolation:</strong> Widget styles should not be affected by host page</li>
+          <li>
+            <strong>Shadow DOM Isolation:</strong> Widget styles should not be
+            affected by host page
+          </li>
           <li><strong>Custom Fonts:</strong> Widget uses Inter font family</li>
-          <li><strong>Multiple Anchors:</strong> Two buttons should open the same widget</li>
-          <li><strong>Indicators:</strong> Red dot should appear on new release notes</li>
-          <li><strong>Host Page Styles:</strong> Gradient background, Georgia serif font</li>
+          <li>
+            <strong>Multiple Anchors:</strong> Two buttons should open the same
+            widget
+          </li>
+          <li>
+            <strong>Indicators:</strong> Red dot should appear on new release
+            notes
+          </li>
+          <li>
+            <strong>Host Page Styles:</strong> Gradient background, Georgia
+            serif font
+          </li>
         </ul>
       </div>
 
-      <div style="margin: 30px 0;">
-        <button data-announcable>
-          📢 What's New?
-        </button>
-        
-        <button data-announcable>
-          🎁 Check Updates
-        </button>
+      <div style="margin: 30px 0">
+        <button data-announcable>📢 What's New?</button>
+
+        <button data-announcable>🎁 Check Updates</button>
       </div>
 
       <div class="info-box">
@@ -124,10 +134,10 @@
     <script>
       // Use the newer announcable_init variable
       window.announcable_init = {
-        org_id: "a1a13d7e-47a2-4629-b323-13a250b5b1b5",
+        org_id: "d038adca-3231-4dfd-afc9-69244b93d59e",
         anchor_query_selector: "[data-announcable]",
         hide_indicator: false,
-        font_family: ["Inter", "system-ui", "sans-serif"]
+        font_family: ["Inter", "system-ui", "sans-serif"],
       };
     </script>
     <script type="module" src="/src/main.ts"></script>

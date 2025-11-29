@@ -36,11 +36,12 @@ type pgAdminConfig struct {
 }
 
 type emailConfig struct {
-	FromAddress       string
-	McServer          string
-	McPort            int
-	PostmarkServerUrl string
-	PostmarkToken     string
+	FromAddress string
+	SMTPHost    string
+	SMTPPort    int
+	SMTPUser    string
+	SMTPPass    string
+	SMTPTLS     bool
 }
 
 type legal struct {
@@ -109,11 +110,12 @@ func New() *config {
 			Port:     getEnvAsInt("PGADMIN_PORT"),
 		},
 		Email: emailConfig{
-			FromAddress:       getEnv("EMAIL_FROM_ADDRESS"),
-			McServer:          getEnv("MAILCATCHER_SERVER"),
-			McPort:            getEnvAsInt("MAILCATCHER_PORT"),
-			PostmarkServerUrl: getEnv("POSTMARK_SERVER_URL"),
-			PostmarkToken:     getEnv("POSTMARK_TOKEN"),
+			FromAddress: getEnv("EMAIL_FROM_ADDRESS"),
+			SMTPHost:    getEnv("SMTP_HOST"),
+			SMTPPort:    getEnvAsInt("SMTP_PORT"),
+			SMTPUser:    getEnvWithDefault("SMTP_USER", ""),
+			SMTPPass:    getEnvWithDefault("SMTP_PASS", ""),
+			SMTPTLS:     getEnvAsBoolWithDefault("SMTP_TLS", false),
 		},
 		ProductInfo: productInfo{
 			ProductName:    "Announcable",
@@ -164,6 +166,16 @@ func getEnvAsBool(name string) bool {
 		return val
 	}
 	panic("Environment variable " + name + " is not a boolean")
+}
+
+func getEnvAsBoolWithDefault(name string, defaultValue bool) bool {
+	if value, exists := os.LookupEnv(name); exists {
+		if val, err := strconv.ParseBool(value); err == nil {
+			return val
+		}
+		panic("Environment variable " + name + " is not a boolean")
+	}
+	return defaultValue
 }
 
 // IsCloud returns true if the application is running in cloud mode

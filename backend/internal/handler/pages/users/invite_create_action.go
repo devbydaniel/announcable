@@ -5,10 +5,12 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/devbydaniel/release-notes-go/internal/domain/organisation"
 	"github.com/devbydaniel/release-notes-go/internal/domain/rbac"
 	mw "github.com/devbydaniel/release-notes-go/internal/middleware"
 	"github.com/devbydaniel/release-notes-go/internal/ratelimit"
 	"github.com/go-playground/validator"
+	"github.com/google/uuid"
 )
 
 // userInviteForm represents the invite form data
@@ -63,6 +65,14 @@ func (h *Handlers) HandleInviteCreate(w http.ResponseWriter, r *http.Request) {
 	if err := validate.Struct(inviteDTO); err != nil {
 		h.deps.Log.Error().Err(err).Msg("Validation error")
 		http.Error(w, "Error creating invite", http.StatusBadRequest)
+		return
+	}
+
+	// create invite and send email
+	orgService := organisation.NewService(*organisation.NewRepository(h.deps.DB))
+	if _, err := orgService.InviteUser(uuid.MustParse(orgId), inviteDTO.Email, inviteDTO.Role); err != nil {
+		h.deps.Log.Error().Err(err).Msg("Error creating invite")
+		http.Error(w, "Error creating invite", http.StatusInternalServerError)
 		return
 	}
 

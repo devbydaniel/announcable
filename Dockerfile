@@ -1,4 +1,4 @@
-#### Widget build stage
+#### Widget build stage (React)
 
 FROM node:18-alpine AS widget-builder
 
@@ -6,6 +6,19 @@ WORKDIR /widget
 
 # Copy widget source
 COPY widget/ .
+
+# Install dependencies and build widget
+RUN npm install
+RUN npm run build
+
+#### Widget-Lit build stage (Lit)
+
+FROM node:18-alpine AS widget-lit-builder
+
+WORKDIR /widget-lit
+
+# Copy widget-lit source
+COPY widget-lit/ .
 
 # Install dependencies and build widget
 RUN npm install
@@ -29,9 +42,10 @@ RUN go mod download
 # Copy source code
 COPY backend/ .
 
-# Create static directory and copy widget
-RUN mkdir -p static/widget
+# Create static directories and copy widgets
+RUN mkdir -p static/widget static/widget-lit
 COPY --from=widget-builder /widget/dist/widget.js static/widget/
+COPY --from=widget-lit-builder /widget-lit/dist/widget.js static/widget-lit/
 
 # Build the application
 RUN GOOS=linux go build -o main .

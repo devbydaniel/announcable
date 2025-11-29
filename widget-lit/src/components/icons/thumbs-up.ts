@@ -5,6 +5,7 @@ import { customElement, property } from 'lit/decorators.js';
 export class ThumbsUpIcon extends LitElement {
   @property({ type: String }) class = '';
   @property({ type: Number }) size = 24;
+  @property({ type: Boolean }) filled = false;
 
   static styles = css`
     :host {
@@ -21,15 +22,15 @@ export class ThumbsUpIcon extends LitElement {
 
   render() {
     return svg`
-      <svg 
+      <svg
         class=${this.class}
-        width=${this.size} 
-        height=${this.size} 
-        viewBox="0 0 24 24" 
-        fill="none" 
-        stroke="currentColor" 
-        stroke-width="2" 
-        stroke-linecap="round" 
+        width=${this.size}
+        height=${this.size}
+        viewBox="0 0 24 24"
+        fill=${this.filled ? 'currentColor' : 'none'}
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
         stroke-linejoin="round"
       >
         <path d="M7 10v12"></path>

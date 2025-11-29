@@ -273,6 +273,20 @@ func main() {
 		r.Get("/", widgetScriptHandler.ServeWidgetScript)
 	})
 
+	// WIDGET-LIT SCRIPT (Lit version of widget)
+
+	r.Route("/widget-lit", func(r chi.Router) {
+		r.Use(cors.Handler(cors.Options{
+			AllowedOrigins:   []string{"*"},
+			AllowedMethods:   []string{"GET", "OPTIONS"},
+			AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+			ExposedHeaders:   []string{"Link"},
+			AllowCredentials: false,
+			MaxAge:           300,
+		}))
+		r.Get("/", widgetScriptHandler.ServeWidgetLitScript)
+	})
+
 	// RELEASE PAGE
 
 	// !! this route path is hardcoded in the widget script
