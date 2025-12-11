@@ -16,14 +16,13 @@ This is a monorepo for Announcable, a release notes and announcement platform. I
 ```bash
 cd backend
 
-# New workflow (recommended) - run in separate terminals:
-# Terminal 1: Start Docker services (postgres, mail, minio)
+# Start dev services (postgres, mail, minio) - runs in background
 make dev-services
 
-# Terminal 2: Start Go backend with Air hot-reload (loads env automatically)
+# In a new terminal - start Go backend with Air hot-reload
 make dev-air
 
-# Terminal 3: Start Vite for CSS/JS hot-reload
+# In a new terminal - start Vite for CSS/JS hot-reload
 npm run dev
 
 # Stop all services
@@ -31,12 +30,22 @@ make dev-stop
 
 # Follow logs from all services
 make dev-logs
-
-# Legacy workflow (runs everything in Docker)
-make dev-start
 ```
 
-The backend runs with Air for hot-reloading. Changes to Go files, templates, or static assets trigger automatic rebuilds. The new workflow runs the app directly on your host (not in Docker) for faster rebuilds and easier debugging.
+The backend runs with Air for hot-reloading. Changes to Go files, templates, or static assets trigger automatic rebuilds. The app runs directly on your host (not in Docker) for faster rebuilds and easier debugging.
+
+### Production Deployment
+
+```bash
+# Start complete production stack (external nginx handles reverse proxy)
+docker compose up -d
+
+# View logs
+docker compose logs -f
+
+# Stop
+docker compose down
+```
 
 ### Backend Development
 
@@ -248,18 +257,19 @@ Copy `.env.example` to `.env` and configure:
 
 ## Docker Services
 
-Development uses Docker Compose with two config files:
+### Development (docker-compose.dev.yml)
+Services run in Docker, app runs on host:
+- `postgres`: PostgreSQL database (port 5432)
+- `pgadmin`: Database admin interface (port from PGADMIN_PORT)
+- `mail`: Mailcatcher for email testing (SMTP: 1025, Web: 1080)
+- `minio`: Object storage (API: 9000, Console: 9001)
 
-- **`compose-base.yml`**: Base services (postgres, pgadmin)
-- **`compose-dev.yml`**: Development overrides (app with Air, mailcatcher, minio, port mappings)
-
-Services:
-
-- `app`: Go backend with Air hot-reload
-- `postgres`: PostgreSQL database
-- `pgadmin`: Database admin interface
-- `mail`: Mailcatcher for email testing (http://localhost:1080)
-- `objstorage`: Minio (ports 9000/9001)
+### Production (docker-compose.yml)
+Complete stack (external nginx handles SSL/reverse proxy):
+- `app`: Go backend (exposed on PORT)
+- `postgres`: PostgreSQL database (internal only)
+- `minio`: Object storage (internal only)
+- `pgadmin`: Database admin (exposed on PGADMIN_PORT)
 
 ## Code Generation
 

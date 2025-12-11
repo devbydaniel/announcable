@@ -1,31 +1,22 @@
-#### Widget build stage (React)
-
-FROM node:18-alpine AS widget-builder
+#### Widget build stage
+FROM node:20-alpine AS widget-builder
 
 WORKDIR /widget
-
-# Copy widget source
 COPY widget/ .
-
-# Install dependencies and build widget
 RUN npm install
 RUN npm run build
 
-#### Widget-Lit build stage (Lit)
+#### Backend assets build stage (Vite CSS/JS)
+FROM node:20-alpine AS backend-assets-builder
 
-FROM node:18-alpine AS widget-lit-builder
-
-WORKDIR /widget-lit
-
-# Copy widget-lit source
-COPY widget-lit/ .
-
-# Install dependencies and build widget
+WORKDIR /backend
+COPY backend/package.json backend/package-lock.json* ./
 RUN npm install
+COPY backend/vite.config.js ./
+COPY backend/assets/ ./assets/
 RUN npm run build
 
 #### Backend build stage
-
 FROM golang:1.23-alpine AS backend-builder
 
 WORKDIR /app
@@ -42,16 +33,17 @@ RUN go mod download
 # Copy source code
 COPY backend/ .
 
-# Create static directories and copy widgets
-RUN mkdir -p static/widget static/widget-lit
+# Copy built assets from asset builder
+COPY --from=backend-assets-builder /backend/static/dist/ ./static/dist/
+
+# Copy widget
+RUN mkdir -p static/widget
 COPY --from=widget-builder /widget/dist/widget.js static/widget/
-COPY --from=widget-lit-builder /widget-lit/dist/widget.js static/widget-lit/
 
 # Build the application
 RUN GOOS=linux go build -o main .
 
 #### Final stage
-
 FROM alpine:3.17
 
 # Dependency of the go-webp library
@@ -61,9 +53,6 @@ WORKDIR /app
 
 # Copy the binary from builder
 COPY --from=backend-builder /app/main .
-
-# Copy env
-COPY .env .
 
 # Run the binary
 CMD ["./main"]

@@ -1,0 +1,62 @@
+# Production stack - docker compose up and done
+# External nginx handles SSL/reverse proxy
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "${PORT}:${PORT}"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      # Override hostnames for Docker networking
+      - POSTGRES_HOST=postgres
+      - MINIO_ENDPOINT=minio:9000
+    volumes:
+      # Mount .env file so Go app can read it
+      - ./.env:/app/.env:ro
+
+  postgres:
+    image: postgres:16
+    restart: always
+    env_file: .env
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  minio:
+    image: quay.io/minio/minio
+    restart: always
+    env_file: .env
+    command: server --console-address ":9001" /data
+    volumes:
+      - minio-data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: always
+    env_file: .env
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres-data:
+  minio-data:

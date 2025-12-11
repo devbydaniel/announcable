@@ -34,22 +34,22 @@ stripe-webhook:
 	stripe listen --forward-to http://localhost:$(PORT)/stripe/webhook
 
 # Development workflow:
-# Terminal 1: make dev-services (start postgres, mail, minio, etc.)
+# Terminal 1: make dev-services (start postgres, mail, minio)
 # Terminal 2: make dev-air (Go hot-reload with env loaded)
 # Terminal 3: npm run dev (Vite CSS/JS watch)
 
 dev-services:
-	docker compose -f ../compose-base.yml -f ../compose-dev.yml up -d --scale app=0
+	docker compose -f ../docker-compose.dev.yml up -d
 
 dev-air:
 	@echo "Loading environment and starting Air..."
 	@set -a; source ../.env; [ -f .env.local ] && source .env.local; set +a; air
 
 dev-stop:
-	docker compose -f ../compose-base.yml -f ../compose-dev.yml down
+	docker compose -f ../docker-compose.dev.yml down
 
 dev-logs:
-	docker compose -f ../compose-base.yml -f ../compose-dev.yml logs -f
+	docker compose -f ../docker-compose.dev.yml logs -f
 
 # Legacy command - kept for compatibility
 dev-start: dev-services
