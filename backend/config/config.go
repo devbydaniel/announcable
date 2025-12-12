@@ -132,7 +132,7 @@ func getEnvAsInt(name string) int {
 }
 
 func getEnvAsIntWithDefault(name string, defaultValue int) int {
-	if value, exists := os.LookupEnv(name); exists {
+	if value, exists := os.LookupEnv(name); exists && value != "" {
 		if intVal, err := strconv.Atoi(value); err == nil {
 			return intVal
 		}
@@ -150,7 +150,7 @@ func getEnvAsBool(name string) bool {
 }
 
 func getEnvAsBoolWithDefault(name string, defaultValue bool) bool {
-	if value, exists := os.LookupEnv(name); exists {
+	if value, exists := os.LookupEnv(name); exists && value != "" {
 		if val, err := strconv.ParseBool(value); err == nil {
 			return val
 		}
