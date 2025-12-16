@@ -53,6 +53,9 @@ func main() {
 	log.Info().Msg("Starting application")
 	initEnv()
 	log.Info().Msg("Environment loaded")
+	if cfg.Env == "production" {
+		runMigrations()
+	}
 	db := initDb()
 	defer database.Close(db)
 	defer logger.Cleanup() // Ensure logger is cleaned up on shutdown
@@ -350,4 +353,15 @@ func initObjStore() *objstore.ObjStore {
 	}
 	log.Info().Msg("Object store initialized")
 	return store
+}
+
+func runMigrations() {
+	log.Info().Msg("Running database migrations")
+	dsn := "postgres://" + cfg.Postgres.User + ":" + cfg.Postgres.Password +
+		"@" + cfg.Postgres.Host + ":" + strconv.Itoa(cfg.Postgres.Port) +
+		"/" + cfg.Postgres.Name + "?sslmode=disable"
+	if err := database.RunMigrations(dsn); err != nil {
+		log.Error().Err(err).Msg("Could not run migrations")
+		os.Exit(1)
+	}
 }
