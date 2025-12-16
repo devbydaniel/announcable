@@ -17,7 +17,7 @@ COPY backend/assets/ ./assets/
 RUN npm run build
 
 #### Backend build stage
-FROM golang:1.23-alpine AS backend-builder
+FROM golang:1.24-alpine AS backend-builder
 
 WORKDIR /app
 
