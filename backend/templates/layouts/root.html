@@ -29,31 +29,24 @@
       <link rel="manifest" href="/static/media/favicon/site.webmanifest" />
       {{ block "layout-css" . }}{{ end }}
       {{ block "page-css" . }}{{ end }}
-      
+
       <!-- Vendor Bundle CSS (Toastify) -->
       <link rel="stylesheet" type="text/css" href="/static/dist/vendor.css" />
-      
+
       <!-- Vendor Bundle JS (HTMX, Toastify, SweetAlert, Feather) -->
       <script src="/static/dist/vendor.js"></script>
-      
+
       <!-- App-level utilities -->
       <script src="/static/dist/components/toast.js"></script>
       <script src="/static/dist/app/confirmDialog.js"></script>
       <script src="/static/dist/app/successMsg.js"></script>
-      
-      <!-- Plausible Analytics -->
-      <script
-        defer
-        data-domain="app.announcable.me"
-        src="https://plausible.danielbenner.de/js/script.js"
-      ></script>
 
       <title>{{ .Title }} | Announcable</title>
     </head>
     <body>
       {{ block "body" . }}
       {{ end }}
-      
+
       <!-- Feather Icons -->
       <script>
         feather.replace();

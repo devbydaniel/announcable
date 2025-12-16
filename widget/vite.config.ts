@@ -2,7 +2,12 @@ import path from "path";
 import { defineConfig } from "vite";
 import cssInjectedByJsPlugin from "vite-plugin-css-injected-by-js";
 
-export default defineConfig({
+export default defineConfig(({ mode }) => {
+  if (mode === "production" && !process.env.VITE_BACKEND_URL) {
+    throw new Error("VITE_BACKEND_URL must be set for production builds");
+  }
+
+  return {
   // PostCSS config is loaded from postcss.config.js
   plugins: [cssInjectedByJsPlugin()],
   resolve: {
@@ -26,4 +31,5 @@ export default defineConfig({
   define: {
     "process.env": {},
   },
+  };
 });
