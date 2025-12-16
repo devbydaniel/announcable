@@ -1,6 +1,9 @@
 #### Widget build stage
 FROM node:20-alpine AS widget-builder
 
+ARG VITE_BACKEND_URL
+ENV VITE_BACKEND_URL=$VITE_BACKEND_URL
+
 WORKDIR /widget
 COPY widget/ .
 RUN npm install

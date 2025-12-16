@@ -5,6 +5,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        VITE_BACKEND_URL: ${BASE_URL}
     restart: always
     ports:
       - "${PORT}:${PORT}"
