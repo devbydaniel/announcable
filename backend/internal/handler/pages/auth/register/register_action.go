@@ -64,6 +64,12 @@ func (h *Handlers) HandleRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if orgService.OrgNameExists(req.OrgName) {
+		h.deps.Log.Debug().Str("org_name", req.OrgName).Msg("Organisation name already taken")
+		http.Error(w, "Organisation name is already taken", http.StatusBadRequest)
+		return
+	}
+
 	if err := password.IsValidPassword(req.Password); err != nil {
 		h.deps.Log.Debug().Err(err).Msg("Invalid password")
 		http.Error(w, err.Error(), http.StatusBadRequest)

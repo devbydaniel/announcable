@@ -41,7 +41,6 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
-	"github.com/joho/godotenv"
 )
 
 var (
@@ -51,8 +50,6 @@ var (
 
 func main() {
 	log.Info().Msg("Starting application")
-	initEnv()
-	log.Info().Msg("Environment loaded")
 	if cfg.Env == "production" {
 		runMigrations()
 	}
@@ -321,15 +318,6 @@ func main() {
 			}
 		}
 	}
-}
-
-func initEnv() {
-	log.Trace().Msg("initEnv")
-	if err := godotenv.Load(".env"); err != nil {
-		log.Error().Err(err).Msg("Error loading .env file")
-		os.Exit(1)
-	}
-	log.Info().Msg("Environment loaded")
 }
 
 func initDb() *database.DB {

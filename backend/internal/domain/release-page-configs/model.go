@@ -23,6 +23,7 @@ type ReleasePageConfig struct {
 	BackLinkLabel      string `gorm:"type:varchar(255)"`
 	BackLinkUrl        string `gorm:"type:varchar(255)"`
 	Slug               string `gorm:"type:varchar(255)"`
+	DisableReleasePage bool   `gorm:"type:boolean;default:false"`
 }
 
 type BrandPosition string

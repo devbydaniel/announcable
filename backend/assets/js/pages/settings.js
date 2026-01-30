@@ -1,6 +1,6 @@
 // toggle the visibility of fields
 document.addEventListener("alpine:init", () => {
-  Alpine.data("landingPageSettings", (useCustomURL) => ({
+  Alpine.data("landingPageSettings", (useCustomURL, disableReleasePage) => ({
     init() {
       const searchParams = new URLSearchParams(window.location.search);
       const focus = searchParams.get("focus");
@@ -9,6 +9,7 @@ document.addEventListener("alpine:init", () => {
       }
     },
     useCustomURL,
+    disableReleasePage,
     onSubmitError: function (event) {
       toastError(event.detail.xhr.response);
     },

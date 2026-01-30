@@ -25,9 +25,10 @@ func New(deps *shared.Dependencies) *Handlers {
 // pageData represents the template data for settings page
 type pageData struct {
 	shared.BaseTemplateData
-	WidgetID       string
-	ReleasePageUrl string
-	CustomUrl      *string
+	WidgetID           string
+	ReleasePageUrl     string
+	CustomUrl          *string
+	DisableReleasePage bool
 }
 
 var pageTmpl = templates.Construct(
@@ -71,13 +72,21 @@ func (h *Handlers) ServeSettingsPage(w http.ResponseWriter, r *http.Request) {
 		h.deps.Log.Error().Err(err).Msg("Error getting release page URL")
 	}
 
+	releasePageConfig, err := releasePageConfigService.Get(uuid.MustParse(orgId))
+	if err != nil {
+		h.deps.Log.Error().Err(err).Msg("Error getting release page config")
+		http.Error(w, "Error getting release page config", http.StatusInternalServerError)
+		return
+	}
+
 	orgName := ctx.Value(mw.OrgNameKey).(string)
 
 	data := pageData{
 		BaseTemplateData: shared.BaseTemplateData{
 			Title: "Settings for " + orgName,
 		},
-		WidgetID: externalId.String(),
+		WidgetID:           externalId.String(),
+		DisableReleasePage: releasePageConfig.DisableReleasePage,
 	}
 	if releasePageUrl != "" {
 		data.ReleasePageUrl = releasePageUrl

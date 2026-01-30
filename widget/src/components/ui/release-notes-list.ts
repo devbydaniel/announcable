@@ -245,7 +245,7 @@ export class ReleaseNoteEntry extends LitElement {
                   </div>
                 ` : ''}
 
-                ${!this.releaseNote.hide_cta ? html`
+                ${!this.releaseNote.hide_cta && !(this.config.disable_release_page && !this.releaseNote.cta_href_override) ? html`
                   <div class="action-wrapper">
                     <a
                       class="cta-link"

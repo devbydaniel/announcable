@@ -88,13 +88,7 @@ func (s *service) GetBySlug(slug string) (*ReleasePageConfig, error) {
 
 func (s *service) GetUrl(orgId uuid.UUID) (string, error) {
 	log.Trace().Str("orgId", orgId.String()).Msg("GetUrl")
-	var protocol string
-	if config.New().Env == "production" {
-		protocol = "https://"
-	} else {
-		protocol = "http://"
-	}
-	baseUrl := protocol + config.New().BaseURL
+	baseUrl := config.New().BaseURL
 	cfg, err := s.repo.Get(orgId)
 	if err != nil {
 		return "", err
@@ -199,6 +193,11 @@ func (s *service) EditSlugAsAdmin(orgId uuid.UUID, slug string) error {
 	}
 
 	return s.repo.UpdateWithNil(orgId, map[string]interface{}{"Slug": slug}, nil)
+}
+
+func (s *service) UpdateDisableReleasePage(orgId uuid.UUID, disabled bool) error {
+	log.Trace().Str("orgId", orgId.String()).Bool("disabled", disabled).Msg("UpdateDisableReleasePage")
+	return s.repo.UpdateWithNil(orgId, map[string]interface{}{"DisableReleasePage": disabled}, nil)
 }
 
 func (s *service) formatSlug(orgName string) string {

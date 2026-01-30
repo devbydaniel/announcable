@@ -57,11 +57,13 @@ export class ModalWidget extends LitElement {
         "
       >
         <div slot="actions">
-          <ui-button size="icon" variant="ghost">
-            <a href="${this.config.release_page_baseurl}" target="_blank">
-              <icon-external-link class="icon-medium" .size=${16}></icon-external-link>
-            </a>
-          </ui-button>
+          ${!this.config.disable_release_page ? html`
+            <ui-button size="icon" variant="ghost">
+              <a href="${this.config.release_page_baseurl}" target="_blank">
+                <icon-external-link class="icon-medium" .size=${16}></icon-external-link>
+              </a>
+            </ui-button>
+          ` : ''}
           <ui-button size="icon" variant="ghost" @click=${this.handleClose}>
             <icon-x class="icon-medium" .size=${16}></icon-x>
           </ui-button>

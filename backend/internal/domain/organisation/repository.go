@@ -20,6 +20,15 @@ func (r *repository) CreateOrg(org *Organisation) error {
 	return r.db.Client.Create(org).Error
 }
 
+func (r *repository) FindOrgByName(name string) (*Organisation, error) {
+	log.Trace().Str("name", name).Msg("FindOrgByName")
+	var org Organisation
+	if err := r.db.Client.First(&org, "name = ?", name).Error; err != nil {
+		return nil, err
+	}
+	return &org, nil
+}
+
 func (r *repository) FindOrg(orgId uuid.UUID) (*Organisation, error) {
 	log.Trace().Str("orgId", orgId.String()).Msg("FindOrgById")
 	var org Organisation

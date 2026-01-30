@@ -37,6 +37,11 @@ func (s *service) IsValidOrgName(name string) error {
 	return nil
 }
 
+func (s *service) OrgNameExists(name string) bool {
+	org, _ := s.repo.FindOrgByName(name)
+	return org != nil
+}
+
 func (s *service) CreateOrgWithAdmin(name string, user *user.User) (*OrganisationUser, error) {
 	log.Trace().Str("name", name).Str("user", user.Email).Msg("CreateOrgWithAdmin")
 	org, err := New(name)

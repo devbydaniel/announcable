@@ -31,6 +31,7 @@ type serviceWidgetConfigResponseBodyWidgetConfig struct {
 	ReleaseNoteBgColor      string `json:"release_note_bg_color"`
 	ReleaseNoteFontColor    string `json:"release_note_font_color"`
 	ReleasePageBaseUrl      string `json:"release_page_baseurl"`
+	DisableReleasePage      bool   `json:"disable_release_page"`
 }
 
 type serveWidgetConfigResponseBody struct {
@@ -76,6 +77,13 @@ func (h *Handlers) HandleWidgetConfigServe(w http.ResponseWriter, r *http.Reques
 		releasePageUrl = *widgetConfig.ReleasePageBaseUrl
 	}
 
+	releasePageConfig, err := releasePageConfigService.Get(org.ID)
+	if err != nil {
+		h.Log.Error().Err(err).Msg("Error getting release page config")
+		http.Error(w, "Error getting widget config", http.StatusInternalServerError)
+		return
+	}
+
 	conf := serviceWidgetConfigResponseBodyWidgetConfig{
 		OrgId:                   externalOrgId,
 		Title:                   widgetConfig.Title,
@@ -96,6 +104,7 @@ func (h *Handlers) HandleWidgetConfigServe(w http.ResponseWriter, r *http.Reques
 		ReleaseNoteBgColor:      widgetConfig.ReleaseNoteBgColor,
 		ReleaseNoteFontColor:    widgetConfig.ReleaseNoteTextColor,
 		ReleasePageBaseUrl:      releasePageUrl,
+		DisableReleasePage:      releasePageConfig.DisableReleasePage,
 	}
 
 	res := serveWidgetConfigResponseBody{

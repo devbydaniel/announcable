@@ -43,9 +43,3 @@ tmp_dir = "tmp"
   clear_on_rebuild = false
   keep_scroll = true
 
-[build.env]
-  # Load environment variables from parent .env file
-  # These override the Docker-specific hostnames with localhost
-  POSTGRES_HOST = "localhost"
-  MINIO_ENDPOINT = "localhost:9000"
-  MAILCATCHER_SERVER = "localhost"

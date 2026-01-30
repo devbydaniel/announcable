@@ -77,6 +77,11 @@ func (h *Handlers) ServeReleasePage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if config.DisableReleasePage {
+		http.NotFound(w, r)
+		return
+	}
+
 	org, err := organisationService.GetOrg(config.OrganisationID)
 	if err != nil {
 		h.Log.Error().Err(err).Msg("Error getting org ID")

@@ -86,9 +86,11 @@ export class PopoverWidget extends LitElement {
         "
       >
         <div class="actions">
-          <ui-button size="icon" variant="ghost">
-            <icon-external-link class="icon-medium" .size=${16}></icon-external-link>
-          </ui-button>
+          ${!this.config.disable_release_page ? html`
+            <ui-button size="icon" variant="ghost">
+              <icon-external-link class="icon-medium" .size=${16}></icon-external-link>
+            </ui-button>
+          ` : ''}
           <ui-button size="icon" variant="ghost" @click=${this.handleClose}>
             <icon-x class="icon-medium" .size=${16}></icon-x>
           </ui-button>

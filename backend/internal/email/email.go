@@ -5,9 +5,10 @@ import (
 	"crypto/tls"
 	"fmt"
 	"html/template"
+	"time"
 
 	"github.com/devbydaniel/announcable/config"
-	"gopkg.in/gomail.v2"
+	mail "github.com/wneessen/go-mail"
 )
 
 type PasswordResetConfig struct {
@@ -71,29 +72,47 @@ func sendEmail(to, subject string, tmpl *template.Template, data map[string]stri
 		return fmt.Errorf("error rendering template: %w", err)
 	}
 
-	m := gomail.NewMessage()
-	m.SetHeader("From", cfg.Email.FromAddress)
-	m.SetHeader("To", to)
-	m.SetHeader("Subject", subject)
-	m.SetBody("text/html", body.String())
+	m := mail.NewMsg()
+	if err := m.From(cfg.Email.FromAddress); err != nil {
+		return fmt.Errorf("error setting from address: %w", err)
+	}
+	if err := m.To(to); err != nil {
+		return fmt.Errorf("error setting to address: %w", err)
+	}
+	m.Subject(subject)
+	m.SetBodyString(mail.TypeTextHTML, body.String())
 
-	d := gomail.NewDialer(
-		cfg.Email.SMTPHost,
-		cfg.Email.SMTPPort,
-		cfg.Email.SMTPUser,
-		cfg.Email.SMTPPass,
-	)
-
-	d.SSL = false
-	if cfg.Email.SMTPTLS {
-		// Production: enable STARTTLS
-		d.TLSConfig = &tls.Config{ServerName: cfg.Email.SMTPHost}
-	} else {
-		// Local dev (Mailcatcher): skip TLS entirely
-		d.TLSConfig = nil
+	opts := []mail.Option{
+		mail.WithPort(cfg.Email.SMTPPort),
+		mail.WithTimeout(10 * time.Second),
 	}
 
-	if err := d.DialAndSend(m); err != nil {
+	if cfg.Email.SMTPUser != "" {
+		opts = append(opts,
+			mail.WithSMTPAuth(mail.SMTPAuthPlain),
+			mail.WithUsername(cfg.Email.SMTPUser),
+			mail.WithPassword(cfg.Email.SMTPPass),
+		)
+	}
+
+	if cfg.Email.SMTPTLS {
+		opts = append(opts,
+			mail.WithTLSPolicy(mail.TLSMandatory),
+			mail.WithTLSConfig(&tls.Config{ServerName: cfg.Email.SMTPHost}),
+		)
+	} else {
+		opts = append(opts,
+			mail.WithTLSPolicy(mail.TLSOpportunistic),
+			mail.WithTLSConfig(&tls.Config{InsecureSkipVerify: true}),
+		)
+	}
+
+	c, err := mail.NewClient(cfg.Email.SMTPHost, opts...)
+	if err != nil {
+		return fmt.Errorf("error creating mail client: %w", err)
+	}
+
+	if err := c.DialAndSend(m); err != nil {
 		return fmt.Errorf("error sending email: %w", err)
 	}
 	return nil

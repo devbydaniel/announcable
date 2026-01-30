@@ -32,6 +32,7 @@ export interface WidgetConfig {
   release_note_bg_color: string;
   release_note_font_color: string;
   release_page_baseurl: string | undefined;
+  disable_release_page?: boolean;
 }
 
 export type WidgetInit = {
