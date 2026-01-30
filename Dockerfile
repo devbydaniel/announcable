@@ -50,12 +50,23 @@ RUN GOOS=linux go build -o main .
 FROM alpine:3.17
 
 # Dependency of the go-webp library
-RUN apk add --no-cache libwebp-dev
+RUN apk add --no-cache libwebp-dev curl
+
+# Install golang-migrate
+RUN curl -L https://github.com/golang-migrate/migrate/releases/download/v4.17.0/migrate.linux-amd64.tar.gz | tar xvz && \
+    mv migrate /usr/local/bin/migrate
 
 WORKDIR /app
 
 # Copy the binary from builder
 COPY --from=backend-builder /app/main .
 
-# Run the binary
-CMD ["./main"]
+# Copy migration files
+COPY backend/internal/database/migrations/ ./migrations/
+
+# Copy entrypoint script
+COPY entrypoint.sh .
+RUN chmod +x entrypoint.sh
+
+# Run migrations then start the app
+CMD ["./entrypoint.sh"]
