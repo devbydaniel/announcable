@@ -1,0 +1,25 @@
+{
+  "active": true,
+  "spec": "004-rate-limiting-on-public-api-endpoints",
+  "state": "planning",
+  "subtasks": {
+    "completed": 0,
+    "total": 0,
+    "in_progress": 1,
+    "failed": 0
+  },
+  "phase": {
+    "current": "Rate Limiting Implementation",
+    "id": null,
+    "total": 6
+  },
+  "workers": {
+    "active": 0,
+    "max": 1
+  },
+  "session": {
+    "number": 2,
+    "started_at": "2026-01-31T19:43:00.213440"
+  },
+  "last_update": "2026-01-31T19:46:53.672298"
+}

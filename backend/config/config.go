@@ -48,6 +48,15 @@ type axiomConfig struct {
 	Token   string
 }
 
+type rateLimitConfig struct {
+	PublicRequestsPerInterval          int
+	PublicMaxTokens                    int
+	PublicRefillIntervalSeconds        int
+	AuthenticatedRequestsPerInterval   int
+	AuthenticatedMaxTokens             int
+	AuthenticatedRefillIntervalSeconds int
+}
+
 type config struct {
 	Env         string
 	BaseURL     string
@@ -59,6 +68,7 @@ type config struct {
 	Email       emailConfig
 	ProductInfo productInfo
 	Axiom       axiomConfig
+	RateLimit   rateLimitConfig
 }
 
 func New() *config {
@@ -103,6 +113,14 @@ func New() *config {
 		Axiom: axiomConfig{
 			Dataset: getEnvWithDefault("AXIOM_DATASET", ""),
 			Token:   getEnvWithDefault("AXIOM_TOKEN", ""),
+		},
+		RateLimit: rateLimitConfig{
+			PublicRequestsPerInterval:          getEnvAsIntWithDefault("RATE_LIMIT_PUBLIC_REQUESTS", 100),
+			PublicMaxTokens:                    getEnvAsIntWithDefault("RATE_LIMIT_PUBLIC_MAX_TOKENS", 100),
+			PublicRefillIntervalSeconds:        getEnvAsIntWithDefault("RATE_LIMIT_PUBLIC_REFILL_SECONDS", 60),
+			AuthenticatedRequestsPerInterval:   getEnvAsIntWithDefault("RATE_LIMIT_AUTHENTICATED_REQUESTS", 1000),
+			AuthenticatedMaxTokens:             getEnvAsIntWithDefault("RATE_LIMIT_AUTHENTICATED_MAX_TOKENS", 1000),
+			AuthenticatedRefillIntervalSeconds: getEnvAsIntWithDefault("RATE_LIMIT_AUTHENTICATED_REFILL_SECONDS", 60),
 		},
 	}
 

@@ -30,3 +30,6 @@ tmp
 *.sw?
 
 *storybook.log
+
+# Auto Claude data directory
+.auto-claude/

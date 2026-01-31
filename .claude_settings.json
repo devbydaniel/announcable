@@ -1,0 +1,39 @@
+{
+  "sandbox": {
+    "enabled": true,
+    "autoAllowBashIfSandboxed": true
+  },
+  "permissions": {
+    "defaultMode": "acceptEdits",
+    "allow": [
+      "Read(./**)",
+      "Write(./**)",
+      "Edit(./**)",
+      "Glob(./**)",
+      "Grep(./**)",
+      "Read(/Users/daniel/dev/dbd/announcable/.auto-claude/worktrees/tasks/004-rate-limiting-on-public-api-endpoints/**)",
+      "Write(/Users/daniel/dev/dbd/announcable/.auto-claude/worktrees/tasks/004-rate-limiting-on-public-api-endpoints/**)",
+      "Edit(/Users/daniel/dev/dbd/announcable/.auto-claude/worktrees/tasks/004-rate-limiting-on-public-api-endpoints/**)",
+      "Glob(/Users/daniel/dev/dbd/announcable/.auto-claude/worktrees/tasks/004-rate-limiting-on-public-api-endpoints/**)",
+      "Grep(/Users/daniel/dev/dbd/announcable/.auto-claude/worktrees/tasks/004-rate-limiting-on-public-api-endpoints/**)",
+      "Read(/Users/daniel/dev/dbd/announcable/.auto-claude/worktrees/tasks/004-rate-limiting-on-public-api-endpoints/.auto-claude/specs/004-rate-limiting-on-public-api-endpoints/**)",
+      "Write(/Users/daniel/dev/dbd/announcable/.auto-claude/worktrees/tasks/004-rate-limiting-on-public-api-endpoints/.auto-claude/specs/004-rate-limiting-on-public-api-endpoints/**)",
+      "Edit(/Users/daniel/dev/dbd/announcable/.auto-claude/worktrees/tasks/004-rate-limiting-on-public-api-endpoints/.auto-claude/specs/004-rate-limiting-on-public-api-endpoints/**)",
+      "Read(/Users/daniel/dev/dbd/announcable/.auto-claude/**)",
+      "Write(/Users/daniel/dev/dbd/announcable/.auto-claude/**)",
+      "Edit(/Users/daniel/dev/dbd/announcable/.auto-claude/**)",
+      "Glob(/Users/daniel/dev/dbd/announcable/.auto-claude/**)",
+      "Grep(/Users/daniel/dev/dbd/announcable/.auto-claude/**)",
+      "Bash(*)",
+      "WebFetch(*)",
+      "WebSearch(*)",
+      "mcp__context7__resolve-library-id(*)",
+      "mcp__context7__get-library-docs(*)",
+      "mcp__graphiti-memory__search_nodes(*)",
+      "mcp__graphiti-memory__search_facts(*)",
+      "mcp__graphiti-memory__add_episode(*)",
+      "mcp__graphiti-memory__get_episodes(*)",
+      "mcp__graphiti-memory__get_entity_edge(*)"
+    ]
+  }
+}
