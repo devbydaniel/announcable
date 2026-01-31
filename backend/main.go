@@ -227,6 +227,8 @@ func main() {
 			AllowCredentials: false,
 			MaxAge:           300, // Maximum value not ignored by any of major browsers
 		}))
+		r.Use(mwHandler.RateLimitPublicByIP)
+		r.Use(mwHandler.RateLimitPublicByOrg)
 		r.Get("/release-notes/{orgId}", widgetAPIHandler.HandleReleaseNotesServe)
 		r.Get("/release-notes/{orgId}/status", widgetAPIHandler.HandleReleaseNotesStatusServe)
 		r.Post("/release-notes/{orgId}/metrics", widgetAPIHandler.HandleReleaseNoteMetricCreate)
