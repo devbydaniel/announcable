@@ -10,6 +10,7 @@ import (
 	"github.com/devbydaniel/announcable/internal/domain/user"
 	"github.com/devbydaniel/announcable/internal/email"
 	"github.com/devbydaniel/announcable/internal/random"
+	"github.com/devbydaniel/announcable/internal/util"
 	"github.com/google/uuid"
 )
 
@@ -101,7 +102,7 @@ func (s *service) InviteUser(orgId uuid.UUID, emailAddr string, role rbac.Role) 
 	}
 
 	cfg := config.New()
-	inviteAcceptUrl := cfg.BaseURL + "/invite-accept/" + token
+	inviteAcceptUrl := util.BuildURL(cfg.BaseURL, "invite-accept", token)
 
 	// Only send email if enabled
 	if cfg.IsEmailEnabled() {
