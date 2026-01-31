@@ -6,6 +6,7 @@ import (
 	"github.com/devbydaniel/announcable/config"
 	"github.com/devbydaniel/announcable/internal/email"
 	"github.com/devbydaniel/announcable/internal/password"
+	"github.com/devbydaniel/announcable/internal/util"
 	"github.com/google/uuid"
 )
 
@@ -58,11 +59,7 @@ func (s *service) Delete(id uuid.UUID) error {
 func (s *service) SendVerifcationEmail(u *User, token string) error {
 	log.Trace().Str("email", u.Email).Msg("SendVerifcationEmail")
 	baseUrl := config.New().BaseURL
-	protocol := "https"
-	if config.New().Env == "development" {
-		protocol = "http"
-	}
-	verifyUrl := fmt.Sprintf("%s://%s/verify-email?token=%s", protocol, baseUrl, token)
+	verifyUrl := util.BuildURL(baseUrl, "verify-email") + fmt.Sprintf("?token=%s", token)
 	config := email.EmailConfirmConfig{
 		To:        u.Email,
 		ActionURL: verifyUrl,
@@ -83,11 +80,7 @@ func (s *service) VerifyEmail(id uuid.UUID) error {
 func (s *service) SendPwResetEmail(u *User, token string) error {
 	log.Trace().Str("email", u.Email).Msg("SendPwResetEmail")
 	baseUrl := config.New().BaseURL
-	protocol := "https"
-	if config.New().Env == "development" {
-		protocol = "http"
-	}
-	url := fmt.Sprintf("%s://%s/reset-pw/%s", protocol, baseUrl, token)
+	url := util.BuildURL(baseUrl, "reset-pw", token)
 	config := email.PasswordResetConfig{
 		To:        u.Email,
 		ActionURL: url,

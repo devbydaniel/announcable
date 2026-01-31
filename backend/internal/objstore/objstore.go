@@ -8,6 +8,7 @@ import (
 
 	"github.com/devbydaniel/announcable/config"
 	"github.com/devbydaniel/announcable/internal/logger"
+	"github.com/devbydaniel/announcable/internal/util"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 )
@@ -119,17 +120,8 @@ func (o *ObjStore) GetImageUrl(bucket, path string) (string, error) {
 	}
 	internalUrl := internalScheme + cfg.ObjStorage.Endpoint
 
-	// Build public URL, handling case where BaseURL may already include scheme
-	var publicUrl string
-	if strings.HasPrefix(cfg.BaseURL, "http://") || strings.HasPrefix(cfg.BaseURL, "https://") {
-		publicUrl = cfg.BaseURL + "/api/img"
-	} else {
-		publicScheme := "http://"
-		if cfg.Env == "production" {
-			publicScheme = "https://"
-		}
-		publicUrl = publicScheme + cfg.BaseURL + "/api/img"
-	}
+	// Build public URL using utility function
+	publicUrl := util.BuildURL(cfg.BaseURL, "api", "img")
 
 	urlProxy := strings.Replace(url.String(), internalUrl, publicUrl, 1)
 	return urlProxy, nil

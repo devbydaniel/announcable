@@ -8,6 +8,7 @@ import (
 
 	"github.com/devbydaniel/announcable/config"
 	"github.com/devbydaniel/announcable/internal/imgUtil"
+	"github.com/devbydaniel/announcable/internal/util"
 	"github.com/google/uuid"
 )
 
@@ -115,7 +116,7 @@ func (s *service) GetUrl(orgId uuid.UUID) (string, error) {
 			return "", nil
 		}
 	}
-	return baseUrl + "/s/" + cfg.Slug, nil
+	return util.BuildURL(baseUrl, "s", cfg.Slug), nil
 }
 
 func (s *service) Update(orgId uuid.UUID, cfg *ReleasePageConfig, imgInput *ImageInput) error {
