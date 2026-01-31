@@ -13,6 +13,7 @@ import (
 	"github.com/devbydaniel/announcable/internal/domain/user"
 	mw "github.com/devbydaniel/announcable/internal/middleware"
 	"github.com/devbydaniel/announcable/internal/ratelimit"
+	"github.com/devbydaniel/announcable/internal/util"
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 )
@@ -84,11 +85,7 @@ func (h *Handlers) HandlePasswordResetTrigger(w http.ResponseWriter, r *http.Req
 
 	// Build reset URL
 	cfg := config.New()
-	protocol := "https"
-	if cfg.Env == "development" {
-		protocol = "http"
-	}
-	resetUrl := fmt.Sprintf("%s://%s/reset-pw/%s", protocol, cfg.BaseURL, token)
+	resetUrl := util.BuildURL(cfg.BaseURL, "reset-pw", token)
 
 	if cfg.IsEmailEnabled() {
 		// Send email
