@@ -7,6 +7,7 @@ import (
 	"github.com/devbydaniel/announcable/internal/database"
 )
 
+// User represents a registered user account with email and password credentials.
 type User struct {
 	database.BaseModel `gorm:"embedded"`
 	Email              string `gorm:"unique"`
@@ -14,6 +15,7 @@ type User struct {
 	EmailVerified      bool `gorm:"default:false"`
 }
 
+// New creates a new User after validating the email format.
 func New(email, password string) (*User, error) {
 	log.Trace().Str("email", email).Msg("New")
 	emailRegex, err := regexp.Compile(`^.+@.+\.[A-Za-z]{2,}$`)

@@ -1,4 +1,4 @@
-package password_forgot
+package passwordforgot
 
 import (
 	"net/http"
@@ -66,13 +66,13 @@ func (h *Handlers) HandleForgotPassword(w http.ResponseWriter, r *http.Request) 
 	}
 
 	// invalidate session, create new session, send email
-	sessionService.InvalidateUserSessions(usr.ID)
+	_ = sessionService.InvalidateUserSessions(usr.ID)
 	token := sessionService.CreateToken()
 	if err := sessionService.CreateCustomDuration(token, usr.ID, 1*time.Hour); err != nil {
 		http.Error(w, "Error creating session", http.StatusInternalServerError)
 		return
 	}
-	userService.SendPwResetEmail(usr, token)
+	_ = userService.SendPwResetEmail(usr, token)
 
 	if err := forgotTmpl.ExecuteTemplate(w, "hx-pw-reset-confirm", nil); err != nil {
 		h.deps.Log.Error().Err(err).Msg("Error rendering page")

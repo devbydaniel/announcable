@@ -9,6 +9,7 @@ type repository struct {
 	db *database.DB
 }
 
+// NewRepository creates a new session repository backed by the given database.
 func NewRepository(db *database.DB) *repository {
 	log.Trace().Msg("NewRepository")
 	return &repository{db: db}
@@ -24,10 +25,10 @@ func (r *repository) Save(s *Session) error {
 	return nil
 }
 
-func (r *repository) FindByExternalId(sessionId string) (*Session, error) {
-	log.Trace().Str("sessionId", sessionId).Msg("FindBySessionId")
+func (r *repository) FindByExternalID(sessionID string) (*Session, error) {
+	log.Trace().Str("sessionID", sessionID).Msg("FindBySessionId")
 	s := Session{}
-	if err := r.db.Client.Where("external_id = ?", sessionId).First(&s).Error; err != nil {
+	if err := r.db.Client.Where("external_id = ?", sessionID).First(&s).Error; err != nil {
 		log.Error().Err(err).Msg("")
 		return nil, err
 	}
@@ -36,7 +37,7 @@ func (r *repository) FindByExternalId(sessionId string) (*Session, error) {
 }
 
 func (r *repository) Delete(id uuid.UUID) error {
-	log.Trace().Str("sessionId", id.String()).Msg("Delete")
+	log.Trace().Str("sessionID", id.String()).Msg("Delete")
 	if err := r.db.Client.Where("id = ?", id).Delete(&Session{}).Error; err != nil {
 		log.Error().Err(err).Msg("")
 		return err
@@ -44,9 +45,9 @@ func (r *repository) Delete(id uuid.UUID) error {
 	return nil
 }
 
-func (r *repository) DeleteByUserId(userId uuid.UUID) error {
-	log.Trace().Str("userId", userId.String()).Msg("DeleteByUserId")
-	if err := r.db.Client.Where("user_id = ?", userId).Delete(&Session{}).Error; err != nil {
+func (r *repository) DeleteByUserID(userID uuid.UUID) error {
+	log.Trace().Str("userID", userID.String()).Msg("DeleteByUserID")
+	if err := r.db.Client.Where("user_id = ?", userID).Delete(&Session{}).Error; err != nil {
 		log.Error().Err(err).Msg("")
 		return err
 	}

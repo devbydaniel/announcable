@@ -1,0 +1,25 @@
+{
+  "active": true,
+  "spec": "003-ci-cd-pipeline",
+  "state": "complete",
+  "subtasks": {
+    "completed": 5,
+    "total": 5,
+    "in_progress": 0,
+    "failed": 0
+  },
+  "phase": {
+    "current": "CI/CD Integration Verification",
+    "id": null,
+    "total": 1
+  },
+  "workers": {
+    "active": 0,
+    "max": 1
+  },
+  "session": {
+    "number": 6,
+    "started_at": "2026-01-31T19:43:00.960418"
+  },
+  "last_update": "2026-01-31T19:57:24.303760"
+}

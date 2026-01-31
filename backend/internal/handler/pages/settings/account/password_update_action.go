@@ -23,13 +23,13 @@ func (h *Handlers) HandlePasswordUpdate(w http.ResponseWriter, r *http.Request) 
 	ctx := r.Context()
 	userService := user.NewService(*user.NewRepository(h.deps.DB))
 
-	userId, ok := ctx.Value(mw.UserIDKey).(string)
+	userID, ok := ctx.Value(mw.UserIDKey).(string)
 	if !ok {
 		h.deps.Log.Error().Msg("User ID not found in context")
 		http.Error(w, "Error updating password", http.StatusInternalServerError)
 	}
 
-	user, err := userService.GetById(uuid.MustParse(userId))
+	user, err := userService.GetByID(uuid.MustParse(userID))
 	if err != nil {
 		h.deps.Log.Error().Err(err).Msg("Error finding user")
 		http.Error(w, "Error updating password", http.StatusInternalServerError)
@@ -77,7 +77,7 @@ func (h *Handlers) HandlePasswordUpdate(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	if err := userService.UpdatePassword(uuid.MustParse(userId), updateDTO.NewPassword); err != nil {
+	if err := userService.UpdatePassword(uuid.MustParse(userID), updateDTO.NewPassword); err != nil {
 		h.deps.Log.Error().Err(err).Msg("Error updating password")
 		http.Error(w, "Error updating password", http.StatusInternalServerError)
 		return

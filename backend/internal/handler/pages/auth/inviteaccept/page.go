@@ -1,4 +1,4 @@
-package invite_accept
+package inviteaccept
 
 import (
 	"errors"

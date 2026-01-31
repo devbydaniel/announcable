@@ -1,4 +1,4 @@
-package password_reset
+package passwordreset
 
 import (
 	"net/http"
@@ -69,15 +69,15 @@ func (h *Handlers) HandleResetPassword(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid token", http.StatusInternalServerError)
 		return
 	}
-	userId := session.UserID
+	userID := session.UserID
 
 	// invalidate session, create new session, send email
-	if err := sessionService.InvalidateUserSessions(userId); err != nil {
+	if err := sessionService.InvalidateUserSessions(userID); err != nil {
 		h.deps.Log.Warn().Err(err).Msg("Error invalidating session")
 	}
 
 	// update password
-	if err := userService.UpdatePassword(userId, resetForm.Password); err != nil {
+	if err := userService.UpdatePassword(userID, resetForm.Password); err != nil {
 		h.deps.Log.Error().Err(err).Msg("Error updating password")
 		http.Error(w, "Error updating password", http.StatusInternalServerError)
 		return

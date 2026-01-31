@@ -1,4 +1,4 @@
-package release_page
+package releasepage
 
 import (
 	"net/http"
@@ -37,7 +37,7 @@ var releaseNotesWebsiteTmpl = templates.Construct("release-notes-website", "page
 func (h *Handlers) ServeReleasePage(w http.ResponseWriter, r *http.Request) {
 	h.Log.Trace().Msg("ServeReleasePage")
 	backLinkLabel := r.URL.Query().Get("backLinkLabel")
-	backLinkUrl := r.URL.Query().Get("backLinkUrl")
+	backLinkURL := r.URL.Query().Get("backLinkURL")
 	organisationService := organisation.NewService(*organisation.NewRepository(h.DB))
 	releasePageConfigService := releasepageconfig.NewService(*releasepageconfig.NewRepository(h.DB, h.ObjStore))
 	rnService := releasenotes.NewService(*releasenotes.NewRepository(h.DB, h.ObjStore))
@@ -93,7 +93,7 @@ func (h *Handlers) ServeReleasePage(w http.ResponseWriter, r *http.Request) {
 		"is_published":         true,
 		"hide_on_release_page": false,
 	}
-	rns, err := rnService.GetAllWithImgUrl(org.ID.String(), pageInt, pageSizeInt, filters)
+	rns, err := rnService.GetAllWithImgURL(org.ID.String(), pageInt, pageSizeInt, filters)
 	if err != nil {
 		h.Log.Error().Err(err).Msg("Error getting release notes")
 		http.Error(w, "Error getting release notes", http.StatusInternalServerError)
@@ -122,8 +122,8 @@ func (h *Handlers) ServeReleasePage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// adjust back link if there's query params
-	if backLinkUrl != "" {
-		config.BackLinkUrl = url.QueryEscape(backLinkUrl)
+	if backLinkURL != "" {
+		config.BackLinkURL = url.QueryEscape(backLinkURL)
 	}
 	if backLinkLabel != "" {
 		config.BackLinkLabel = url.QueryEscape(backLinkLabel)

@@ -6,7 +6,7 @@ import (
 	"net/url"
 
 	releasenotes "github.com/devbydaniel/announcable/internal/domain/release-notes"
-	"github.com/devbydaniel/announcable/internal/imgUtil"
+	"github.com/devbydaniel/announcable/internal/imgutil"
 	mw "github.com/devbydaniel/announcable/internal/middleware"
 	"github.com/go-playground/validator"
 	"github.com/google/uuid"
@@ -24,8 +24,8 @@ type releaseNoteCreateForm struct {
 	ReleaseDate         string `schema:"release_date"`
 	OverrideCtaLabel    bool   `schema:"override_cta_label"`
 	CtaLabelOverride    string `schema:"cta_label_override"`
-	OverrideCtaUrl      bool   `schema:"override_cta_url"`
-	CtaUrlOverride      string `schema:"cta_url_override"`
+	OverrideCtaURL      bool   `schema:"override_cta_url"`
+	CtaURLOverride      string `schema:"cta_url_override"`
 	HideCta             bool   `schema:"hide_cta"`
 	AttentionMechanism  string `schema:"attention_mechanism"`
 	HideOnWidget        bool   `schema:"hide_on_widget"`
@@ -42,13 +42,13 @@ func (h *Handlers) HandleReleaseNoteCreate(w http.ResponseWriter, r *http.Reques
 	releaseNotesService := releasenotes.NewService(*releasenotes.NewRepository(h.deps.DB, h.deps.ObjStore))
 
 	// extract organisation ID from context
-	orgId, ok := ctx.Value(mw.OrgIDKey).(string)
+	orgID, ok := ctx.Value(mw.OrgIDKey).(string)
 	if !ok {
 		h.deps.Log.Error().Msg("Organisation ID not found in context")
 		http.Error(w, "Error while authenticating", http.StatusInternalServerError)
 		return
 	}
-	userId, ok := ctx.Value(mw.UserIDKey).(string)
+	userID, ok := ctx.Value(mw.UserIDKey).(string)
 	if !ok {
 		h.deps.Log.Error().Msg("User ID not found in context")
 		http.Error(w, "Error while authenticating", http.StatusInternalServerError)
@@ -89,7 +89,7 @@ func (h *Handlers) HandleReleaseNoteCreate(w http.ResponseWriter, r *http.Reques
 		}
 
 		if img != nil {
-			ok := imgUtil.VerifyImageType(img)
+			ok := imgutil.VerifyImageType(img)
 			if !ok {
 				h.deps.Log.Error().Msg("Invalid image type")
 				http.Error(w, "Error updating release note", http.StatusBadRequest)
@@ -108,13 +108,13 @@ func (h *Handlers) HandleReleaseNoteCreate(w http.ResponseWriter, r *http.Reques
 	}
 
 	releaseNote := &releasenotes.ReleaseNote{
-		OrganisationID:     uuid.MustParse(orgId),
-		CreatedBy:          uuid.MustParse(userId),
+		OrganisationID:     uuid.MustParse(orgID),
+		CreatedBy:          uuid.MustParse(userID),
 		Title:              createDTO.Title,
 		DescriptionShort:   createDTO.DescriptionShort,
 		HideCta:            createDTO.HideCta,
 		AttentionMechanism: releasenotes.AttentionMechanism(createDTO.AttentionMechanism),
-		LastUpdatedBy:      uuid.MustParse(userId),
+		LastUpdatedBy:      uuid.MustParse(userID),
 		HideOnWidget:       createDTO.HideOnWidget,
 		HideOnReleasePage:  createDTO.HideOnReleasePage,
 	}
@@ -144,10 +144,10 @@ func (h *Handlers) HandleReleaseNoteCreate(w http.ResponseWriter, r *http.Reques
 	} else {
 		releaseNote.CtaLabelOverride = ""
 	}
-	if !createDTO.HideCta && createDTO.OverrideCtaUrl {
-		releaseNote.CtaUrlOverride = createDTO.CtaUrlOverride
+	if !createDTO.HideCta && createDTO.OverrideCtaURL {
+		releaseNote.CtaURLOverride = createDTO.CtaURLOverride
 	} else {
-		releaseNote.CtaUrlOverride = ""
+		releaseNote.CtaURLOverride = ""
 	}
 	if createDTO.ReleaseDate != "" {
 		releaseNote.ReleaseDate = &createDTO.ReleaseDate

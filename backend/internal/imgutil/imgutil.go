@@ -1,4 +1,4 @@
-package imgUtil
+package imgutil
 
 import (
 	"bytes"
@@ -21,27 +21,32 @@ import (
 
 var log = logger.Get()
 
+// SupportedFormat represents an image format that can be decoded.
 type SupportedFormat string
 
 func (f SupportedFormat) String() string {
 	return string(f)
 }
 
+// Supported input image formats.
 const (
 	JPEG SupportedFormat = "jpeg"
 	PNG  SupportedFormat = "png"
 )
 
+// EncodedFormat represents an output image format after encoding.
 type EncodedFormat string
 
 func (f EncodedFormat) String() string {
 	return string(f)
 }
 
+// Supported output image formats.
 const (
 	WebP EncodedFormat = "webp"
 )
 
+// ToEncodedFormat returns the target encoded format for this supported format.
 func (f SupportedFormat) ToEncodedFormat() EncodedFormat {
 	switch f {
 	case JPEG:
@@ -53,11 +58,13 @@ func (f SupportedFormat) ToEncodedFormat() EncodedFormat {
 	}
 }
 
+// ImgProcessConfig holds parameters for image processing.
 type ImgProcessConfig struct {
 	MaxWidth uint
 	Quality  int
 }
 
+// VerifyImageType checks whether the given file contains a valid image content type.
 func VerifyImageType(img multipart.File) bool {
 	log.Trace().Msg("VerifyImageType")
 	// Read the first 512 bytes to detect content type
@@ -68,16 +75,16 @@ func VerifyImageType(img multipart.File) bool {
 	}
 
 	// Reset the file pointer
-	img.Seek(0, io.SeekStart)
+	if _, err := img.Seek(0, io.SeekStart); err != nil {
+		return false
+	}
 
 	// Verify file type
 	contentType := http.DetectContentType(buff)
-	if !strings.HasPrefix(contentType, "image/") {
-		return false
-	}
-	return true
+	return strings.HasPrefix(contentType, "image/")
 }
 
+// Decode decodes an image from the reader and returns the image with its format name.
 func Decode(file io.Reader) (image.Image, string, error) {
 	log.Trace().Msg("Decode")
 	// Decode the image
@@ -89,12 +96,17 @@ func Decode(file io.Reader) (image.Image, string, error) {
 	return img, format, nil
 }
 
+// ProcessImage resizes the image if it exceeds the specified maximum width.
 func ProcessImage(img image.Image, maxWidth uint, quality int) (image.Image, error) {
 	log.Trace().Msg("ProcessImage")
 
 	// Resize the image if it's too wide
 	bounds := img.Bounds()
-	width := uint(bounds.Dx())
+	dx := bounds.Dx()
+	if dx < 0 {
+		dx = 0
+	}
+	width := uint(dx) //nolint:gosec // dx is non-negative after check
 	if width > maxWidth {
 		log.Debug().Uint("width", width).Uint("maxWidth", maxWidth).Msg("Resizing image")
 		img = resize.Resize(maxWidth, 0, img, resize.Lanczos3)
@@ -102,6 +114,7 @@ func ProcessImage(img image.Image, maxWidth uint, quality int) (image.Image, err
 	return img, nil
 }
 
+// Encode encodes the image into the target format derived from the given supported format.
 func Encode(img image.Image, format SupportedFormat) (*io.Reader, error) {
 	log.Trace().Msg("Encode")
 	// Encode the image
@@ -138,6 +151,7 @@ func Encode(img image.Image, format SupportedFormat) (*io.Reader, error) {
 	return &ioReader, nil
 }
 
+// DecodeProcessEncode decodes, resizes, and re-encodes an image in one step.
 func DecodeProcessEncode(img io.Reader, config *ImgProcessConfig) (*io.Reader, EncodedFormat, error) {
 	log.Trace().Msg("DecodeProcessEncode")
 	// Decode the image

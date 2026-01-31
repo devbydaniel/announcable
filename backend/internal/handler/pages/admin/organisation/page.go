@@ -22,16 +22,16 @@ func New(deps *shared.Dependencies) *Handlers {
 	return &Handlers{Dependencies: deps}
 }
 
-// OrganisationDetailsData represents the organisation details template data
-type OrganisationDetailsData struct {
+// OrganisationDetailsData represents the organisation details template data.
+type OrganisationDetailsData struct { //nolint:revive // stutter is acceptable here
 	shared.BaseTemplateData
 	Organisation *OrganisationDetailData
 	ReleasePage  *ReleasePageData
 	Users        []*OrganisationUserData
 }
 
-// OrganisationDetailData represents organisation detail info
-type OrganisationDetailData struct {
+// OrganisationDetailData represents organisation detail info.
+type OrganisationDetailData struct { //nolint:revive // stutter is acceptable here
 	ID        string
 	Name      string
 	CreatedAt string
@@ -42,8 +42,8 @@ type ReleasePageData struct {
 	Slug string
 }
 
-// OrganisationUserData represents user info in an organisation
-type OrganisationUserData struct {
+// OrganisationUserData represents user info in an organisation.
+type OrganisationUserData struct { //nolint:revive // stutter is acceptable here
 	ID        string
 	Email     string
 	Role      string
@@ -60,12 +60,12 @@ var orgDetailsTmpl = templates.Construct(
 // ServeOrganisationDetailsPage renders the organisation details page
 func (h *Handlers) ServeOrganisationDetailsPage(w http.ResponseWriter, r *http.Request) {
 	h.Log.Trace().Msg("ServeOrganisationDetailsPage")
-	orgId := chi.URLParam(r, "orgId")
+	orgID := chi.URLParam(r, "orgID")
 
 	// Get the current user from the session
 	adminService := admin.NewService(*admin.NewRepository(h.DB))
 
-	userId, ok := r.Context().Value(mw.UserIDKey).(string)
+	userID, ok := r.Context().Value(mw.UserIDKey).(string)
 	if !ok {
 		h.Log.Error().Msg("Error finding user")
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
@@ -73,14 +73,14 @@ func (h *Handlers) ServeOrganisationDetailsPage(w http.ResponseWriter, r *http.R
 	}
 
 	// Check if the user is an admin
-	if !adminService.IsAdminUser(uuid.MustParse(userId)) {
-		h.Log.Warn().Str("userId", userId).Msg("Unauthorized access attempt to admin dashboard")
+	if !adminService.IsAdminUser(uuid.MustParse(userID)) {
+		h.Log.Warn().Str("userID", userID).Msg("Unauthorized access attempt to admin dashboard")
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
 
 	// Get organisation details with users
-	org, orgUsers, err := adminService.GetOrganisationWithUsers(uuid.MustParse(userId), uuid.MustParse(orgId))
+	org, orgUsers, err := adminService.GetOrganisationWithUsers(uuid.MustParse(userID), uuid.MustParse(orgID))
 	if err != nil {
 		h.Log.Error().Err(err).Msg("Error getting organisation details")
 		http.Error(w, "Error getting organisation details", http.StatusInternalServerError)
@@ -89,7 +89,7 @@ func (h *Handlers) ServeOrganisationDetailsPage(w http.ResponseWriter, r *http.R
 
 	// Get release page details
 	releasePageService := releasepageconfig.NewService(*releasepageconfig.NewRepository(h.DB, h.ObjStore))
-	releasePageConfig, err := releasePageService.Get(uuid.MustParse(orgId))
+	releasePageConfig, err := releasePageService.Get(uuid.MustParse(orgID))
 	if err != nil {
 		h.Log.Error().Err(err).Msg("Error getting release page details")
 		http.Error(w, "Error getting release page details", http.StatusInternalServerError)

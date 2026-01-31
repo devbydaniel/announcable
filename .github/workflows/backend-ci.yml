@@ -69,6 +69,7 @@ jobs:
           version: latest
           working-directory: backend
           args: --config=.golangci.yml
+          only-new-issues: false
 
       - name: Run tests
         run: go test -v -race -coverprofile=coverage.out ./...

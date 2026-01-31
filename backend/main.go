@@ -16,16 +16,16 @@ import (
 	apiWidget "github.com/devbydaniel/announcable/internal/handler/api/widget"
 	"github.com/devbydaniel/announcable/internal/handler/pages/admin/dashboard"
 	"github.com/devbydaniel/announcable/internal/handler/pages/admin/organisation"
-	"github.com/devbydaniel/announcable/internal/handler/pages/auth/invite_accept"
+	"github.com/devbydaniel/announcable/internal/handler/pages/auth/inviteaccept"
 	"github.com/devbydaniel/announcable/internal/handler/pages/auth/login"
 	"github.com/devbydaniel/announcable/internal/handler/pages/auth/logout"
-	"github.com/devbydaniel/announcable/internal/handler/pages/auth/password_forgot"
-	"github.com/devbydaniel/announcable/internal/handler/pages/auth/password_reset"
+	"github.com/devbydaniel/announcable/internal/handler/pages/auth/passwordforgot"
+	"github.com/devbydaniel/announcable/internal/handler/pages/auth/passwordreset"
 	"github.com/devbydaniel/announcable/internal/handler/pages/auth/register"
-	"github.com/devbydaniel/announcable/internal/handler/pages/auth/verify_email"
+	"github.com/devbydaniel/announcable/internal/handler/pages/auth/verifyemail"
 	"github.com/devbydaniel/announcable/internal/handler/pages/public/home"
-	"github.com/devbydaniel/announcable/internal/handler/pages/public/release_page"
-	"github.com/devbydaniel/announcable/internal/handler/pages/public/widget_script"
+	"github.com/devbydaniel/announcable/internal/handler/pages/public/releasepage"
+	"github.com/devbydaniel/announcable/internal/handler/pages/public/widgetscript"
 	rnCreateHandler "github.com/devbydaniel/announcable/internal/handler/pages/release_notes/create"
 	rnDetailHandler "github.com/devbydaniel/announcable/internal/handler/pages/release_notes/detail"
 	rnListHandler "github.com/devbydaniel/announcable/internal/handler/pages/release_notes/list"
@@ -66,10 +66,10 @@ func main() {
 	// Auth handlers
 	loginHandler := login.New(deps)
 	registerHandler := register.New(deps)
-	verifyEmailHandler := verify_email.New(deps)
-	inviteAcceptHandler := invite_accept.New(deps)
-	passwordForgotHandler := password_forgot.New(deps)
-	passwordResetHandler := password_reset.New(deps)
+	verifyEmailHandler := verifyemail.New(deps)
+	inviteAcceptHandler := inviteaccept.New(deps)
+	passwordForgotHandler := passwordforgot.New(deps)
+	passwordResetHandler := passwordreset.New(deps)
 	logoutHandler := logout.New(deps)
 
 	// User & Settings handlers
@@ -91,8 +91,8 @@ func main() {
 
 	// Public handlers
 	homeHandler := home.New(deps)
-	releasePagePublicHandler := release_page.New(deps)
-	widgetScriptHandler := widget_script.New(deps)
+	releasePagePublicHandler := releasepage.New(deps)
+	widgetScriptHandler := widgetscript.New(deps)
 
 	// API handlers
 	widgetAPIHandler := apiWidget.New(deps)
@@ -199,8 +199,8 @@ func main() {
 	).Route("/settings", func(r chi.Router) {
 		r.Get("/", settingsHandler.ServeSettingsPage)
 		r.Patch("/password", settingsHandler.HandlePasswordUpdate)
-		r.Patch("/widget-id", settingsHandler.HandleWidgetIdRegenerate)
-		r.Patch("/release-page-url", settingsHandler.HandleReleasePageUrlUpdate)
+		r.Patch("/widget-id", settingsHandler.HandleWidgetIDRegenerate)
+		r.Patch("/release-page-url", settingsHandler.HandleReleasePageURLUpdate)
 	})
 
 	// ADMIN DASHBOARD
@@ -210,9 +210,9 @@ func main() {
 		mwHandler.AuthorizeSuperAdmin,
 	).Route("/admin", func(r chi.Router) {
 		r.Get("/", adminDashboardHandler.ServeDashboardPage)
-		r.Get("/organisations/{orgId}", adminOrgHandler.ServeOrganisationDetailsPage)
-		r.Patch("/organisations/{orgId}", adminOrgHandler.HandleOrgUpdate)
-		r.Patch("/organisations/{orgId}/release-page", adminOrgHandler.HandleReleasePageUpdate)
+		r.Get("/organisations/{orgID}", adminOrgHandler.ServeOrganisationDetailsPage)
+		r.Patch("/organisations/{orgID}", adminOrgHandler.HandleOrgUpdate)
+		r.Patch("/organisations/{orgID}/release-page", adminOrgHandler.HandleReleasePageUpdate)
 	})
 
 	// API
@@ -227,12 +227,12 @@ func main() {
 			AllowCredentials: false,
 			MaxAge:           300, // Maximum value not ignored by any of major browsers
 		}))
-		r.Get("/release-notes/{orgId}", widgetAPIHandler.HandleReleaseNotesServe)
-		r.Get("/release-notes/{orgId}/status", widgetAPIHandler.HandleReleaseNotesStatusServe)
-		r.Post("/release-notes/{orgId}/metrics", widgetAPIHandler.HandleReleaseNoteMetricCreate)
-		r.Get("/release-notes/{orgId}/{releaseNoteId}/like", widgetAPIHandler.HandleGetReleaseNoteLikeState)
-		r.Post("/release-notes/{orgId}/{releaseNoteId}/like", widgetAPIHandler.HandleReleaseNoteToggleLike)
-		r.Get("/widget-config/{orgId}", widgetAPIHandler.HandleWidgetConfigServe)
+		r.Get("/release-notes/{orgID}", widgetAPIHandler.HandleReleaseNotesServe)
+		r.Get("/release-notes/{orgID}/status", widgetAPIHandler.HandleReleaseNotesStatusServe)
+		r.Post("/release-notes/{orgID}/metrics", widgetAPIHandler.HandleReleaseNoteMetricCreate)
+		r.Get("/release-notes/{orgID}/{releaseNoteID}/like", widgetAPIHandler.HandleGetReleaseNoteLikeState)
+		r.Post("/release-notes/{orgID}/{releaseNoteID}/like", widgetAPIHandler.HandleReleaseNoteToggleLike)
+		r.Get("/widget-config/{orgID}", widgetAPIHandler.HandleWidgetConfigServe)
 		r.Get("/img/*", sharedAPIHandler.HandleObjStore)
 	})
 

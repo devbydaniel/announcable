@@ -25,14 +25,14 @@ func (h *Handlers) HandleReleaseNotePublish(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	userId := ctx.Value(mw.UserIDKey).(string)
-	if userId == "" {
+	userID := ctx.Value(mw.UserIDKey).(string)
+	if userID == "" {
 		h.deps.Log.Error().Msg("User ID not found in context")
 		http.Error(w, "Error updating release note", http.StatusInternalServerError)
 	}
 
-	orgId := ctx.Value(mw.OrgIDKey).(string)
-	if orgId == "" {
+	orgID := ctx.Value(mw.OrgIDKey).(string)
+	if orgID == "" {
 		h.deps.Log.Error().Msg("Organisation ID not found in context")
 		http.Error(w, "Error updating release note", http.StatusInternalServerError)
 	}

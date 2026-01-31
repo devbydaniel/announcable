@@ -1,4 +1,4 @@
-package password_forgot
+package passwordforgot
 
 import (
 	"net/http"

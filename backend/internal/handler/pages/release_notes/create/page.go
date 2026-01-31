@@ -26,7 +26,7 @@ type pageData struct {
 	TextWebsiteOverrideIsChecked bool
 	HideCtaIsChecked             bool
 	CtaLabelOverrideIsChecked    bool
-	CtaUrlOverrideIsChecked      bool
+	CtaURLOverrideIsChecked      bool
 }
 
 var pageTmpl = templates.Construct(
@@ -49,7 +49,7 @@ func (h *Handlers) ServeReleaseNoteCreatePage(w http.ResponseWriter, r *http.Req
 		TextWebsiteOverrideIsChecked: false,
 		HideCtaIsChecked:             false,
 		CtaLabelOverrideIsChecked:    false,
-		CtaUrlOverrideIsChecked:      false,
+		CtaURLOverrideIsChecked:      false,
 	}
 
 	if err := pageTmpl.ExecuteTemplate(w, "root", data); err != nil {

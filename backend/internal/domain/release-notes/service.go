@@ -1,7 +1,7 @@
 package releasenotes
 
 import (
-	"github.com/devbydaniel/announcable/internal/imgUtil"
+	"github.com/devbydaniel/announcable/internal/imgutil"
 	"github.com/google/uuid"
 )
 
@@ -9,15 +9,16 @@ type service struct {
 	repo repository
 }
 
-var imgProcessConfig = imgUtil.ImgProcessConfig{
+var imgProcessConfig = imgutil.ImgProcessConfig{
 	MaxWidth: 1000,
 	Quality:  80,
 }
 
-func createImgPath(orgId, randomId, format string) string {
-	return orgId + "/" + randomId + "." + format
+func createImgPath(orgID, randomID, format string) string {
+	return orgID + "/" + randomID + "." + format
 }
 
+// NewService creates a new release notes service with the given repository.
 func NewService(r repository) *service {
 	log.Trace().Msg("NewService")
 	return &service{repo: r}
@@ -39,19 +40,19 @@ func (s *service) Create(rn *ReleaseNote, imgInput *ImageInput) (uuid.UUID, erro
 	// Create image
 	if imgInput != nil {
 		if imgInput.ImgData != nil {
-			processedImg, format, err := imgUtil.DecodeProcessEncode(imgInput.ImgData, &imgProcessConfig)
+			processedImg, format, err := imgutil.DecodeProcessEncode(imgInput.ImgData, &imgProcessConfig)
 			if err != nil {
 				log.Error().Err(err).Msg("Error processing image")
 				tx.Rollback()
 				return uuid.Nil, err
 			}
-			randomId, err := uuid.NewRandom()
+			randomID, err := uuid.NewRandom()
 			if err != nil {
 				log.Error().Err(err).Msg("Error generating random UUID")
 				tx.Rollback()
 				return uuid.Nil, err
 			}
-			imgPath := createImgPath(rn.OrganisationID.String(), randomId.String(), format.String())
+			imgPath := createImgPath(rn.OrganisationID.String(), randomID.String(), format.String())
 			log.Debug().Str("path", imgPath).Msg("Creating image")
 			if err := s.repo.UpdateImage(id, processedImg, imgPath, tx.Tx); err != nil {
 				log.Error().Err(err).Msg("Error creating image")
@@ -67,9 +68,9 @@ func (s *service) Create(rn *ReleaseNote, imgInput *ImageInput) (uuid.UUID, erro
 	return id, nil
 }
 
-func (s *service) GetAll(orgId string, page, pageSize int) (*PaginatedReleaseNotes, error) {
-	log.Trace().Str("orgId", orgId).Msg("GetAll")
-	rns, err := s.repo.FindAll(orgId, page, pageSize, nil)
+func (s *service) GetAll(orgID string, page, pageSize int) (*PaginatedReleaseNotes, error) {
+	log.Trace().Str("orgID", orgID).Msg("GetAll")
+	rns, err := s.repo.FindAll(orgID, page, pageSize, nil)
 	if err != nil {
 		log.Error().Err(err).Msg("Error finding release notes by organisation ID")
 		return nil, err
@@ -84,9 +85,9 @@ func (s *service) GetAll(orgId string, page, pageSize int) (*PaginatedReleaseNot
 	return rns, nil
 }
 
-func (s *service) GetAllWithImgUrl(orgId string, page, pageSize int, filters map[string]interface{}) (*PaginatedReleaseNotes, error) {
-	log.Trace().Str("orgId", orgId).Msg("GetAllWithImgUrl")
-	rns, err := s.repo.FindAll(orgId, page, pageSize, filters)
+func (s *service) GetAllWithImgURL(orgID string, page, pageSize int, filters map[string]interface{}) (*PaginatedReleaseNotes, error) {
+	log.Trace().Str("orgID", orgID).Msg("GetAllWithImgURL")
+	rns, err := s.repo.FindAll(orgID, page, pageSize, filters)
 	if err != nil {
 		log.Error().Err(err).Msg("Error finding release notes by organisation ID")
 		return nil, err
@@ -98,23 +99,23 @@ func (s *service) GetAllWithImgUrl(orgId string, page, pageSize int, filters map
 			rn.ReleaseDate = &rd
 		}
 		if rn.ImagePath != "" {
-			imgUrl, err := s.repo.GetImageUrl(rn.ImagePath)
+			imgURL, err := s.repo.GetImageURL(rn.ImagePath)
 			if err != nil {
 				log.Error().Err(err).Msg("Error getting image URL")
 			} else {
-				rn.ImageUrl = imgUrl
+				rn.ImageURL = imgURL
 			}
 		}
 	}
 	return rns, nil
 }
 
-func (s *service) GetStatus(orgId string, filters map[string]interface{}) ([]*ReleaseNoteStatus, error) {
-	log.Trace().Str("orgId", orgId).Msg("GetStatus")
-	return s.repo.GetStatus(orgId, filters)
+func (s *service) GetStatus(orgID string, filters map[string]interface{}) ([]*ReleaseNoteStatus, error) {
+	log.Trace().Str("orgID", orgID).Msg("GetStatus")
+	return s.repo.GetStatus(orgID, filters)
 }
 
-func (s *service) GetOne(id, orgId string) (*ReleaseNote, error) {
+func (s *service) GetOne(id, orgID string) (*ReleaseNote, error) {
 	log.Trace().Msg("GetByID")
 
 	uuid, err := uuid.Parse(id)
@@ -137,11 +138,11 @@ func (s *service) GetOne(id, orgId string) (*ReleaseNote, error) {
 
 	// Get image URL from path if it exists
 	if rn.ImagePath != "" {
-		imgUrl, err := s.repo.GetImageUrl(rn.ImagePath)
+		imgURL, err := s.repo.GetImageURL(rn.ImagePath)
 		if err != nil {
 			log.Error().Err(err).Msg("Error getting image URL")
 		} else {
-			rn.ImageUrl = imgUrl
+			rn.ImageURL = imgURL
 		}
 	}
 	return rn, nil
@@ -162,19 +163,19 @@ func (s *service) Update(id uuid.UUID, rn *ReleaseNote, imgInput *ImageInput) er
 				return err
 			}
 		} else if imgInput.ImgData != nil {
-			processedImg, format, err := imgUtil.DecodeProcessEncode(imgInput.ImgData, &imgProcessConfig)
+			processedImg, format, err := imgutil.DecodeProcessEncode(imgInput.ImgData, &imgProcessConfig)
 			if err != nil {
 				log.Error().Err(err).Msg("Error processing image")
 				tx.Rollback()
 				return err
 			}
-			randId, err := uuid.NewRandom()
+			randID, err := uuid.NewRandom()
 			if err != nil {
 				log.Error().Err(err).Msg("Error generating random UUID")
 				tx.Rollback()
 				return err
 			}
-			path = createImgPath(rn.OrganisationID.String(), randId.String(), format.String())
+			path = createImgPath(rn.OrganisationID.String(), randID.String(), format.String())
 			log.Debug().Str("path", path).Msg("Updating image")
 			if err := s.repo.UpdateImage(id, processedImg, path, tx.Tx); err != nil {
 				log.Error().Err(err).Msg("Error updating image")
@@ -189,7 +190,7 @@ func (s *service) Update(id uuid.UUID, rn *ReleaseNote, imgInput *ImageInput) er
 	if err := s.repo.Update(id, rn, tx.Tx); err != nil {
 		log.Error().Err(err).Msg("Error updating release note")
 		if imgInput != nil && imgInput.ImgData != nil {
-			s.repo.DeleteImage(id, tx.Tx)
+			_ = s.repo.DeleteImage(id, tx.Tx)
 		}
 		tx.Rollback()
 		return err

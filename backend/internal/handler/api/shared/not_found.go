@@ -36,7 +36,7 @@ func (h *Handlers) HandleNotFound(w http.ResponseWriter, r *http.Request) {
 			Message: "Page not found",
 			Path:    r.URL.Path,
 		}
-		json.NewEncoder(w).Encode(response)
+		_ = json.NewEncoder(w).Encode(response)
 	} else {
 		// HTML response
 		w.WriteHeader(404)

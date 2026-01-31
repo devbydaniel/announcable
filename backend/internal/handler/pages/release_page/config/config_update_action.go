@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	releasepageconfig "github.com/devbydaniel/announcable/internal/domain/release-page-configs"
-	"github.com/devbydaniel/announcable/internal/imgUtil"
+	"github.com/devbydaniel/announcable/internal/imgutil"
 	mw "github.com/devbydaniel/announcable/internal/middleware"
 	"github.com/go-playground/validator"
 	"github.com/google/uuid"
@@ -22,7 +22,7 @@ type configUpdateForm struct {
 	TextColor         string `schema:"text_color" validate:"required"`
 	TextColorMuted    string `schema:"text_color_muted" validate:"required"`
 	BackLinkLabel     string `schema:"back_link_label"`
-	BackLinkUrl       string `schema:"back_link_url"`
+	BackLinkURL       string `schema:"back_link_url"`
 }
 
 // HandleConfigUpdate handles PATCH /release-page-config/
@@ -31,8 +31,8 @@ func (h *Handlers) HandleConfigUpdate(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	releasePageConfigService := releasepageconfig.NewService(*releasepageconfig.NewRepository(h.deps.DB, h.deps.ObjStore))
 
-	orgId := ctx.Value(mw.OrgIDKey).(string)
-	if orgId == "" {
+	orgID := ctx.Value(mw.OrgIDKey).(string)
+	if orgID == "" {
 		h.deps.Log.Error().Msg("Organisation ID not found in context")
 		http.Error(w, "Error updating landing page config", http.StatusInternalServerError)
 		return
@@ -70,7 +70,7 @@ func (h *Handlers) HandleConfigUpdate(w http.ResponseWriter, r *http.Request) {
 	// prepare models
 	var imgInput *releasepageconfig.ImageInput
 	if img != nil {
-		ok := imgUtil.VerifyImageType(img)
+		ok := imgutil.VerifyImageType(img)
 		if !ok {
 			h.deps.Log.Error().Msg("Invalid image type")
 			http.Error(w, "Error updating release note", http.StatusBadRequest)
@@ -91,7 +91,7 @@ func (h *Handlers) HandleConfigUpdate(w http.ResponseWriter, r *http.Request) {
 	h.deps.Log.Debug().Interface("imgInput", imgInput).Msg("ImageInput")
 
 	lpConfig := &releasepageconfig.ReleasePageConfig{
-		OrganisationID: uuid.MustParse(orgId),
+		OrganisationID: uuid.MustParse(orgID),
 		BrandPosition:  updateDTO.BrandPosition,
 		Title:          updateDTO.Title,
 		Description:    updateDTO.Description,
@@ -99,11 +99,11 @@ func (h *Handlers) HandleConfigUpdate(w http.ResponseWriter, r *http.Request) {
 		TextColor:      updateDTO.TextColor,
 		TextColorMuted: updateDTO.TextColorMuted,
 		BackLinkLabel:  updateDTO.BackLinkLabel,
-		BackLinkUrl:    updateDTO.BackLinkUrl,
+		BackLinkURL:    updateDTO.BackLinkURL,
 	}
 	h.deps.Log.Debug().Interface("lpconfig", lpConfig).Msg("Landing page config to update")
 
-	if err := releasePageConfigService.Update(uuid.MustParse(orgId), lpConfig, imgInput); err != nil {
+	if err := releasePageConfigService.Update(uuid.MustParse(orgID), lpConfig, imgInput); err != nil {
 		h.deps.Log.Error().Err(err).Msg("Error updating landing page config")
 		http.Error(w, "Error updating landing page config", http.StatusInternalServerError)
 		return

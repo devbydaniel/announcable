@@ -74,5 +74,4 @@ func (h *Handlers) HandleLogin(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("HX-Redirect", "/release-notes")
 	w.WriteHeader(http.StatusOK)
-	return
 }

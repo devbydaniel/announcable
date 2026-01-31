@@ -106,7 +106,7 @@ func (h *Handlers) HandleRegister(w http.ResponseWriter, r *http.Request) {
 	// create org with user as admin
 	ou, err := orgService.CreateOrgWithAdmin(req.OrgName, user)
 	if err != nil {
-		userService.Delete(user.ID)
+		_ = userService.Delete(user.ID)
 		http.Error(w, "Error creating organisation", http.StatusInternalServerError)
 		return
 	}

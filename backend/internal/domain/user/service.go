@@ -13,6 +13,7 @@ type service struct {
 	repo repository
 }
 
+// NewService creates a new user service with the given repository.
 func NewService(r repository) *service {
 	log.Trace().Msg("NewService")
 	return &service{repo: r}
@@ -45,9 +46,9 @@ func (s *service) GetByEmail(email string) (*User, error) {
 	return s.repo.FindByEmail(email)
 }
 
-func (s *service) GetById(id uuid.UUID) (*User, error) {
-	log.Trace().Str("id", id.String()).Msg("GetById")
-	return s.repo.FindById(id)
+func (s *service) GetByID(id uuid.UUID) (*User, error) {
+	log.Trace().Str("id", id.String()).Msg("GetByID")
+	return s.repo.FindByID(id)
 }
 
 func (s *service) Delete(id uuid.UUID) error {
@@ -57,15 +58,15 @@ func (s *service) Delete(id uuid.UUID) error {
 
 func (s *service) SendVerifcationEmail(u *User, token string) error {
 	log.Trace().Str("email", u.Email).Msg("SendVerifcationEmail")
-	baseUrl := config.New().BaseURL
+	baseURL := config.New().BaseURL
 	protocol := "https"
 	if config.New().Env == "development" {
 		protocol = "http"
 	}
-	verifyUrl := fmt.Sprintf("%s://%s/verify-email?token=%s", protocol, baseUrl, token)
+	verifyURL := fmt.Sprintf("%s://%s/verify-email?token=%s", protocol, baseURL, token)
 	config := email.EmailConfirmConfig{
 		To:        u.Email,
-		ActionURL: verifyUrl,
+		ActionURL: verifyURL,
 	}
 
 	if err := email.SendEmailConfirm(&config); err != nil {
@@ -82,12 +83,12 @@ func (s *service) VerifyEmail(id uuid.UUID) error {
 
 func (s *service) SendPwResetEmail(u *User, token string) error {
 	log.Trace().Str("email", u.Email).Msg("SendPwResetEmail")
-	baseUrl := config.New().BaseURL
+	baseURL := config.New().BaseURL
 	protocol := "https"
 	if config.New().Env == "development" {
 		protocol = "http"
 	}
-	url := fmt.Sprintf("%s://%s/reset-pw/%s", protocol, baseUrl, token)
+	url := fmt.Sprintf("%s://%s/reset-pw/%s", protocol, baseURL, token)
 	config := email.PasswordResetConfig{
 		To:        u.Email,
 		ActionURL: url,

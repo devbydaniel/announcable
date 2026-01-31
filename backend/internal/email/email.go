@@ -11,16 +11,19 @@ import (
 	mail "github.com/wneessen/go-mail"
 )
 
+// PasswordResetConfig holds the configuration for sending a password reset email.
 type PasswordResetConfig struct {
 	To        string
 	ActionURL string
 }
 
-type EmailConfirmConfig struct {
+// EmailConfirmConfig holds the configuration for sending an email confirmation.
+type EmailConfirmConfig struct { //nolint:revive // stutter is acceptable here
 	To        string
 	ActionURL string
 }
 
+// UserInviteConfig holds the configuration for sending a user invitation email.
 type UserInviteConfig struct {
 	To               string
 	OrganisationName string
@@ -29,6 +32,7 @@ type UserInviteConfig struct {
 
 var cfg = config.New()
 
+// SendPasswordReset sends a password reset email to the specified recipient.
 func SendPasswordReset(c *PasswordResetConfig) error {
 	data := map[string]string{
 		"action_url":      c.ActionURL,
@@ -41,6 +45,7 @@ func SendPasswordReset(c *PasswordResetConfig) error {
 	return sendEmail(c.To, "Reset Your Password", passwordResetTmpl, data)
 }
 
+// SendEmailConfirm sends a welcome email with a confirmation link.
 func SendEmailConfirm(c *EmailConfirmConfig) error {
 	data := map[string]string{
 		"action_url":      c.ActionURL,
@@ -53,6 +58,7 @@ func SendEmailConfirm(c *EmailConfirmConfig) error {
 	return sendEmail(c.To, "Welcome to "+cfg.ProductInfo.ProductName, welcomeTmpl, data)
 }
 
+// SendUserInvite sends an organisation invitation email to a user.
 func SendUserInvite(c *UserInviteConfig) error {
 	data := map[string]string{
 		"action_url":        c.ActionURL,

@@ -25,23 +25,23 @@ func (h *Handlers) HandlePasswordResetTrigger(w http.ResponseWriter, r *http.Req
 	ctx := r.Context()
 
 	// Get admin's user ID for rate limiting
-	adminUserId := ctx.Value(mw.UserIDKey).(string)
-	if adminUserId == "" {
+	adminUserID := ctx.Value(mw.UserIDKey).(string)
+	if adminUserID == "" {
 		h.deps.Log.Error().Msg("User ID not found in context")
 		http.Error(w, "Error triggering password reset", http.StatusInternalServerError)
 		return
 	}
 
 	// Check rate limit
-	if err := passwordResetTriggerRateLimiter.Deduct(adminUserId, 1); err != nil {
-		h.deps.Log.Warn().Str("admin_user_id", adminUserId).Msg("Rate limit exceeded for password reset trigger")
+	if err := passwordResetTriggerRateLimiter.Deduct(adminUserID, 1); err != nil {
+		h.deps.Log.Warn().Str("admin_user_id", adminUserID).Msg("Rate limit exceeded for password reset trigger")
 		http.Error(w, "Too many requests. Please try again later.", http.StatusTooManyRequests)
 		return
 	}
 
 	// Get target OrgUser ID from URL
-	orgUserId := chi.URLParam(r, "id")
-	if orgUserId == "" {
+	orgUserID := chi.URLParam(r, "id")
+	if orgUserID == "" {
 		h.deps.Log.Error().Msg("OrgUser ID not found in URL")
 		http.Error(w, "Error triggering password reset", http.StatusBadRequest)
 		return
@@ -53,7 +53,7 @@ func (h *Handlers) HandlePasswordResetTrigger(w http.ResponseWriter, r *http.Req
 	sessionService := session.NewService(*session.NewRepository(h.deps.DB))
 
 	// Get target OrgUser to find the actual user
-	ou, err := orgService.GetOrgUser(uuid.MustParse(orgUserId))
+	ou, err := orgService.GetOrgUser(uuid.MustParse(orgUserID))
 	if err != nil {
 		h.deps.Log.Error().Err(err).Msg("Error getting org user")
 		http.Error(w, "User not found", http.StatusNotFound)
@@ -61,7 +61,7 @@ func (h *Handlers) HandlePasswordResetTrigger(w http.ResponseWriter, r *http.Req
 	}
 
 	// Get target user
-	targetUser, err := userService.GetById(ou.UserID)
+	targetUser, err := userService.GetByID(ou.UserID)
 	if err != nil {
 		h.deps.Log.Error().Err(err).Msg("Error getting user")
 		http.Error(w, "User not found", http.StatusNotFound)
@@ -88,7 +88,7 @@ func (h *Handlers) HandlePasswordResetTrigger(w http.ResponseWriter, r *http.Req
 	if cfg.Env == "development" {
 		protocol = "http"
 	}
-	resetUrl := fmt.Sprintf("%s://%s/reset-pw/%s", protocol, cfg.BaseURL, token)
+	resetURL := fmt.Sprintf("%s://%s/reset-pw/%s", protocol, cfg.BaseURL, token)
 
 	if cfg.IsEmailEnabled() {
 		// Send email
@@ -107,6 +107,6 @@ func (h *Handlers) HandlePasswordResetTrigger(w http.ResponseWriter, r *http.Req
 		// Return reset URL as JSON
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(map[string]string{"resetUrl": resetUrl})
+		_ = json.NewEncoder(w).Encode(map[string]string{"resetURL": resetURL})
 	}
 }

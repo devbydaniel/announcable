@@ -15,6 +15,7 @@ type repository struct {
 	bucket   string
 }
 
+// NewRepository creates a new release page config repository with database and object storage access.
 func NewRepository(db *database.DB, objStore *objstore.ObjStore) *repository {
 	log.Trace().Msg("NewRepository")
 	return &repository{db: db, objStore: objStore, bucket: objstore.LandingPageBucket.String()}
@@ -38,7 +39,7 @@ func (r *repository) Create(cfg *ReleasePageConfig, tx *gorm.DB) error {
 	return nil
 }
 
-func (r *repository) Update(orgId uuid.UUID, cfg *ReleasePageConfig, tx *gorm.DB) error {
+func (r *repository) Update(orgID uuid.UUID, cfg *ReleasePageConfig, tx *gorm.DB) error {
 	log.Trace().Msg("Update")
 	var client *gorm.DB
 	if tx != nil {
@@ -47,7 +48,7 @@ func (r *repository) Update(orgId uuid.UUID, cfg *ReleasePageConfig, tx *gorm.DB
 		client = r.db.Client
 	}
 
-	if err := client.Model(&ReleasePageConfig{}).Where("organisation_id = ?", orgId).Select("Title", "Description", "BgColor", "TextColor", "TextColorMuted", "BrandPosition", "BackLinkLabel", "BackLinkUrl").Updates(cfg).Error; err != nil {
+	if err := client.Model(&ReleasePageConfig{}).Where("organisation_id = ?", orgID).Select("Title", "Description", "BgColor", "TextColor", "TextColorMuted", "BrandPosition", "BackLinkLabel", "BackLinkURL").Updates(cfg).Error; err != nil {
 		log.Error().Err(err).Msg("Error updating landing page config")
 		return err
 	}
@@ -55,7 +56,7 @@ func (r *repository) Update(orgId uuid.UUID, cfg *ReleasePageConfig, tx *gorm.DB
 	return nil
 }
 
-func (r *repository) UpdateWithNil(orgId uuid.UUID, fields map[string]interface{}, tx *gorm.DB) error {
+func (r *repository) UpdateWithNil(orgID uuid.UUID, fields map[string]interface{}, tx *gorm.DB) error {
 	log.Trace().Msg("UpdateWithNil")
 	var client *gorm.DB
 	if tx != nil {
@@ -64,7 +65,7 @@ func (r *repository) UpdateWithNil(orgId uuid.UUID, fields map[string]interface{
 		client = r.db.Client
 	}
 
-	if err := client.Model(&ReleasePageConfig{}).Where("organisation_id = ?", orgId).Updates(fields).Error; err != nil {
+	if err := client.Model(&ReleasePageConfig{}).Where("organisation_id = ?", orgID).Updates(fields).Error; err != nil {
 		log.Error().Err(err).Msg("Error updating landing page config")
 		return err
 	}
@@ -72,10 +73,10 @@ func (r *repository) UpdateWithNil(orgId uuid.UUID, fields map[string]interface{
 	return nil
 }
 
-func (r *repository) Get(orgId uuid.UUID) (*ReleasePageConfig, error) {
-	log.Trace().Str("orgId", orgId.String()).Msg("Get")
+func (r *repository) Get(orgID uuid.UUID) (*ReleasePageConfig, error) {
+	log.Trace().Str("orgID", orgID.String()).Msg("Get")
 	var cfg ReleasePageConfig
-	if err := r.db.Client.Model(&ReleasePageConfig{}).Preload("Organisation").Where("organisation_id = ?", orgId).First(&cfg).Error; err != nil {
+	if err := r.db.Client.Model(&ReleasePageConfig{}).Preload("Organisation").Where("organisation_id = ?", orgID).First(&cfg).Error; err != nil {
 		return nil, err
 	}
 	return &cfg, nil
@@ -90,9 +91,9 @@ func (r *repository) GetBySlug(slug string) (*ReleasePageConfig, error) {
 	return &cfg, nil
 }
 
-func (r *repository) GetImageUrl(path string) (string, error) {
-	log.Trace().Msg("GetImageUrl")
-	return r.objStore.GetImageUrl(r.bucket, path)
+func (r *repository) GetImageURL(path string) (string, error) {
+	log.Trace().Msg("GetImageURL")
+	return r.objStore.GetImageURL(r.bucket, path)
 }
 
 func (r *repository) UpdateImage(path string, img *io.Reader) error {
@@ -100,9 +101,9 @@ func (r *repository) UpdateImage(path string, img *io.Reader) error {
 	return r.objStore.UpdateImage(r.bucket, path, img)
 }
 
-func (r *repository) DeleteImage(orgId uuid.UUID) error {
+func (r *repository) DeleteImage(orgID uuid.UUID) error {
 	log.Trace().Msg("DeleteImage")
-	cfg, err := r.Get(orgId)
+	cfg, err := r.Get(orgID)
 	if err != nil {
 		log.Error().Err(err).Msg("Error finding landing page config")
 		return err
@@ -111,7 +112,7 @@ func (r *repository) DeleteImage(orgId uuid.UUID) error {
 		log.Error().Err(err).Msg("Error deleting image")
 		return err
 	}
-	if err := r.UpdateWithNil(orgId, map[string]interface{}{"ImagePath": nil}, nil); err != nil {
+	if err := r.UpdateWithNil(orgID, map[string]interface{}{"ImagePath": nil}, nil); err != nil {
 		log.Error().Err(err).Msg("Error updating landing page config")
 		return err
 	}

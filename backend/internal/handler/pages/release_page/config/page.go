@@ -30,7 +30,7 @@ type pageData struct {
 	SafeTitle         string
 	SafeDescription   string
 	SafeBackLinkLabel string
-	ReleasePageUrl    string
+	ReleasePageURL    string
 }
 
 var pageTmpl = templates.Construct(
@@ -46,7 +46,7 @@ func (h *Handlers) ServeReleasePageConfigPage(w http.ResponseWriter, r *http.Req
 	releasePageConfigService := releasepageconfig.NewService(*releasepageconfig.NewRepository(h.deps.DB, h.deps.ObjStore))
 	widgetConfigService := widgetconfigs.NewService(*widgetconfigs.NewRepository(h.deps.DB))
 
-	orgId, ok := r.Context().Value(mw.OrgIDKey).(string)
+	orgID, ok := r.Context().Value(mw.OrgIDKey).(string)
 	if !ok {
 		h.deps.Log.Error().Msg("Organisation ID not found in context")
 		http.Error(w, "Failed to authenticate", http.StatusInternalServerError)
@@ -55,13 +55,13 @@ func (h *Handlers) ServeReleasePageConfigPage(w http.ResponseWriter, r *http.Req
 
 	// get release page config
 	var cfg *releasepageconfig.ReleasePageConfig
-	cfg, err := releasePageConfigService.Get(uuid.MustParse(orgId))
+	cfg, err := releasePageConfigService.Get(uuid.MustParse(orgID))
 	if err != nil {
 		if errors.Is(err, h.deps.DB.ErrRecordNotFound) {
 			// this should not happen, just in case...
 			h.deps.Log.Warn().Msg("Release page config not found, creating...")
 			orgName := r.Context().Value(mw.OrgNameKey).(string)
-			cfg, err = releasePageConfigService.Init(uuid.MustParse(orgId), orgName)
+			cfg, err = releasePageConfigService.Init(uuid.MustParse(orgID), orgName)
 			if err != nil {
 				h.deps.Log.Error().Err(err).Msg("Error creating release page config")
 				http.Error(w, "Error creating release page config", http.StatusInternalServerError)
@@ -74,18 +74,18 @@ func (h *Handlers) ServeReleasePageConfigPage(w http.ResponseWriter, r *http.Req
 	}
 
 	// get release page URL, either from slug or custom URL
-	releasePageUrl, err := releasePageConfigService.GetUrl(uuid.MustParse(orgId))
+	releasePageURL, err := releasePageConfigService.GetURL(uuid.MustParse(orgID))
 	if err != nil {
 		h.deps.Log.Error().Err(err).Msg("Error getting release page URL")
 	}
-	widgetCfg, err := widgetConfigService.Get(uuid.MustParse(orgId))
+	widgetCfg, err := widgetConfigService.Get(uuid.MustParse(orgID))
 	if err != nil {
 		h.deps.Log.Error().Err(err).Msg("Error getting widget config")
 	}
-	if widgetCfg.ReleasePageBaseUrl != nil {
-		releasePageUrl = *widgetCfg.ReleasePageBaseUrl
+	if widgetCfg.ReleasePageBaseURL != nil {
+		releasePageURL = *widgetCfg.ReleasePageBaseURL
 	}
-	h.deps.Log.Debug().Str("releasePageUrl", releasePageUrl).Msg("Release page URL")
+	h.deps.Log.Debug().Str("releasePageURL", releasePageURL).Msg("Release page URL")
 
 	data := pageData{
 		BaseTemplateData: shared.BaseTemplateData{
@@ -95,7 +95,7 @@ func (h *Handlers) ServeReleasePageConfigPage(w http.ResponseWriter, r *http.Req
 		SafeTitle:         html.EscapeString(cfg.Title),
 		SafeDescription:   html.EscapeString(cfg.Description),
 		SafeBackLinkLabel: html.EscapeString(cfg.BackLinkLabel),
-		ReleasePageUrl:    releasePageUrl,
+		ReleasePageURL:    releasePageURL,
 	}
 
 	if err := pageTmpl.ExecuteTemplate(w, "root", data); err != nil {

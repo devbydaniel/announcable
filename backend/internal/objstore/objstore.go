@@ -30,16 +30,19 @@ var (
 	bucketOptions = minio.MakeBucketOptions{Region: cfg.ObjStorage.Region}
 )
 
+// ObjStore wraps a Minio client for object storage operations.
 type ObjStore struct {
 	Client *minio.Client
 }
 
+// Bucket represents a named storage bucket.
 type Bucket string
 
 func (b Bucket) String() string {
 	return string(b)
 }
 
+// Available storage buckets.
 const (
 	ReleaseNotesBucket Bucket = "release-notes"
 	LandingPageBucket  Bucket = "landing-page"
@@ -47,6 +50,7 @@ const (
 
 var buckets = []Bucket{"release-notes", "landing-page"}
 
+// Init initializes the object store client and creates required buckets.
 func Init(ctx context.Context) (*ObjStore, error) {
 	log.Trace().Msg("Init")
 	client, err := createClient(endpoint, &minioCfg)
@@ -95,7 +99,8 @@ func createBuckets(client *minio.Client, ctx context.Context) error {
 	return nil
 }
 
-func (o *ObjStore) GetImageUrl(bucket, path string) (string, error) {
+// GetImageURL returns a presigned URL for accessing the image at the given bucket and path.
+func (o *ObjStore) GetImageURL(bucket, path string) (string, error) {
 	cfg := config.New()
 	ctx := context.Background()
 	// check if object exists
@@ -117,24 +122,25 @@ func (o *ObjStore) GetImageUrl(bucket, path string) (string, error) {
 	if cfg.ObjStorage.UseSSL {
 		internalScheme = "https://"
 	}
-	internalUrl := internalScheme + cfg.ObjStorage.Endpoint
+	internalURL := internalScheme + cfg.ObjStorage.Endpoint
 
 	// Build public URL, handling case where BaseURL may already include scheme
-	var publicUrl string
+	var publicURL string
 	if strings.HasPrefix(cfg.BaseURL, "http://") || strings.HasPrefix(cfg.BaseURL, "https://") {
-		publicUrl = cfg.BaseURL + "/api/img"
+		publicURL = cfg.BaseURL + "/api/img"
 	} else {
 		publicScheme := "http://"
 		if cfg.Env == "production" {
 			publicScheme = "https://"
 		}
-		publicUrl = publicScheme + cfg.BaseURL + "/api/img"
+		publicURL = publicScheme + cfg.BaseURL + "/api/img"
 	}
 
-	urlProxy := strings.Replace(url.String(), internalUrl, publicUrl, 1)
+	urlProxy := strings.Replace(url.String(), internalURL, publicURL, 1)
 	return urlProxy, nil
 }
 
+// UpdateImage uploads or replaces an image in the specified bucket and path.
 func (o *ObjStore) UpdateImage(bucket, path string, img *io.Reader) error {
 	log.Trace().Msg("UpdateImage")
 	ctx := context.Background()
@@ -147,6 +153,7 @@ func (o *ObjStore) UpdateImage(bucket, path string, img *io.Reader) error {
 	return nil
 }
 
+// DeleteImage removes an image from the specified bucket and path.
 func (o *ObjStore) DeleteImage(bucket, path string) error {
 	log.Trace().Str("path", path).Str("bucket", bucket).Msg("DeleteImage")
 	ctx := context.Background()

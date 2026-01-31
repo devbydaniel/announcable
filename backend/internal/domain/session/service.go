@@ -16,6 +16,7 @@ type service struct {
 	repository repository
 }
 
+// NewService creates a new session service with the given repository.
 func NewService(r repository) *service {
 	log.Trace().Msg("NewService")
 	return &service{repository: r}
@@ -24,32 +25,34 @@ func NewService(r repository) *service {
 func (s *service) CreateToken() string {
 	log.Trace().Msg("CreateSessionToken")
 	bytes := make([]byte, 15)
-	rand.Read(bytes)
+	if _, err := rand.Read(bytes); err != nil {
+		panic("failed to read random bytes: " + err.Error())
+	}
 	token := base32.StdEncoding.EncodeToString(bytes)
 	log.Debug().Str("token", token).Msg("")
 	return token
 }
 
-func (s *service) Create(token string, userId uuid.UUID) error {
-	log.Trace().Str("token", token).Str("userId", userId.String()).Msg("CreateSession")
-	sessionId := getIdFromToken(token)
+func (s *service) Create(token string, userID uuid.UUID) error {
+	log.Trace().Str("token", token).Str("userID", userID.String()).Msg("CreateSession")
+	sessionID := getIDFromToken(token)
 	expiresAt := calcNextExpiry()
-	session := Session{ExternalID: sessionId, ExpiresAt: expiresAt, UserID: userId}
+	session := Session{ExternalID: sessionID, ExpiresAt: expiresAt, UserID: userID}
 	return s.repository.Save(&session)
 }
 
-func (s *service) CreateCustomDuration(token string, userId uuid.UUID, duration time.Duration) error {
-	log.Trace().Str("token", token).Str("userId", userId.String()).Msg("CreateCustomDuration")
-	sessionId := getIdFromToken(token)
+func (s *service) CreateCustomDuration(token string, userID uuid.UUID, duration time.Duration) error {
+	log.Trace().Str("token", token).Str("userID", userID.String()).Msg("CreateCustomDuration")
+	sessionID := getIDFromToken(token)
 	expiresAt := time.Now().Add(duration).UnixMilli()
-	session := Session{ExternalID: sessionId, ExpiresAt: expiresAt, UserID: userId}
+	session := Session{ExternalID: sessionID, ExpiresAt: expiresAt, UserID: userID}
 	return s.repository.Save(&session)
 }
 
 func (s *service) ValidateSession(token string) (*Session, error) {
 	log.Trace().Str("token", token).Msg("ValidateSession")
-	sessionId := getIdFromToken(token)
-	session, err := s.repository.FindByExternalId(sessionId)
+	sessionID := getIDFromToken(token)
+	session, err := s.repository.FindByExternalID(sessionID)
 	if err != nil {
 		return nil, err
 	}
@@ -69,9 +72,9 @@ func (s *service) ValidateSession(token string) (*Session, error) {
 	return session, nil
 }
 
-func (s *service) InvalidateUserSessions(userId uuid.UUID) error {
-	log.Trace().Str("userId", userId.String()).Msg("InvalidateUserSessions")
-	return s.repository.DeleteByUserId(userId)
+func (s *service) InvalidateUserSessions(userID uuid.UUID) error {
+	log.Trace().Str("userID", userID.String()).Msg("InvalidateUserSessions")
+	return s.repository.DeleteByUserID(userID)
 }
 
 func (s *service) Delete(id uuid.UUID) error {
@@ -79,9 +82,9 @@ func (s *service) Delete(id uuid.UUID) error {
 	return s.repository.Delete(id)
 }
 
-func getIdFromToken(token string) string {
-	byteId := sha256.Sum256([]byte(token))
-	return hex.EncodeToString(byteId[:])
+func getIDFromToken(token string) string {
+	byteID := sha256.Sum256([]byte(token))
+	return hex.EncodeToString(byteID[:])
 }
 
 func calcNextExpiry() int64 {

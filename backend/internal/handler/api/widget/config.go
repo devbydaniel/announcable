@@ -12,7 +12,7 @@ import (
 )
 
 type serviceWidgetConfigResponseBodyWidgetConfig struct {
-	OrgId                   string `json:"org_id"`
+	OrgID                   string `json:"org_id"`
 	Title                   string `json:"title"`
 	Description             string `json:"description"`
 	CtaText                 string `json:"cta_text"`
@@ -30,7 +30,7 @@ type serviceWidgetConfigResponseBodyWidgetConfig struct {
 	ReleaseNoteBorderWidth  int    `json:"release_note_border_width"`
 	ReleaseNoteBgColor      string `json:"release_note_bg_color"`
 	ReleaseNoteFontColor    string `json:"release_note_font_color"`
-	ReleasePageBaseUrl      string `json:"release_page_baseurl"`
+	ReleasePageBaseURL      string `json:"release_page_baseurl"`
 	DisableReleasePage      bool   `json:"disable_release_page"`
 }
 
@@ -45,14 +45,14 @@ func (h *Handlers) HandleWidgetConfigServe(w http.ResponseWriter, r *http.Reques
 	releasePageConfigService := releasepageconfig.NewService(*releasepageconfig.NewRepository(h.DB, h.ObjStore))
 	organisationService := organisation.NewService(*organisation.NewRepository(h.DB))
 
-	externalOrgId := chi.URLParam(r, "orgId")
-	if externalOrgId == "" {
+	externalOrgID := chi.URLParam(r, "orgID")
+	if externalOrgID == "" {
 		h.Log.Error().Msg("Org ID not found in URL")
 		http.Error(w, "Error getting widget config", http.StatusBadRequest)
 		return
 	}
 
-	org, err := organisationService.GetOrgByExternalId(uuid.MustParse(externalOrgId))
+	org, err := organisationService.GetOrgByExternalID(uuid.MustParse(externalOrgID))
 	if err != nil {
 		h.Log.Error().Err(err).Msg("Error getting org ID")
 		http.Error(w, "Error getting widget config", http.StatusInternalServerError)
@@ -66,15 +66,15 @@ func (h *Handlers) HandleWidgetConfigServe(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	var releasePageUrl string
-	releasePageUrl, err = releasePageConfigService.GetUrl(org.ID)
+	var releasePageURL string
+	releasePageURL, err = releasePageConfigService.GetURL(org.ID)
 	if err != nil {
 		h.Log.Error().Err(err).Msg("Error getting release page URL")
 		http.Error(w, "Error getting widget config", http.StatusInternalServerError)
 		return
 	}
-	if widgetConfig.ReleasePageBaseUrl != nil {
-		releasePageUrl = *widgetConfig.ReleasePageBaseUrl
+	if widgetConfig.ReleasePageBaseURL != nil {
+		releasePageURL = *widgetConfig.ReleasePageBaseURL
 	}
 
 	releasePageConfig, err := releasePageConfigService.Get(org.ID)
@@ -85,7 +85,7 @@ func (h *Handlers) HandleWidgetConfigServe(w http.ResponseWriter, r *http.Reques
 	}
 
 	conf := serviceWidgetConfigResponseBodyWidgetConfig{
-		OrgId:                   externalOrgId,
+		OrgID:                   externalOrgID,
 		Title:                   widgetConfig.Title,
 		Description:             widgetConfig.Description,
 		CtaText:                 widgetConfig.ReleaseNoteCtaText,
@@ -103,7 +103,7 @@ func (h *Handlers) HandleWidgetConfigServe(w http.ResponseWriter, r *http.Reques
 		ReleaseNoteBorderWidth:  widgetConfig.ReleaseNoteBorderWidth,
 		ReleaseNoteBgColor:      widgetConfig.ReleaseNoteBgColor,
 		ReleaseNoteFontColor:    widgetConfig.ReleaseNoteTextColor,
-		ReleasePageBaseUrl:      releasePageUrl,
+		ReleasePageBaseURL:      releasePageURL,
 		DisableReleasePage:      releasePageConfig.DisableReleasePage,
 	}
 

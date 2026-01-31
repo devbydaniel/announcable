@@ -29,6 +29,7 @@ func (r *repository) Rollback() {
 	r.tx.Rollback()
 }
 
+// NewRepository creates a new release notes repository with database and object storage access.
 func NewRepository(db *database.DB, objStore *objstore.ObjStore) *repository {
 	log.Trace().Msg("NewRepository")
 	return &repository{db: db, objStore: objStore, bucket: objstore.ReleaseNotesBucket.String()}
@@ -64,7 +65,7 @@ func (r *repository) Update(id uuid.UUID, rn *ReleaseNote, tx *gorm.DB) error {
 		"DescriptionLong",
 		"ReleaseDate",
 		"CtaLabelOverride",
-		"CtaUrlOverride",
+		"CtaURLOverride",
 		"HideCta",
 		"AttentionMechanism",
 		"HideOnWidget",
@@ -94,14 +95,14 @@ func (r *repository) UpdateWithNil(id uuid.UUID, data map[string]interface{}, tx
 	return nil
 }
 
-func (r *repository) GetStatus(orgId string, filters map[string]interface{}) ([]*ReleaseNoteStatus, error) {
-	log.Trace().Str("orgId", orgId).Msg("GetStatus")
+func (r *repository) GetStatus(orgID string, filters map[string]interface{}) ([]*ReleaseNoteStatus, error) {
+	log.Trace().Str("orgID", orgID).Msg("GetStatus")
 	var statuses []*ReleaseNoteStatus
 
 	// Base query conditions
 	query := r.db.Client.Model(&ReleaseNote{}).
 		Select("updated_at, attention_mechanism").
-		Where("organisation_id = ?", orgId).Where("is_published = ?", true)
+		Where("organisation_id = ?", orgID).Where("is_published = ?", true)
 
 	// Apply additional filters if any
 	if len(filters) > 0 {
@@ -117,8 +118,8 @@ func (r *repository) GetStatus(orgId string, filters map[string]interface{}) ([]
 	return statuses, nil
 }
 
-func (r *repository) FindAll(orgId string, page, pageSize int, filters map[string]interface{}) (*PaginatedReleaseNotes, error) {
-	log.Trace().Str("orgId", orgId).Int("page", page).Int("pageSize", pageSize).Msg("FindByOrganisationId")
+func (r *repository) FindAll(orgID string, page, pageSize int, filters map[string]interface{}) (*PaginatedReleaseNotes, error) {
+	log.Trace().Str("orgID", orgID).Int("page", page).Int("pageSize", pageSize).Msg("FindByOrganisationId")
 	if page < 1 {
 		page = 1
 	}
@@ -130,7 +131,7 @@ func (r *repository) FindAll(orgId string, page, pageSize int, filters map[strin
 	}
 
 	// Base query conditions
-	query := r.db.Client.Model(&ReleaseNote{}).Where("organisation_id = ?", orgId)
+	query := r.db.Client.Model(&ReleaseNote{}).Where("organisation_id = ?", orgID)
 
 	if len(filters) > 0 {
 		// Apply additional filters
@@ -167,7 +168,7 @@ func (r *repository) FindAll(orgId string, page, pageSize int, filters map[strin
 }
 
 func (r *repository) FindOne(id uuid.UUID) (*ReleaseNote, error) {
-	log.Trace().Msg("FindById")
+	log.Trace().Msg("FindByID")
 	rn := &ReleaseNote{}
 	if err := r.db.Client.First(rn, id).Error; err != nil {
 		log.Error().Err(err).Msg("Error finding release note by id")
@@ -191,9 +192,9 @@ func (r *repository) Delete(id uuid.UUID, tx *gorm.DB) error {
 	return nil
 }
 
-func (r *repository) GetImageUrl(path string) (string, error) {
-	log.Trace().Msg("GetImageUrl")
-	return r.objStore.GetImageUrl(r.bucket, path)
+func (r *repository) GetImageURL(path string) (string, error) {
+	log.Trace().Msg("GetImageURL")
+	return r.objStore.GetImageURL(r.bucket, path)
 }
 
 func (r *repository) UpdateImage(id uuid.UUID, img *io.Reader, path string, tx *gorm.DB) error {

@@ -20,8 +20,8 @@ func New(deps *shared.Dependencies) *Handlers {
 	return &Handlers{Dependencies: deps}
 }
 
-// DashboardData represents the admin dashboard template data
-type DashboardData struct {
+// DashboardData represents the admin dashboard template data.
+type DashboardData struct { //nolint:revive // stutter is acceptable here
 	shared.BaseTemplateData
 	Organisations []*OrganisationData
 }
@@ -45,7 +45,7 @@ func (h *Handlers) ServeDashboardPage(w http.ResponseWriter, r *http.Request) {
 	h.Log.Trace().Msg("ServeDashboardPage")
 	adminService := admin.NewService(*admin.NewRepository(h.DB))
 
-	userId, ok := r.Context().Value(mw.UserIDKey).(string)
+	userID, ok := r.Context().Value(mw.UserIDKey).(string)
 	if !ok {
 		h.Log.Error().Msg("Error finding user")
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
@@ -53,14 +53,14 @@ func (h *Handlers) ServeDashboardPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Check if the user is an admin
-	if !adminService.IsAdminUser(uuid.MustParse(userId)) {
-		h.Log.Warn().Str("userId", userId).Msg("Unauthorized access attempt to admin dashboard")
+	if !adminService.IsAdminUser(uuid.MustParse(userID)) {
+		h.Log.Warn().Str("userID", userID).Msg("Unauthorized access attempt to admin dashboard")
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
 
 	// Get all organisations
-	orgs, err := adminService.GetAllOrganisations(uuid.MustParse(userId))
+	orgs, err := adminService.GetAllOrganisations(uuid.MustParse(userID))
 	if err != nil {
 		h.Log.Error().Err(err).Msg("Error getting organisations")
 		http.Error(w, "Error getting organisations", http.StatusInternalServerError)

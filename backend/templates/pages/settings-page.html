@@ -56,7 +56,7 @@
     </div>
     <div
       class="card"
-      x-data="landingPageSettings({{ if .CustomUrl }}
+      x-data="landingPageSettings({{ if .CustomURL }}
         true
       {{ else }}
         false
@@ -95,12 +95,12 @@
                   class="form__input"
                   name=""
                   disabled
-                  value="{{ .ReleasePageUrl }}"
+                  value="{{ .ReleasePageURL }}"
                 />
                 <button
                   type="button"
                   class="button button--square button--sm button--ghost"
-                  onclick="navigator.clipboard.writeText('{{ .ReleasePageUrl }}'); toastSuccess('Copied to clipboard')"
+                  onclick="navigator.clipboard.writeText('{{ .ReleasePageURL }}'); toastSuccess('Copied to clipboard')"
                 >
                   <i data-feather="copy" width="16" height="16"></i>
                 </button>
@@ -127,8 +127,8 @@
                 id="custom_url"
                 name="custom_url"
                 class="form__input"
-                {{ if .CustomUrl }}
-                  value="{{ .CustomUrl }}"
+                {{ if .CustomURL }}
+                  value="{{ .CustomURL }}"
                 {{ end }}
               />
             </div>

@@ -26,8 +26,8 @@ func New(deps *shared.Dependencies) *Handlers {
 type pageData struct {
 	shared.BaseTemplateData
 	WidgetID           string
-	ReleasePageUrl     string
-	CustomUrl          *string
+	ReleasePageURL     string
+	CustomURL          *string
 	DisableReleasePage bool
 }
 
@@ -41,7 +41,7 @@ var pageTmpl = templates.Construct(
 // ServeSettingsPage handles GET /settings/
 func (h *Handlers) ServeSettingsPage(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	orgId, ok := ctx.Value(mw.OrgIDKey).(string)
+	orgID, ok := ctx.Value(mw.OrgIDKey).(string)
 	if !ok {
 		h.deps.Log.Error().Msg("Organisation ID not found in context")
 		http.Error(w, "Failed to authenticate", http.StatusInternalServerError)
@@ -52,27 +52,27 @@ func (h *Handlers) ServeSettingsPage(w http.ResponseWriter, r *http.Request) {
 	widgetConfigService := widgetconfigs.NewService(*widgetconfigs.NewRepository(h.deps.DB))
 	releasePageConfigService := releasepageconfig.NewService(*releasepageconfig.NewRepository(h.deps.DB, h.deps.ObjStore))
 
-	widgetConfig, err := widgetConfigService.Get(uuid.MustParse(orgId))
+	widgetConfig, err := widgetConfigService.Get(uuid.MustParse(orgID))
 	if err != nil {
 		h.deps.Log.Error().Err(err).Msg("Error getting widget config")
 		http.Error(w, "Error getting widget config", http.StatusInternalServerError)
 		return
 	}
 
-	externalId, err := organisationService.GetExternalId(uuid.MustParse(orgId))
+	externalID, err := organisationService.GetExternalID(uuid.MustParse(orgID))
 	if err != nil {
 		h.deps.Log.Error().Err(err).Msg("Error getting external org ID")
 		http.Error(w, "Error getting external org ID", http.StatusInternalServerError)
 		return
 	}
 
-	var releasePageUrl string
-	releasePageUrl, err = releasePageConfigService.GetUrl(uuid.MustParse(orgId))
+	var releasePageURL string
+	releasePageURL, err = releasePageConfigService.GetURL(uuid.MustParse(orgID))
 	if err != nil {
 		h.deps.Log.Error().Err(err).Msg("Error getting release page URL")
 	}
 
-	releasePageConfig, err := releasePageConfigService.Get(uuid.MustParse(orgId))
+	releasePageConfig, err := releasePageConfigService.Get(uuid.MustParse(orgID))
 	if err != nil {
 		h.deps.Log.Error().Err(err).Msg("Error getting release page config")
 		http.Error(w, "Error getting release page config", http.StatusInternalServerError)
@@ -85,15 +85,15 @@ func (h *Handlers) ServeSettingsPage(w http.ResponseWriter, r *http.Request) {
 		BaseTemplateData: shared.BaseTemplateData{
 			Title: "Settings for " + orgName,
 		},
-		WidgetID:           externalId.String(),
+		WidgetID:           externalID.String(),
 		DisableReleasePage: releasePageConfig.DisableReleasePage,
 	}
-	if releasePageUrl != "" {
-		data.ReleasePageUrl = releasePageUrl
+	if releasePageURL != "" {
+		data.ReleasePageURL = releasePageURL
 	}
 
-	if widgetConfig.ReleasePageBaseUrl != nil {
-		data.CustomUrl = widgetConfig.ReleasePageBaseUrl
+	if widgetConfig.ReleasePageBaseURL != nil {
+		data.CustomURL = widgetConfig.ReleasePageBaseURL
 	}
 
 	if err := pageTmpl.ExecuteTemplate(w, "root", data); err != nil {

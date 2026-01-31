@@ -61,7 +61,7 @@
     .TextWebsiteOverrideIsChecked
     .HideCtaIsChecked
     .CtaLabelOverrideIsChecked
-    .CtaUrlOverrideIsChecked
+    .CtaURLOverrideIsChecked
     $mediaType
   }}
 
@@ -141,7 +141,7 @@
         <label class="form__label" for="image">Image</label>
         <div
           class="file-input"
-          x-data="fileInput('{{ .Rn.ImageUrl }}')"
+          x-data="fileInput('{{ .Rn.ImageURL }}')"
           @click="$refs.imgUpload.click()"
         >
           <input
@@ -309,7 +309,7 @@
                 id="cta_url_override"
                 type="url"
                 name="cta_url_override"
-                value="{{ .Rn.CtaUrlOverride }}"
+                value="{{ .Rn.CtaURLOverride }}"
               />
             </div>
           </div>

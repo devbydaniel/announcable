@@ -15,15 +15,17 @@ import (
 
 type contextKey string
 
+// Context keys for storing authentication and authorisation values.
 const (
-	SessionIdKey     contextKey = "sessionId"
-	UserIDKey        contextKey = "userId"
+	SessionIDKey     contextKey = "sessionID"
+	UserIDKey        contextKey = "userID"
 	OrgRoleKey       contextKey = "orgRole"
-	OrgIDKey         contextKey = "orgId"
+	OrgIDKey         contextKey = "orgID"
 	OrgNameKey       contextKey = "orgName"
 	EmailVerifiedKey contextKey = "emailVerified"
 )
 
+// Authenticate is middleware that validates the session cookie and populates the request context.
 func (h *Handler) Authenticate(next http.Handler) http.Handler {
 	sessionService := session.NewService(*session.NewRepository(h.DB))
 	orgService := organisation.NewService(*organisation.NewRepository(h.DB))
@@ -53,20 +55,20 @@ func (h *Handler) Authenticate(next http.Handler) http.Handler {
 			return
 		}
 
-		ou, err := orgService.GetOrgUserByUserId(session.UserID)
+		ou, err := orgService.GetOrgUserByUserID(session.UserID)
 		if err != nil {
 			http.Error(w, "Error getting organisation user", http.StatusInternalServerError)
 			return
 		}
 		if ou == nil {
-			sessionService.InvalidateUserSessions(session.UserID)
+			_ = sessionService.InvalidateUserSessions(session.UserID)
 			http.Redirect(w, r, "/login", http.StatusSeeOther)
 			return
 		}
 		h.log.Debug().Interface("ou", ou).Msg("OrganisationUser")
 
 		ctx := r.Context()
-		ctx = context.WithValue(ctx, SessionIdKey, session.ID.String())
+		ctx = context.WithValue(ctx, SessionIDKey, session.ID.String())
 		ctx = context.WithValue(ctx, EmailVerifiedKey, ou.User.EmailVerified)
 		ctx = context.WithValue(ctx, UserIDKey, session.UserID.String())
 		ctx = context.WithValue(ctx, OrgRoleKey, ou.Role)
@@ -75,15 +77,16 @@ func (h *Handler) Authenticate(next http.Handler) http.Handler {
 
 		r = r.WithContext(ctx)
 		h.log.Trace().
-			Str("userId", session.UserID.String()).
+			Str("userID", session.UserID.String()).
 			Str("role", ou.Role.String()).
-			Str("orgId", ou.OrganisationID.String()).
+			Str("orgID", ou.OrganisationID.String()).
 			Msg("Authenticated")
 
 		next.ServeHTTP(w, r)
 	})
 }
 
+// Authorize is middleware that checks the user has the required RBAC permissions.
 func (h *Handler) Authorize(permissions ...rbac.Permission) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -119,18 +122,19 @@ func (h *Handler) Authorize(permissions ...rbac.Permission) func(http.Handler) h
 	}
 }
 
+// AuthorizeSuperAdmin is middleware that restricts access to the configured admin user.
 func (h *Handler) AuthorizeSuperAdmin(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		h.log.Trace().Msg("mw AuthorizeSuperAdmin")
 		ctx := r.Context()
-		userId, ok := ctx.Value(UserIDKey).(string)
+		userID, ok := ctx.Value(UserIDKey).(string)
 		if !ok {
 			h.log.Warn().Msg("UserId not found in context")
 			http.Error(w, "UserId not found in context", http.StatusInternalServerError)
 			return
 		}
-		if userId != config.New().AdminUserId {
-			h.log.Warn().Str("userId", userId).Msg("Unauthorized")
+		if userID != config.New().AdminUserID {
+			h.log.Warn().Str("userID", userID).Msg("Unauthorized")
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}

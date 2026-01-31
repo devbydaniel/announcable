@@ -1,4 +1,4 @@
-package widget_script
+package widgetscript
 
 import (
 	"net/http"
@@ -22,5 +22,5 @@ func (h *Handlers) ServeWidgetScript(w http.ResponseWriter, r *http.Request) {
 	h.Log.Trace().Msg("ServeWidgetScript")
 	w.Header().Set("Content-Type", "application/javascript")
 	w.Header().Set("Cache-Control", "public, max-age=3600")
-	w.Write(static.Widget)
+	_, _ = w.Write(static.Widget)
 }

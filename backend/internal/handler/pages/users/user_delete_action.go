@@ -13,9 +13,9 @@ import (
 // HandleUserDelete handles DELETE /users/{id}
 func (h *Handlers) HandleUserDelete(w http.ResponseWriter, r *http.Request) {
 	h.deps.Log.Trace().Msg("HandleUserDelete")
-	orgUserId := chi.URLParam(r, "id")
-	h.deps.Log.Debug().Str("ouId", orgUserId).Msg("id URL param")
-	if orgUserId == "" {
+	orgUserID := chi.URLParam(r, "id")
+	h.deps.Log.Debug().Str("ouId", orgUserID).Msg("id URL param")
+	if orgUserID == "" {
 		h.deps.Log.Error().Msg("User ID not found in URL")
 		http.Error(w, "Error deleting user", http.StatusBadRequest)
 		return
@@ -25,14 +25,14 @@ func (h *Handlers) HandleUserDelete(w http.ResponseWriter, r *http.Request) {
 	userService := user.NewService(*user.NewRepository(h.deps.DB))
 	sessionService := session.NewService(*session.NewRepository(h.deps.DB))
 
-	ou, err := orgService.GetOrgUser(uuid.MustParse(orgUserId))
+	ou, err := orgService.GetOrgUser(uuid.MustParse(orgUserID))
 	if err != nil {
 		h.deps.Log.Error().Err(err).Msg("Error getting org user")
 		http.Error(w, "Error deleting user", http.StatusInternalServerError)
 		return
 	}
 
-	if err := orgService.RemoveFromOrg(uuid.MustParse(orgUserId)); err != nil {
+	if err := orgService.RemoveFromOrg(uuid.MustParse(orgUserID)); err != nil {
 		h.deps.Log.Error().Err(err).Msg("Error deleting user")
 		http.Error(w, "Error deleting user", http.StatusInternalServerError)
 		return

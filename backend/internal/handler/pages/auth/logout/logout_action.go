@@ -24,14 +24,14 @@ func New(deps *shared.Dependencies) *Handlers {
 func (h *Handlers) HandleLogout(w http.ResponseWriter, r *http.Request) {
 	h.deps.Log.Trace().Msg("HandleLogout")
 	ctx := r.Context()
-	sessionId, ok := ctx.Value(mw.SessionIdKey).(string)
+	sessionID, ok := ctx.Value(mw.SessionIDKey).(string)
 	if !ok {
 		http.Error(w, "Error getting user id", http.StatusInternalServerError)
 		return
 	}
 
 	sessionService := session.NewService(*session.NewRepository(h.deps.DB))
-	if err := sessionService.Delete(uuid.MustParse(sessionId)); err != nil {
+	if err := sessionService.Delete(uuid.MustParse(sessionID)); err != nil {
 		http.Error(w, "Error deleting session", http.StatusInternalServerError)
 		return
 	}

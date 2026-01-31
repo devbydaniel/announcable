@@ -38,12 +38,12 @@
           <div class="header__content">
             <img
               class="header__img"
-              src="{{ $.Cfg.ImageUrl }}"
+              src="{{ $.Cfg.ImageURL }}"
               alt="Brand logo"
             />
-            {{ with (and $.Cfg.BackLinkUrl $.Cfg.BackLinkLabel) }}
+            {{ with (and $.Cfg.BackLinkURL $.Cfg.BackLinkLabel) }}
               <a
-                href="{{ $.Cfg.BackLinkUrl }}"
+                href="{{ $.Cfg.BackLinkURL }}"
                 class="header__back-link"
                 style="color: {{ $.Cfg.TextColorMuted }}"
               >
@@ -58,7 +58,7 @@
           {{ with eq .Cfg.BrandPosition "top" }}
             <img
               class="content__img"
-              src="{{ $.Cfg.ImageUrl }}"
+              src="{{ $.Cfg.ImageURL }}"
               alt="Brand logo"
             />
           {{ end }}
@@ -99,7 +99,7 @@
                 {{ end }}
               </div>
               <div class="content__rns__rn__content">
-                {{ with .ImageUrl }}
+                {{ with .ImageURL }}
                   <img
                     src="{{ . }}"
                     alt=""

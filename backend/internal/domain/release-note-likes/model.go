@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 )
 
+// ReleaseNoteLike represents a like on a release note by a client.
 type ReleaseNoteLike struct {
 	database.BaseModel `gorm:"embedded"`
 	ReleaseNoteID      uuid.UUID

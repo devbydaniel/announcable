@@ -1,4 +1,4 @@
-package verify_email
+package verifyemail
 
 import (
 	"errors"
@@ -54,19 +54,19 @@ func (h *Handlers) ServeVerifyEmailPage(w http.ResponseWriter, r *http.Request) 
 			http.Error(w, "Error validating session", http.StatusInternalServerError)
 			return
 		}
-		userId := session.UserID
-		_, err = userService.GetById(userId)
+		userID := session.UserID
+		_, err = userService.GetByID(userID)
 		if err != nil {
 			h.deps.Log.Error().Err(err).Msg("Error getting user")
 			http.Error(w, "Error getting user", http.StatusInternalServerError)
 			return
 		}
-		if err := userService.VerifyEmail(userId); err != nil {
+		if err := userService.VerifyEmail(userID); err != nil {
 			h.deps.Log.Error().Err(err).Msg("Error updating email verified")
 			http.Error(w, "Error updating email verified", http.StatusInternalServerError)
 			return
 		}
-		if err := sessionService.InvalidateUserSessions(userId); err != nil {
+		if err := sessionService.InvalidateUserSessions(userID); err != nil {
 			h.deps.Log.Error().Err(err).Msg("Error invalidating user sessions")
 		}
 		successMsg := "Email verified"

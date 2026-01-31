@@ -10,30 +10,31 @@ import (
 
 type service struct {
 	repo        repository
-	adminUserId string
+	adminUserID string
 }
 
+// NewService creates a new admin service.
 func NewService(r repository) *service {
 	log.Trace().Msg("NewService")
 	cfg := config.New()
 	return &service{
 		repo:        r,
-		adminUserId: cfg.AdminUserId,
+		adminUserID: cfg.AdminUserID,
 	}
 }
 
 // IsAdminUser checks if the provided user ID is the admin user
-func (s *service) IsAdminUser(userId uuid.UUID) bool {
-	log.Trace().Str("userId", userId.String()).Msg("IsAdminUser")
-	return IsAdmin(userId, s.adminUserId)
+func (s *service) IsAdminUser(userID uuid.UUID) bool {
+	log.Trace().Str("userID", userID.String()).Msg("IsAdminUser")
+	return IsAdmin(userID, s.adminUserID)
 }
 
 // GetAllOrganisations retrieves all organisations if the user is an admin
-func (s *service) GetAllOrganisations(userId uuid.UUID) ([]*organisation.Organisation, error) {
-	log.Trace().Str("userId", userId.String()).Msg("GetAllOrganisations")
+func (s *service) GetAllOrganisations(userID uuid.UUID) ([]*organisation.Organisation, error) {
+	log.Trace().Str("userID", userID.String()).Msg("GetAllOrganisations")
 
-	if !s.IsAdminUser(userId) {
-		log.Warn().Str("userId", userId.String()).Msg("Unauthorized access attempt to admin functionality")
+	if !s.IsAdminUser(userID) {
+		log.Warn().Str("userID", userID.String()).Msg("Unauthorized access attempt to admin functionality")
 		return nil, errors.New("unauthorized access")
 	}
 
@@ -41,13 +42,13 @@ func (s *service) GetAllOrganisations(userId uuid.UUID) ([]*organisation.Organis
 }
 
 // GetOrganisationWithUsers retrieves an organisation with its users if the user is an admin
-func (s *service) GetOrganisationWithUsers(userId, orgId uuid.UUID) (*organisation.Organisation, []*organisation.OrganisationUser, error) {
-	log.Trace().Str("userId", userId.String()).Str("orgId", orgId.String()).Msg("GetOrganisationWithUsers")
+func (s *service) GetOrganisationWithUsers(userID, orgID uuid.UUID) (*organisation.Organisation, []*organisation.OrganisationUser, error) {
+	log.Trace().Str("userID", userID.String()).Str("orgID", orgID.String()).Msg("GetOrganisationWithUsers")
 
-	if !s.IsAdminUser(userId) {
-		log.Warn().Str("userId", userId.String()).Msg("Unauthorized access attempt to admin functionality")
+	if !s.IsAdminUser(userID) {
+		log.Warn().Str("userID", userID.String()).Msg("Unauthorized access attempt to admin functionality")
 		return nil, nil, errors.New("unauthorized access")
 	}
 
-	return s.repo.GetOrganisationWithUsers(orgId)
+	return s.repo.GetOrganisationWithUsers(orgID)
 }

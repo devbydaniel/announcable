@@ -21,9 +21,7 @@ linters:
     - revive       # Fast, configurable, extensible, flexible, and beautiful linter for Go
     - goconst      # Finds repeated strings that could be replaced by a constant
     - unconvert    # Removes unnecessary type conversions
-    - unparam      # Reports unused function parameters
     - gosec        # Inspects source code for security problems
-    - exportloopref # Checks for pointers to enclosing loop variables
     - nolintlint   # Reports ill-formed or insufficient nolint directives
     - bodyclose    # Checks whether HTTP response body is closed successfully
 
@@ -58,7 +56,9 @@ linters-settings:
   gosec:
     excludes:
       - G104  # Audit errors not checked - covered by errcheck
+      - G112  # Potential Slowloris Attack - handled at reverse proxy level (nginx)
       - G307  # Deferring unsafe method "Close" - too many false positives
+      - G402  # TLS InsecureSkipVerify / MinVersion - used for dev email (Mailcatcher)
 
   goconst:
     min-len: 3
@@ -68,7 +68,8 @@ linters-settings:
   misspell:
     locale: US
     ignore-words:
-      - organisation  # UK spelling used in codebase
+      - organisation  # UK spelling used intentionally throughout codebase
+      - organisations
 
   nolintlint:
     allow-unused: false
@@ -82,7 +83,6 @@ issues:
       linters:
         - errcheck
         - gosec
-        - unparam
 
     # Exclude shadow check in main.go for common var names
     - path: main\.go

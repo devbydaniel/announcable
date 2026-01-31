@@ -52,7 +52,7 @@ type config struct {
 	Env         string
 	BaseURL     string
 	Port        int
-	AdminUserId string
+	AdminUserID string
 	Postgres    postgresConfig
 	ObjStorage  objStorageConfig
 	PgAdmin     pgAdminConfig
@@ -61,12 +61,13 @@ type config struct {
 	Axiom       axiomConfig
 }
 
+// New creates a config instance populated from environment variables.
 func New() *config {
 	cfg := &config{
 		Env:         getEnv("ENV"),
 		BaseURL:     getEnv("BASE_URL"),
 		Port:        getEnvAsInt("PORT"),
-		AdminUserId: getEnv("ADMIN_USER_ID"),
+		AdminUserID: getEnv("ADMIN_USER_ID"),
 		Postgres: postgresConfig{
 			Host:     getEnv("POSTGRES_HOST"),
 			Port:     getEnvAsInt("POSTGRES_PORT"),

@@ -7,13 +7,17 @@ import (
 	"github.com/google/uuid"
 )
 
+// MetricType represents the type of release note metric being tracked.
 type MetricType string
 
 const (
-	MetricTypeView     MetricType = "view"
+	// MetricTypeView represents a release note view event.
+	MetricTypeView MetricType = "view"
+	// MetricTypeCtaClick represents a call-to-action click event.
 	MetricTypeCtaClick MetricType = "cta_click"
 )
 
+// ReleaseNoteMetric represents a tracked metric event for a release note.
 type ReleaseNoteMetric struct {
 	database.BaseModel `gorm:"embedded"`
 	ReleaseNoteID      uuid.UUID

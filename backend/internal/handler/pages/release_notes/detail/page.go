@@ -28,7 +28,7 @@ type pageData struct {
 	TextWebsiteOverrideIsChecked bool
 	HideCtaIsChecked             bool
 	CtaLabelOverrideIsChecked    bool
-	CtaUrlOverrideIsChecked      bool
+	CtaURLOverrideIsChecked      bool
 }
 
 var pageTmpl = templates.Construct(
@@ -45,16 +45,16 @@ func (h *Handlers) ServeReleaseNoteDetailPage(w http.ResponseWriter, r *http.Req
 
 	id := chi.URLParam(r, "id")
 	h.deps.Log.Debug().Str("id", id).Msg("id URL param")
-	orgId, ok := r.Context().Value(mw.OrgIDKey).(string)
+	orgID, ok := r.Context().Value(mw.OrgIDKey).(string)
 	if !ok {
 		h.deps.Log.Error().Msg("Organisation ID not found in context")
 		http.Error(w, "Failed to authenticate", http.StatusInternalServerError)
 		return
 	}
-	h.deps.Log.Debug().Str("id", id).Str("orgId", orgId).Msg("Release note page")
+	h.deps.Log.Debug().Str("id", id).Str("orgID", orgID).Msg("Release note page")
 
 	// get release note
-	rn, err := releaseNoteService.GetOne(id, orgId)
+	rn, err := releaseNoteService.GetOne(id, orgID)
 	if err != nil {
 		http.Error(w, "Error getting release note", http.StatusInternalServerError)
 	}
@@ -68,7 +68,7 @@ func (h *Handlers) ServeReleaseNoteDetailPage(w http.ResponseWriter, r *http.Req
 		TextWebsiteOverrideIsChecked: rn.DescriptionLong != "",
 		HideCtaIsChecked:             rn.HideCta,
 		CtaLabelOverrideIsChecked:    rn.CtaLabelOverride != "",
-		CtaUrlOverrideIsChecked:      rn.CtaUrlOverride != "",
+		CtaURLOverrideIsChecked:      rn.CtaURLOverride != "",
 	}
 	h.deps.Log.Debug().Interface("data", data).Msg("Data")
 	if err := pageTmpl.ExecuteTemplate(w, "root", data); err != nil {

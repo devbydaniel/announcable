@@ -9,6 +9,7 @@ type repository struct {
 	db *database.DB
 }
 
+// NewRepository creates a new widget config repository backed by the given database.
 func NewRepository(db *database.DB) *repository {
 	log.Trace().Msg("NewRepository")
 	return &repository{db: db}
@@ -25,7 +26,7 @@ func (r *repository) Create(cfg *WidgetConfig) error {
 	return nil
 }
 
-func (r *repository) Update(orgId uuid.UUID, cfg *WidgetConfig) error {
+func (r *repository) Update(orgID uuid.UUID, cfg *WidgetConfig) error {
 	log.Trace().Msg("Update")
 	client := r.db.Client
 	if err := client.Model(&WidgetConfig{}).Select(
@@ -46,7 +47,7 @@ func (r *repository) Update(orgId uuid.UUID, cfg *WidgetConfig) error {
 		"EnableLikes",
 		"LikeButtonText",
 		"UnlikeButtonText",
-	).Where("organisation_id = ?", orgId).Updates(cfg).Error; err != nil {
+	).Where("organisation_id = ?", orgID).Updates(cfg).Error; err != nil {
 		log.Error().Err(err).Msg("Error updating widget config")
 		return err
 	}
@@ -54,10 +55,10 @@ func (r *repository) Update(orgId uuid.UUID, cfg *WidgetConfig) error {
 	return nil
 }
 
-func (r *repository) UpdatePartial(orgId uuid.UUID, fields map[string]interface{}) error {
+func (r *repository) UpdatePartial(orgID uuid.UUID, fields map[string]interface{}) error {
 	log.Trace().Msg("UpdateFields")
 	client := r.db.Client
-	if err := client.Model(&WidgetConfig{}).Where("organisation_id = ?", orgId).Updates(fields).Error; err != nil {
+	if err := client.Model(&WidgetConfig{}).Where("organisation_id = ?", orgID).Updates(fields).Error; err != nil {
 		log.Error().Err(err).Msg("Error updating widget config fields")
 		return err
 	}
@@ -65,10 +66,10 @@ func (r *repository) UpdatePartial(orgId uuid.UUID, fields map[string]interface{
 	return nil
 }
 
-func (r *repository) Get(orgId uuid.UUID) (*WidgetConfig, error) {
-	log.Trace().Str("orgId", orgId.String()).Msg("Get")
+func (r *repository) Get(orgID uuid.UUID) (*WidgetConfig, error) {
+	log.Trace().Str("orgID", orgID.String()).Msg("Get")
 	var cfg WidgetConfig
-	if err := r.db.Client.Model(&WidgetConfig{}).Where("organisation_id = ?", orgId).First(&cfg).Error; err != nil {
+	if err := r.db.Client.Model(&WidgetConfig{}).Where("organisation_id = ?", orgID).First(&cfg).Error; err != nil {
 		return nil, err
 	}
 	return &cfg, nil

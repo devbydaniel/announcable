@@ -43,7 +43,7 @@ func (h *Handlers) ServeWidgetConfigPage(w http.ResponseWriter, r *http.Request)
 	h.deps.Log.Trace().Msg("ServeWidgetConfigPage")
 	widgetService := widgetconfigs.NewService(*widgetconfigs.NewRepository(h.deps.DB))
 
-	orgId, ok := r.Context().Value(mw.OrgIDKey).(string)
+	orgID, ok := r.Context().Value(mw.OrgIDKey).(string)
 	if !ok {
 		h.deps.Log.Error().Msg("Organisation ID not found in context")
 		http.Error(w, "Failed to authenticate", http.StatusInternalServerError)
@@ -52,12 +52,12 @@ func (h *Handlers) ServeWidgetConfigPage(w http.ResponseWriter, r *http.Request)
 
 	// get widget config
 	var cfg *widgetconfigs.WidgetConfig
-	cfg, err := widgetService.Get(uuid.MustParse(orgId))
+	cfg, err := widgetService.Get(uuid.MustParse(orgID))
 	if err != nil {
 		if errors.Is(err, h.deps.DB.ErrRecordNotFound) {
 			// this should not happen, just in case...
 			h.deps.Log.Warn().Msg("Widget config not found, creating...")
-			cfg, err = widgetService.Init(uuid.MustParse(orgId))
+			cfg, err = widgetService.Init(uuid.MustParse(orgID))
 			if err != nil {
 				h.deps.Log.Error().Err(err).Msg("Error creating widget config")
 				http.Error(w, "Error creating widget config", http.StatusInternalServerError)

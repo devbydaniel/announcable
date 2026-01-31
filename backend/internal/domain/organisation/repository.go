@@ -10,6 +10,7 @@ type repository struct {
 	db *database.DB
 }
 
+// NewRepository creates a new organisation repository.
 func NewRepository(db *database.DB) *repository {
 	log.Trace().Msg("NewRepository")
 	return &repository{db: db}
@@ -29,31 +30,31 @@ func (r *repository) FindOrgByName(name string) (*Organisation, error) {
 	return &org, nil
 }
 
-func (r *repository) FindOrg(orgId uuid.UUID) (*Organisation, error) {
-	log.Trace().Str("orgId", orgId.String()).Msg("FindOrgById")
+func (r *repository) FindOrg(orgID uuid.UUID) (*Organisation, error) {
+	log.Trace().Str("orgID", orgID.String()).Msg("FindOrgById")
 	var org Organisation
 
-	if err := r.db.Client.First(&org, "id = ?", orgId).Error; err != nil {
+	if err := r.db.Client.First(&org, "id = ?", orgID).Error; err != nil {
 		log.Error().Err(err).Msg("Error finding organisation")
 		return nil, err
 	}
 	return &org, nil
 }
 
-func (r *repository) FindOrgByExternalId(externalId uuid.UUID) (*Organisation, error) {
-	log.Trace().Str("externalId", externalId.String()).Msg("FindOrgByExternalId")
+func (r *repository) FindOrgByExternalID(externalID uuid.UUID) (*Organisation, error) {
+	log.Trace().Str("externalID", externalID.String()).Msg("FindOrgByExternalID")
 	var org Organisation
 
-	if err := r.db.Client.First(&org, "external_id = ?", externalId).Error; err != nil {
+	if err := r.db.Client.First(&org, "external_id = ?", externalID).Error; err != nil {
 		log.Error().Err(err).Msg("Error finding organisation by external id")
 		return nil, err
 	}
 	return &org, nil
 }
 
-func (r *repository) UpdateOrg(orgId uuid.UUID, org *Organisation) error {
-	log.Trace().Str("orgId", orgId.String()).Msg("UpdateOrg")
-	return r.db.Client.Model(&Organisation{}).Where("id = ?", orgId).Updates(org).Error
+func (r *repository) UpdateOrg(orgID uuid.UUID, org *Organisation) error {
+	log.Trace().Str("orgID", orgID.String()).Msg("UpdateOrg")
+	return r.db.Client.Model(&Organisation{}).Where("id = ?", orgID).Updates(org).Error
 }
 
 func (r *repository) SaveOrgUser(ou *OrganisationUser, tx *gorm.DB) error {
@@ -67,32 +68,32 @@ func (r *repository) SaveOrgUser(ou *OrganisationUser, tx *gorm.DB) error {
 	return client.Create(ou).Error
 }
 
-func (r *repository) FindOrgUser(orgUserId uuid.UUID) (*OrganisationUser, error) {
-	log.Trace().Str("orgUserId", orgUserId.String()).Msg("FindByOrgUserId")
+func (r *repository) FindOrgUser(orgUserID uuid.UUID) (*OrganisationUser, error) {
+	log.Trace().Str("orgUserID", orgUserID.String()).Msg("FindByOrgUserId")
 	var ou OrganisationUser
-	if err := r.db.Client.First(&ou, orgUserId).Error; err != nil {
+	if err := r.db.Client.First(&ou, orgUserID).Error; err != nil {
 		log.Error().Err(err).Msg("Error finding organisation user")
 		return nil, err
 	}
 	return &ou, nil
 }
 
-func (r *repository) FindOrgUserByUserId(userId uuid.UUID) (*OrganisationUser, error) {
-	log.Trace().Str("userId", userId.String()).Msg("FindByUserId")
+func (r *repository) FindOrgUserByUserID(userID uuid.UUID) (*OrganisationUser, error) {
+	log.Trace().Str("userID", userID.String()).Msg("FindByUserId")
 	var ou OrganisationUser
 
-	if err := r.db.Client.Preload("User").Preload("Organisation").First(&ou, "user_id = ?", userId).Error; err != nil {
+	if err := r.db.Client.Preload("User").Preload("Organisation").First(&ou, "user_id = ?", userID).Error; err != nil {
 		log.Error().Err(err).Msg("Error finding organisation user")
 		return nil, err
 	}
 	return &ou, nil
 }
 
-func (r *repository) FindOrgUsers(orgId uuid.UUID) ([]*OrganisationUser, error) {
-	log.Trace().Str("orgId", orgId.String()).Msg("FindByOrgId")
+func (r *repository) FindOrgUsers(orgID uuid.UUID) ([]*OrganisationUser, error) {
+	log.Trace().Str("orgID", orgID.String()).Msg("FindByOrgID")
 	var ous []*OrganisationUser
 
-	if err := r.db.Client.Model(&OrganisationUser{}).Preload("User").Find(&ous, "organisation_id = ?", orgId).Error; err != nil {
+	if err := r.db.Client.Model(&OrganisationUser{}).Preload("User").Find(&ous, "organisation_id = ?", orgID).Error; err != nil {
 		log.Error().Err(err).Msg("Error finding organisation users by organisation id")
 		return nil, err
 	}
@@ -107,7 +108,7 @@ func (r *repository) DeleteOrgUser(orgUserID uuid.UUID, tx *gorm.DB) error {
 	} else {
 		client = r.db.Client
 	}
-	log.Trace().Str("userId", orgUserID.String()).Msg("DeleteByUserId")
+	log.Trace().Str("userID", orgUserID.String()).Msg("DeleteByUserID")
 	return client.Delete(&OrganisationUser{}, orgUserID).Error
 }
 
@@ -116,11 +117,11 @@ func (r *repository) CreateInvite(invite *OrganisationInvite) error {
 	return r.db.Client.Create(invite).Error
 }
 
-func (r *repository) FindInvites(orgId uuid.UUID) ([]*OrganisationInvite, error) {
-	log.Trace().Str("orgId", orgId.String()).Msg("FindInvitesByOrgId")
+func (r *repository) FindInvites(orgID uuid.UUID) ([]*OrganisationInvite, error) {
+	log.Trace().Str("orgID", orgID.String()).Msg("FindInvitesByOrgID")
 	var invites []*OrganisationInvite
 
-	if err := r.db.Client.Model(&OrganisationInvite{}).Find(&invites, "organisation_id = ?", orgId).Error; err != nil {
+	if err := r.db.Client.Model(&OrganisationInvite{}).Find(&invites, "organisation_id = ?", orgID).Error; err != nil {
 		log.Error().Err(err).Msg("Error finding invites by organisation id")
 		return nil, err
 	}
@@ -128,11 +129,11 @@ func (r *repository) FindInvites(orgId uuid.UUID) ([]*OrganisationInvite, error)
 	return invites, nil
 }
 
-func (r *repository) FindInviteByExternalId(externalId string) (*OrganisationInvite, error) {
-	log.Trace().Str("externalId", externalId).Msg("FindInviteByExternalId")
+func (r *repository) FindInviteByExternalID(externalID string) (*OrganisationInvite, error) {
+	log.Trace().Str("externalID", externalID).Msg("FindInviteByExternalID")
 	var invite OrganisationInvite
 
-	if err := r.db.Client.Preload("Organisation").First(&invite, "external_id = ?", externalId).Error; err != nil {
+	if err := r.db.Client.Preload("Organisation").First(&invite, "external_id = ?", externalID).Error; err != nil {
 		log.Error().Err(err).Msg("Error finding invite by external id")
 		return nil, err
 	}

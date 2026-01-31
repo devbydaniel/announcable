@@ -50,7 +50,7 @@ var pageTmpl = templates.Construct(
 func (h *Handlers) ServeReleaseNotesListPage(w http.ResponseWriter, r *http.Request) {
 	h.deps.Log.Trace().Msg("ServeReleaseNotesListPage")
 	ctx := r.Context()
-	orgId, ok := ctx.Value(mw.OrgIDKey).(string)
+	orgID, ok := ctx.Value(mw.OrgIDKey).(string)
 	if !ok {
 		h.deps.Log.Error().Msg("Organisation ID not found in context")
 		http.Error(w, "Failed to authenticate", http.StatusInternalServerError)
@@ -81,9 +81,9 @@ func (h *Handlers) ServeReleaseNotesListPage(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	releaseNotes, err := releaseNotesService.GetAll(orgId, pageInt, pageSizeInt)
+	releaseNotes, err := releaseNotesService.GetAll(orgID, pageInt, pageSizeInt)
 	if err != nil {
-		w.Write([]byte(err.Error()))
+		_, _ = w.Write([]byte(err.Error()))
 		return
 	}
 

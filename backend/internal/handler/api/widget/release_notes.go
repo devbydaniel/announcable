@@ -59,14 +59,14 @@ func (h *Handlers) HandleReleaseNotesServe(w http.ResponseWriter, r *http.Reques
 		http.Error(w, "Error getting release notes", http.StatusBadRequest)
 		return
 	}
-	externalOrgId := chi.URLParam(r, "orgId")
-	if externalOrgId == "" {
+	externalOrgID := chi.URLParam(r, "orgID")
+	if externalOrgID == "" {
 		h.Log.Error().Msg("Org ID not found in URL")
 		http.Error(w, "Error getting release notes", http.StatusBadRequest)
 		return
 	}
 
-	org, err := organisationService.GetOrgByExternalId(uuid.MustParse(externalOrgId))
+	org, err := organisationService.GetOrgByExternalID(uuid.MustParse(externalOrgID))
 	if err != nil {
 		h.Log.Error().Err(err).Msg("Error getting org ID")
 		http.Error(w, "Error getting widget config", http.StatusInternalServerError)
@@ -82,7 +82,7 @@ func (h *Handlers) HandleReleaseNotesServe(w http.ResponseWriter, r *http.Reques
 		filters["hide_on_release_page"] = false
 	}
 
-	releaseNotes, err := releaseNotesService.GetAllWithImgUrl(org.ID.String(), pageInt, pageSizeInt, filters)
+	releaseNotes, err := releaseNotesService.GetAllWithImgURL(org.ID.String(), pageInt, pageSizeInt, filters)
 	if err != nil {
 		h.Log.Error().Err(err).Msg("Error getting release notes")
 		http.Error(w, "Error getting release notes", http.StatusInternalServerError)
@@ -92,7 +92,7 @@ func (h *Handlers) HandleReleaseNotesServe(w http.ResponseWriter, r *http.Reques
 
 	var res serveReleaseNotesWidgetResponseBody
 	for _, rn := range releaseNotes.Items {
-		if rn.IsPublished == false {
+		if !rn.IsPublished {
 			continue
 		}
 		var releaseDate string
@@ -114,12 +114,12 @@ func (h *Handlers) HandleReleaseNotesServe(w http.ResponseWriter, r *http.Reques
 			ID:                 rn.ID.String(),
 			Title:              rn.Title,
 			Date:               releaseDate,
-			ImageSrc:           rn.ImageUrl,
+			ImageSrc:           rn.ImageURL,
 			MediaLink:          rn.MediaLink,
 			Text:               rn.DescriptionShort,
 			LastUpdateOn:       rn.UpdatedAt.String(),
 			CtaLabelOverride:   rn.CtaLabelOverride,
-			CtaHrefOverride:    rn.CtaUrlOverride,
+			CtaHrefOverride:    rn.CtaURLOverride,
 			HideCta:            rn.HideCta,
 			AttentionMechanism: rn.AttentionMechanism.String(),
 		})

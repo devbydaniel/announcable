@@ -4,8 +4,8 @@ import (
 	"github.com/google/uuid"
 )
 
-// AdminUser represents the admin user with special privileges
-type AdminUser struct {
+// AdminUser represents the admin user with special privileges.
+type AdminUser struct { //nolint:revive // stutter is acceptable here
 	UserID uuid.UUID
 }
 

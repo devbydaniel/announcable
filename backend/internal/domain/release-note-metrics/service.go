@@ -8,6 +8,7 @@ type service struct {
 	repo *repository
 }
 
+// NewService creates a new release note metrics service.
 func NewService(r *repository) *service {
 	log.Trace().Msg("NewService")
 	return &service{repo: r}

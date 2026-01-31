@@ -12,6 +12,7 @@ type repository struct {
 	db *database.DB
 }
 
+// NewRepository creates a new release note likes repository.
 func NewRepository(db *database.DB) *repository {
 	log.Trace().Msg("NewRepository")
 	return &repository{db: db}

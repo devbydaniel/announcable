@@ -26,15 +26,15 @@ func (h *Handlers) HandleReleaseNoteToggleLike(w http.ResponseWriter, r *http.Re
 	orgService := organisation.NewService(*organisation.NewRepository(h.DB))
 
 	// Get external org ID from URL params
-	externalOrgId := chi.URLParam(r, "orgId")
-	if externalOrgId == "" {
+	externalOrgID := chi.URLParam(r, "orgID")
+	if externalOrgID == "" {
 		h.Log.Error().Msg("Organisation ID not found in URL")
 		http.Error(w, "Organisation ID required", http.StatusBadRequest)
 		return
 	}
 
 	// Get org by external ID
-	org, err := orgService.GetOrgByExternalId(uuid.MustParse(externalOrgId))
+	org, err := orgService.GetOrgByExternalID(uuid.MustParse(externalOrgID))
 	if err != nil {
 		h.Log.Error().Err(err).Msg("Error getting organisation")
 		http.Error(w, "Error getting organisation", http.StatusInternalServerError)

@@ -10,21 +10,21 @@ import (
 	"github.com/google/uuid"
 )
 
-// releasePageUrlUpdateForm represents the form data for updating release page base URL
-type releasePageUrlUpdateForm struct {
-	UseCustomUrl       bool   `schema:"use_custom_url"`
-	CustomUrl          string `schema:"custom_url"`
+// releasePageURLUpdateForm represents the form data for updating release page base URL
+type releasePageURLUpdateForm struct {
+	UseCustomURL       bool   `schema:"use_custom_url"`
+	CustomURL          string `schema:"custom_url"`
 	DisableReleasePage bool   `schema:"disable_release_page"`
 }
 
-// HandleReleasePageUrlUpdate handles PATCH /settings/release-page-url
-func (h *Handlers) HandleReleasePageUrlUpdate(w http.ResponseWriter, r *http.Request) {
-	h.deps.Log.Trace().Msg("HandleReleasePageUrlUpdate")
+// HandleReleasePageURLUpdate handles PATCH /settings/release-page-url
+func (h *Handlers) HandleReleasePageURLUpdate(w http.ResponseWriter, r *http.Request) {
+	h.deps.Log.Trace().Msg("HandleReleasePageURLUpdate")
 	ctx := r.Context()
 	widgetService := widgetconfigs.NewService(*widgetconfigs.NewRepository(h.deps.DB))
 
-	orgId := ctx.Value(mw.OrgIDKey).(string)
-	if orgId == "" {
+	orgID := ctx.Value(mw.OrgIDKey).(string)
+	if orgID == "" {
 		h.deps.Log.Error().Msg("Organisation ID not found in context")
 		http.Error(w, "Error updating release page URL", http.StatusInternalServerError)
 		return
@@ -38,7 +38,7 @@ func (h *Handlers) HandleReleasePageUrlUpdate(w http.ResponseWriter, r *http.Req
 	}
 
 	// decode form
-	var updateDTO releasePageUrlUpdateForm
+	var updateDTO releasePageURLUpdateForm
 	if err := h.deps.Decoder.Decode(&updateDTO, r.PostForm); err != nil {
 		h.deps.Log.Error().Err(err).Msg("Error decoding form")
 		http.Error(w, "Error updating release page URL", http.StatusBadRequest)
@@ -53,17 +53,21 @@ func (h *Handlers) HandleReleasePageUrlUpdate(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	var newBaseUrl *string
-	if updateDTO.UseCustomUrl {
-		newBaseUrl = &updateDTO.CustomUrl
+	var newBaseURL *string
+	if updateDTO.UseCustomURL {
+		newBaseURL = &updateDTO.CustomURL
 	} else {
-		newBaseUrl = nil
+		newBaseURL = nil
 	}
 
-	widgetService.UpdateBaseUrl(uuid.MustParse(orgId), newBaseUrl)
+	if err := widgetService.UpdateBaseURL(uuid.MustParse(orgID), newBaseURL); err != nil {
+		h.deps.Log.Error().Err(err).Msg("Error updating widget base URL")
+		http.Error(w, "Error updating settings", http.StatusInternalServerError)
+		return
+	}
 
 	releasePageConfigService := releasepageconfig.NewService(*releasepageconfig.NewRepository(h.deps.DB, h.deps.ObjStore))
-	if err := releasePageConfigService.UpdateDisableReleasePage(uuid.MustParse(orgId), updateDTO.DisableReleasePage); err != nil {
+	if err := releasePageConfigService.UpdateDisableReleasePage(uuid.MustParse(orgID), updateDTO.DisableReleasePage); err != nil {
 		h.deps.Log.Error().Err(err).Msg("Error updating disable release page")
 		http.Error(w, "Error updating settings", http.StatusInternalServerError)
 		return

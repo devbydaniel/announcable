@@ -1,4 +1,4 @@
-package invite_accept
+package inviteaccept
 
 import (
 	"errors"
@@ -92,7 +92,7 @@ func (h *Handlers) HandleAccept(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := orgService.AcceptInvite(invite, user); err != nil {
-		userService.Delete(user.ID)
+		_ = userService.Delete(user.ID)
 		http.Error(w, "Error accepting invite", http.StatusInternalServerError)
 		return
 	}
@@ -100,5 +100,4 @@ func (h *Handlers) HandleAccept(w http.ResponseWriter, r *http.Request) {
 	successMsg := url.QueryEscape("invite accepted")
 	w.Header().Set("HX-Redirect", "/login?success="+successMsg)
 	w.WriteHeader(http.StatusCreated)
-	return
 }

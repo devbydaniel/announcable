@@ -28,21 +28,21 @@ func (h *Handlers) HandleInviteCreate(w http.ResponseWriter, r *http.Request) {
 	h.deps.Log.Trace().Msg("HandleInviteCreate")
 	ctx := r.Context()
 
-	userId := ctx.Value(mw.UserIDKey).(string)
-	if userId == "" {
+	userID := ctx.Value(mw.UserIDKey).(string)
+	if userID == "" {
 		h.deps.Log.Error().Msg("User ID not found in context")
 		http.Error(w, "Error creating invite", http.StatusInternalServerError)
 	}
 
 	// check rate limit
-	if err := inviteUserRateLimiter.Deduct(userId, 1); err != nil {
-		h.deps.Log.Warn().Str("user_id", userId).Msg("Rate limit exceeded for invite user requests")
+	if err := inviteUserRateLimiter.Deduct(userID, 1); err != nil {
+		h.deps.Log.Warn().Str("user_id", userID).Msg("Rate limit exceeded for invite user requests")
 		http.Error(w, "Too many requests. Please try again later.", http.StatusTooManyRequests)
 		return
 	}
 
-	orgId := ctx.Value(mw.OrgIDKey).(string)
-	if orgId == "" {
+	orgID := ctx.Value(mw.OrgIDKey).(string)
+	if orgID == "" {
 		h.deps.Log.Error().Msg("Organisation ID not found in context")
 		http.Error(w, "Error creating invite", http.StatusInternalServerError)
 	}
@@ -72,7 +72,7 @@ func (h *Handlers) HandleInviteCreate(w http.ResponseWriter, r *http.Request) {
 
 	// create invite and send email (if enabled)
 	orgService := organisation.NewService(*organisation.NewRepository(h.deps.DB))
-	inviteUrl, err := orgService.InviteUser(uuid.MustParse(orgId), inviteDTO.Email, inviteDTO.Role)
+	inviteURL, err := orgService.InviteUser(uuid.MustParse(orgID), inviteDTO.Email, inviteDTO.Role)
 	if err != nil {
 		h.deps.Log.Error().Err(err).Msg("Error creating invite")
 		http.Error(w, "Error creating invite", http.StatusInternalServerError)
@@ -91,6 +91,6 @@ func (h *Handlers) HandleInviteCreate(w http.ResponseWriter, r *http.Request) {
 		// Email disabled: return invite URL as JSON
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode(map[string]string{"inviteUrl": inviteUrl})
+		_ = json.NewEncoder(w).Encode(map[string]string{"inviteURL": inviteURL})
 	}
 }

@@ -23,7 +23,7 @@ func (h *Handlers) HandleOrgUpdate(w http.ResponseWriter, r *http.Request) {
 	adminService := admin.NewService(*admin.NewRepository(h.DB))
 	orgService := organisation.NewService(*organisation.NewRepository(h.DB))
 
-	userId, ok := r.Context().Value(mw.UserIDKey).(string)
+	userID, ok := r.Context().Value(mw.UserIDKey).(string)
 	if !ok {
 		h.Log.Error().Msg("Error finding user")
 		http.Error(w, "Failed to authenticate", http.StatusInternalServerError)
@@ -31,17 +31,17 @@ func (h *Handlers) HandleOrgUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Check if the user is an admin
-	if !adminService.IsAdminUser(uuid.MustParse(userId)) {
-		h.Log.Warn().Str("userId", userId).Msg("Unauthorized access attempt to admin functionality")
+	if !adminService.IsAdminUser(uuid.MustParse(userID)) {
+		h.Log.Warn().Str("userID", userID).Msg("Unauthorized access attempt to admin functionality")
 		http.Error(w, "Unauthorized", http.StatusForbidden)
 		return
 	}
 
 	// Get organisation ID from URL params
-	orgIDStr := chi.URLParam(r, "orgId")
+	orgIDStr := chi.URLParam(r, "orgID")
 	orgID, err := uuid.Parse(orgIDStr)
 	if err != nil {
-		h.Log.Error().Str("orgId", orgIDStr).Err(err).Msg("Error parsing organisation ID")
+		h.Log.Error().Str("orgID", orgIDStr).Err(err).Msg("Error parsing organisation ID")
 		http.Error(w, "Invalid organisation ID", http.StatusBadRequest)
 		return
 	}

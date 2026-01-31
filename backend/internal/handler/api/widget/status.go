@@ -21,20 +21,21 @@ type releaseNotesStatusResponseBody struct {
 	Data []releaseNotesStatusResponseBodyData `json:"data"`
 }
 
+// MemCacheReleaseNotesStatus is the in-memory cache for release notes status responses.
 var MemCacheReleaseNotesStatus = memcache.New(5*time.Minute, 10*time.Minute)
 
 // HandleReleaseNotesStatusServe serves release notes status for the widget
 func (h *Handlers) HandleReleaseNotesStatusServe(w http.ResponseWriter, r *http.Request) {
 	h.Log.Trace().Msg("HandleReleaseNotesStatusServe")
-	externalOrgId := chi.URLParam(r, "orgId")
-	if externalOrgId == "" {
+	externalOrgID := chi.URLParam(r, "orgID")
+	if externalOrgID == "" {
 		h.Log.Error().Msg("Org ID not found in URL")
 		http.Error(w, "Error getting release notes status", http.StatusBadRequest)
 		return
 	}
 
 	var releaseNotesStatus []*releasenotes.ReleaseNoteStatus
-	status, found := MemCacheReleaseNotesStatus.Get(externalOrgId)
+	status, found := MemCacheReleaseNotesStatus.Get(externalOrgID)
 	if found {
 		h.Log.Trace().Msg("Found in cache")
 		releaseNotesStatus = status.([]*releasenotes.ReleaseNoteStatus)
@@ -43,7 +44,7 @@ func (h *Handlers) HandleReleaseNotesStatusServe(w http.ResponseWriter, r *http.
 		releaseNotesService := releasenotes.NewService(*releasenotes.NewRepository(h.DB, h.ObjStore))
 		forWidgetOrWebsite := r.URL.Query().Get("for")
 		h.Log.Trace().Msg("Not found in cache")
-		org, err := organisationService.GetOrgByExternalId(uuid.MustParse(externalOrgId))
+		org, err := organisationService.GetOrgByExternalID(uuid.MustParse(externalOrgID))
 		if err != nil {
 			h.Log.Error().Err(err).Msg("Error getting org ID")
 			http.Error(w, "Error getting release notes status", http.StatusInternalServerError)
@@ -61,7 +62,7 @@ func (h *Handlers) HandleReleaseNotesStatusServe(w http.ResponseWriter, r *http.
 			http.Error(w, "Error getting release notes status", http.StatusInternalServerError)
 			return
 		}
-		MemCacheReleaseNotesStatus.Set(externalOrgId, status, 5*time.Minute)
+		MemCacheReleaseNotesStatus.Set(externalOrgID, status, 5*time.Minute)
 		releaseNotesStatus = status
 	}
 

@@ -10,6 +10,7 @@ import (
 
 var log = logger.Get()
 
+// HashPassword returns a bcrypt hash of the given password.
 func HashPassword(password string) (string, error) {
 	log.Trace().Msg("HashPassword")
 	passwordBytes := []byte(password)
@@ -20,6 +21,7 @@ func HashPassword(password string) (string, error) {
 	return string(hashed), nil
 }
 
+// DoPasswordsMatch reports whether the plaintext password matches the bcrypt hash.
 func DoPasswordsMatch(hashedPassword, test string) bool {
 	log.Trace().Msg("DoPasswordsMatch")
 	if err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(test)); err != nil {
@@ -28,6 +30,7 @@ func DoPasswordsMatch(hashedPassword, test string) bool {
 	return true
 }
 
+// IsValidPassword validates that the password meets minimum complexity requirements.
 func IsValidPassword(password string) error {
 	log.Trace().Msg("IsValidPassword")
 	// Check minimum length

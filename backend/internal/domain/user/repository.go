@@ -9,6 +9,7 @@ type repository struct {
 	db *database.DB
 }
 
+// NewRepository creates a new user repository backed by the given database.
 func NewRepository(db *database.DB) *repository {
 	log.Trace().Msg("NewRepository")
 	return &repository{db: db}
@@ -42,8 +43,8 @@ func (r *repository) UpdateWithNil(id uuid.UUID, data map[string]interface{}) er
 	return nil
 }
 
-func (r *repository) FindById(id uuid.UUID) (*User, error) {
-	log.Trace().Str("id", id.String()).Msg("FindById")
+func (r *repository) FindByID(id uuid.UUID) (*User, error) {
+	log.Trace().Str("id", id.String()).Msg("FindByID")
 	var u User
 
 	if err := r.db.Client.First(&u, "id = ?", id).Error; err != nil {

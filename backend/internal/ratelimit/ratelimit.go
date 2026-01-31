@@ -7,15 +7,18 @@ import (
 	"time"
 )
 
+// RaterLimiter defines the interface for a rate limiter.
 type RaterLimiter interface {
 	Deduct(id string, cost float64) error
 }
 
+// New creates a new token bucket rate limiter with the given refill interval and max value.
 func New(refillIntervalSeconds int64, maxValue float64) RaterLimiter {
 	buckets := make(map[string]*Bucket)
 	return &TokenBucketRateLimit{refillIntervalMillis: refillIntervalSeconds * 1000, maxValue: maxValue, buckets: buckets}
 }
 
+// Bucket holds the token count and refill state for a single rate-limited entity.
 type Bucket struct {
 	count      float64
 	refilledAt int64
@@ -40,15 +43,17 @@ func (b *Bucket) consume(cost, maxValue float64, refillIntervalMillis int64) boo
 	return false
 }
 
+// TokenBucketRateLimit implements RaterLimiter using the token bucket algorithm.
 type TokenBucketRateLimit struct {
 	refillIntervalMillis int64
 	maxValue             float64
 	buckets              map[string]*Bucket
 }
 
+// Deduct attempts to consume tokens from the bucket for the given ID, returning an error if the limit is exceeded.
 func (tbr *TokenBucketRateLimit) Deduct(id string, cost float64) error {
 	now := time.Now().UTC().UnixMilli()
-	// check if userId is already part of the map
+	// check if userID is already part of the map
 	bucket, ok := tbr.buckets[id]
 	if !ok {
 		bucket := Bucket{count: tbr.maxValue, refilledAt: now}

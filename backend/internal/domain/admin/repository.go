@@ -10,6 +10,7 @@ type repository struct {
 	db *database.DB
 }
 
+// NewRepository creates a new admin repository.
 func NewRepository(db *database.DB) *repository {
 	log.Trace().Msg("NewRepository")
 	return &repository{db: db}
@@ -30,17 +31,17 @@ func (r *repository) GetAllOrganisations() ([]*organisation.Organisation, error)
 }
 
 // GetOrganisationWithUsers retrieves an organisation with its users
-func (r *repository) GetOrganisationWithUsers(orgId uuid.UUID) (*organisation.Organisation, []*organisation.OrganisationUser, error) {
-	log.Trace().Str("orgId", orgId.String()).Msg("GetOrganisationWithUsers")
+func (r *repository) GetOrganisationWithUsers(orgID uuid.UUID) (*organisation.Organisation, []*organisation.OrganisationUser, error) {
+	log.Trace().Str("orgID", orgID.String()).Msg("GetOrganisationWithUsers")
 	var org organisation.Organisation
 	var orgUsers []*organisation.OrganisationUser
 
-	if err := r.db.Client.First(&org, "id = ?", orgId.String()).Error; err != nil {
+	if err := r.db.Client.First(&org, "id = ?", orgID.String()).Error; err != nil {
 		log.Error().Err(err).Msg("Error finding organisation")
 		return nil, nil, err
 	}
 
-	if err := r.db.Client.Preload("User").Find(&orgUsers, "organisation_id = ?", orgId).Error; err != nil {
+	if err := r.db.Client.Preload("User").Find(&orgUsers, "organisation_id = ?", orgID).Error; err != nil {
 		log.Error().Err(err).Msg("Error finding organisation users")
 		return &org, nil, err
 	}

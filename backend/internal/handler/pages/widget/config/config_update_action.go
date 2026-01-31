@@ -36,15 +36,15 @@ func (h *Handlers) HandleConfigUpdate(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	widgetService := widgetconfigs.NewService(*widgetconfigs.NewRepository(h.deps.DB))
 
-	userId := ctx.Value(mw.UserIDKey).(string)
-	if userId == "" {
+	userID := ctx.Value(mw.UserIDKey).(string)
+	if userID == "" {
 		h.deps.Log.Error().Msg("User ID not found in context")
 		http.Error(w, "Error updating release note", http.StatusInternalServerError)
 		return
 	}
 
-	orgId := ctx.Value(mw.OrgIDKey).(string)
-	if orgId == "" {
+	orgID := ctx.Value(mw.OrgIDKey).(string)
+	if orgID == "" {
 		h.deps.Log.Error().Msg("Organisation ID not found in context")
 		http.Error(w, "Error updating release note", http.StatusInternalServerError)
 		return
@@ -91,7 +91,7 @@ func (h *Handlers) HandleConfigUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	widgetConfig := &widgetconfigs.WidgetConfig{
-		OrganisationID:          uuid.MustParse(orgId),
+		OrganisationID:          uuid.MustParse(orgID),
 		Title:                   updateDTO.Title,
 		Description:             updateDTO.Description,
 		WidgetType:              widgetconfigs.WidgetType(updateDTO.WidgetType),
@@ -112,7 +112,7 @@ func (h *Handlers) HandleConfigUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 	h.deps.Log.Debug().Interface("widget config", widgetConfig).Msg("Widget config to update")
 
-	if err := widgetService.Update(uuid.MustParse(orgId), widgetConfig); err != nil {
+	if err := widgetService.Update(uuid.MustParse(orgID), widgetConfig); err != nil {
 		h.deps.Log.Error().Err(err).Msg("Error updating widget config")
 		http.Error(w, "Error updating widget config", http.StatusInternalServerError)
 		return

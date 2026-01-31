@@ -1,4 +1,4 @@
-package verify_email
+package verifyemail
 
 import (
 	"errors"
@@ -43,7 +43,7 @@ func (h *Handlers) HandleResend(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	sessionService.InvalidateUserSessions(user.ID)
+	_ = sessionService.InvalidateUserSessions(user.ID)
 
 	token := sessionService.CreateToken()
 	if err := sessionService.CreateCustomDuration(token, user.ID, 1*time.Hour); err != nil {

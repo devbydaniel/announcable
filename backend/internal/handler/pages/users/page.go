@@ -62,7 +62,7 @@ func (h *Handlers) ServeUsersPage(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to authenticate", http.StatusInternalServerError)
 		return
 	}
-	orgId, ok := ctx.Value(mw.OrgIDKey).(string)
+	orgID, ok := ctx.Value(mw.OrgIDKey).(string)
 	if !ok {
 		h.deps.Log.Error().Msg("Organisation ID not found in context")
 		http.Error(w, "Failed to authenticate", http.StatusInternalServerError)
@@ -70,9 +70,9 @@ func (h *Handlers) ServeUsersPage(w http.ResponseWriter, r *http.Request) {
 	}
 	orgService := organisation.NewService(*organisation.NewRepository(h.deps.DB))
 
-	orgUsers, err := orgService.GetOrgUsers(uuid.MustParse(orgId))
+	orgUsers, err := orgService.GetOrgUsers(uuid.MustParse(orgID))
 	if err != nil {
-		w.Write([]byte(err.Error()))
+		_, _ = w.Write([]byte(err.Error()))
 		return
 	}
 	userData := make([]*UserData, 0)
@@ -85,9 +85,9 @@ func (h *Handlers) ServeUsersPage(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-	invites, err := orgService.GetInvites(uuid.MustParse(orgId))
+	invites, err := orgService.GetInvites(uuid.MustParse(orgID))
 	if err != nil {
-		w.Write([]byte(err.Error()))
+		_, _ = w.Write([]byte(err.Error()))
 	}
 	inviteData := make([]*InviteData, 0)
 	for _, i := range invites {

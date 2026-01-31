@@ -8,11 +8,11 @@ import (
 	"github.com/google/uuid"
 )
 
-// HandleWidgetIdRegenerate handles PATCH /settings/widget-id
-func (h *Handlers) HandleWidgetIdRegenerate(w http.ResponseWriter, r *http.Request) {
-	h.deps.Log.Trace().Msg("HandleWidgetIdRegenerate")
+// HandleWidgetIDRegenerate handles PATCH /settings/widget-id
+func (h *Handlers) HandleWidgetIDRegenerate(w http.ResponseWriter, r *http.Request) {
+	h.deps.Log.Trace().Msg("HandleWidgetIDRegenerate")
 	ctx := r.Context()
-	orgId, ok := ctx.Value(mw.OrgIDKey).(string)
+	orgID, ok := ctx.Value(mw.OrgIDKey).(string)
 	if !ok {
 		h.deps.Log.Error().Msg("Organisation ID not found in context")
 		http.Error(w, "Failed to authenticate", http.StatusInternalServerError)
@@ -20,7 +20,7 @@ func (h *Handlers) HandleWidgetIdRegenerate(w http.ResponseWriter, r *http.Reque
 	}
 	organisationService := organisation.NewService(*organisation.NewRepository(h.deps.DB))
 
-	_, err := organisationService.RegenerateExternalId(uuid.MustParse(orgId))
+	_, err := organisationService.RegenerateExternalID(uuid.MustParse(orgID))
 	if err != nil {
 		h.deps.Log.Error().Err(err).Msg("Error regenerating widget external ID")
 		http.Error(w, "Error regenerating widget external ID", http.StatusInternalServerError)
