@@ -1,5 +1,9 @@
 # Announcable
 
+[![Backend CI](https://github.com/devbydaniel/announcable/actions/workflows/backend-ci.yml/badge.svg)](https://github.com/devbydaniel/announcable/actions/workflows/backend-ci.yml)
+[![Widget CI](https://github.com/devbydaniel/announcable/actions/workflows/widget-ci.yml/badge.svg)](https://github.com/devbydaniel/announcable/actions/workflows/widget-ci.yml)
+[![Docker Build and Publish](https://github.com/devbydaniel/announcable/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/devbydaniel/announcable/actions/workflows/docker-publish.yml)
+
 A self-hosted release notes and changelog platform. Create beautiful release notes, embed them in your product with a customizable widget, and host a public changelog page.
 
 ## Features
