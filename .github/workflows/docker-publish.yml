@@ -1,21 +1,20 @@
 name: Docker Build and Publish
 
 on:
-  push:
+  workflow_run:
+    workflows: ["Backend CI", "Widget CI"]
+    types:
+      - completed
     branches:
       - main
-    paths:
-      - 'backend/**'
-      - 'widget/**'
-      - 'Dockerfile'
-      - 'docker-compose.yml'
-      - '.github/workflows/docker-publish.yml'
 
 env:
   REGISTRY_IMAGE: announcable/announcable
 
 jobs:
   build-and-push:
+    # Only run if both CI workflows succeeded
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     name: Build and Push Docker Image
     runs-on: ubuntu-latest
     permissions:

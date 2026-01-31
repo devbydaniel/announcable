@@ -49,6 +49,98 @@ A self-hosted release notes and changelog platform. Create beautiful release not
 - **Object Storage**: Minio (S3-compatible)
 - **Email**: SMTP (any provider)
 
+## CI/CD
+
+This project uses GitHub Actions for continuous integration and deployment.
+
+### Automated Workflows
+
+- **Backend CI** ([`.github/workflows/backend-ci.yml`](./.github/workflows/backend-ci.yml))
+  - Runs on: Push to `main`/`develop` branches, all pull requests
+  - Triggers when: Backend code changes
+  - Steps: Go linting (golangci-lint), tests, build verification
+
+- **Widget CI** ([`.github/workflows/widget-ci.yml`](./.github/workflows/widget-ci.yml))
+  - Runs on: Push to `main`/`develop` branches, all pull requests
+  - Triggers when: Widget code changes
+  - Steps: ESLint linting, TypeScript compilation, Vite build
+
+- **Docker Build & Publish** ([`.github/workflows/docker-publish.yml`](./.github/workflows/docker-publish.yml))
+  - Runs on: After Backend CI and Widget CI succeed on `main` branch
+  - Triggers when: CI passes after merge to `main`
+  - Steps: Multi-platform Docker build (amd64/arm64), publish to registry
+
+### Setup for Forks and Contributors
+
+#### 1. Docker Registry Configuration
+
+The Docker publish workflow supports GitHub Container Registry (GHCR) by default. No additional configuration needed - images will be published to `ghcr.io/OWNER/REPO`.
+
+**Alternative: Docker Hub**
+
+To publish to Docker Hub instead:
+
+1. Go to your repository Settings → Secrets and variables → Actions
+2. Add repository secrets:
+   - `DOCKER_USERNAME`: Your Docker Hub username
+   - `DOCKER_PASSWORD`: Your Docker Hub access token (not your password!)
+3. Add repository variable:
+   - `DOCKER_REGISTRY`: Set value to `dockerhub`
+
+#### 2. Branch Protection (Recommended)
+
+To enforce CI checks before merging:
+
+1. Go to Settings → Branches
+2. Click "Add branch protection rule"
+3. Branch name pattern: `main`
+4. Enable:
+   - ☑ Require status checks to pass before merging
+   - ☑ Require branches to be up to date before merging
+   - Select required checks:
+     - `lint-test-build` (Backend CI)
+     - `lint-build` (Widget CI)
+5. Save changes
+
+Without branch protection, contributors can merge PRs even if CI fails.
+
+#### 3. Optional: Code Coverage
+
+To enable Codecov integration:
+
+1. Sign up at [codecov.io](https://codecov.io) and add your repository
+2. Go to Settings → Secrets and variables → Actions
+3. Add secret:
+   - `CODECOV_TOKEN`: Your Codecov token from codecov.io
+
+Coverage reports will automatically upload after backend tests run.
+
+### For Contributors
+
+When you open a pull request:
+1. Backend CI and/or Widget CI will run automatically (depending on changed files)
+2. All checks must pass before merging
+3. You can view workflow logs in the "Checks" tab of your PR
+4. Fix any linting or build errors reported by CI
+
+### Troubleshooting CI/CD
+
+**Workflows not triggering?**
+- Check that your changes are in the correct paths (backend/** or widget/**)
+- Verify GitHub Actions is enabled: Settings → Actions → General
+
+**Docker publish failing?**
+- Verify registry credentials are correct
+- For GHCR: Check Settings → Actions → General → Workflow permissions is set to "Read and write permissions"
+- For Docker Hub: Verify `DOCKER_USERNAME` and `DOCKER_PASSWORD` secrets are set
+
+**Linting errors?**
+- Backend: Run `cd backend && golangci-lint run` locally
+- Widget: Run `cd widget && npm run lint` locally
+- Fix errors and push again
+
+For detailed verification and troubleshooting, see [CI/CD Verification Guide](./docs/ci-cd-verification.md).
+
 ## Self-Hosting
 
 Announcable is designed for self-hosting. No external services required except email delivery.
