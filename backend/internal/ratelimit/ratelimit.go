@@ -44,17 +44,30 @@ type TokenBucketRateLimit struct {
 	refillIntervalMillis int64
 	maxValue             float64
 	buckets              map[string]*Bucket
+	mu                   sync.RWMutex
 }
 
 func (tbr *TokenBucketRateLimit) Deduct(id string, cost float64) (float64, error) {
 	now := time.Now().UTC().UnixMilli()
-	// check if userId is already part of the map
+
+	// Check if bucket exists (read lock)
+	tbr.mu.RLock()
 	bucket, ok := tbr.buckets[id]
+	tbr.mu.RUnlock()
+
 	if !ok {
-		bucket := Bucket{count: tbr.maxValue, refilledAt: now}
-		tbr.buckets[id] = &bucket
+		// Create new bucket (write lock)
+		tbr.mu.Lock()
+		// Double-check after acquiring write lock (another goroutine might have created it)
+		bucket, ok = tbr.buckets[id]
+		if !ok {
+			bucket := Bucket{count: tbr.maxValue, refilledAt: now}
+			tbr.buckets[id] = &bucket
+		}
+		tbr.mu.Unlock()
 		return tbr.Deduct(id, cost)
 	}
+
 	remaining, ok := bucket.consume(cost, tbr.maxValue, tbr.refillIntervalMillis)
 	if !ok {
 		return remaining, errors.New("rate limit reached")

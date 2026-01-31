@@ -124,6 +124,26 @@ func New() *config {
 		},
 	}
 
+	// Validate rate limit configuration
+	if cfg.RateLimit.PublicMaxTokens <= 0 {
+		panic("RATE_LIMIT_PUBLIC_MAX_TOKENS must be positive")
+	}
+	if cfg.RateLimit.PublicRequestsPerInterval <= 0 {
+		panic("RATE_LIMIT_PUBLIC_REQUESTS must be positive")
+	}
+	if cfg.RateLimit.PublicRefillIntervalSeconds <= 0 {
+		panic("RATE_LIMIT_PUBLIC_REFILL_SECONDS must be positive")
+	}
+	if cfg.RateLimit.AuthenticatedMaxTokens <= 0 {
+		panic("RATE_LIMIT_AUTHENTICATED_MAX_TOKENS must be positive")
+	}
+	if cfg.RateLimit.AuthenticatedRequestsPerInterval <= 0 {
+		panic("RATE_LIMIT_AUTHENTICATED_REQUESTS must be positive")
+	}
+	if cfg.RateLimit.AuthenticatedRefillIntervalSeconds <= 0 {
+		panic("RATE_LIMIT_AUTHENTICATED_REFILL_SECONDS must be positive")
+	}
+
 	return cfg
 }
 
