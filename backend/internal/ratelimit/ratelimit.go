@@ -8,7 +8,7 @@ import (
 )
 
 type RaterLimiter interface {
-	Deduct(id string, cost float64) error
+	Deduct(id string, cost float64) (float64, error)
 }
 
 func New(refillIntervalSeconds int64, maxValue float64) RaterLimiter {
@@ -22,7 +22,7 @@ type Bucket struct {
 	mu         sync.Mutex
 }
 
-func (b *Bucket) consume(cost, maxValue float64, refillIntervalMillis int64) bool {
+func (b *Bucket) consume(cost, maxValue float64, refillIntervalMillis int64) (float64, bool) {
 	// lock the bucket
 	b.mu.Lock()
 	defer b.mu.Unlock()
@@ -35,9 +35,9 @@ func (b *Bucket) consume(cost, maxValue float64, refillIntervalMillis int64) boo
 	// deduct cost if possible
 	if b.count >= cost {
 		b.count -= cost
-		return true
+		return b.count, true
 	}
-	return false
+	return b.count, false
 }
 
 type TokenBucketRateLimit struct {
@@ -46,7 +46,7 @@ type TokenBucketRateLimit struct {
 	buckets              map[string]*Bucket
 }
 
-func (tbr *TokenBucketRateLimit) Deduct(id string, cost float64) error {
+func (tbr *TokenBucketRateLimit) Deduct(id string, cost float64) (float64, error) {
 	now := time.Now().UTC().UnixMilli()
 	// check if userId is already part of the map
 	bucket, ok := tbr.buckets[id]
@@ -55,8 +55,9 @@ func (tbr *TokenBucketRateLimit) Deduct(id string, cost float64) error {
 		tbr.buckets[id] = &bucket
 		return tbr.Deduct(id, cost)
 	}
-	if ok := bucket.consume(cost, tbr.maxValue, tbr.refillIntervalMillis); !ok {
-		return errors.New("rate limit reached")
+	remaining, ok := bucket.consume(cost, tbr.maxValue, tbr.refillIntervalMillis)
+	if !ok {
+		return remaining, errors.New("rate limit reached")
 	}
-	return nil
+	return remaining, nil
 }
