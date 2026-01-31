@@ -1,0 +1,109 @@
+run:
+  timeout: 5m
+  tests: true
+  modules-download-mode: readonly
+  go: '1.24'
+
+linters:
+  enable:
+    # Required linters from spec
+    - gofmt        # Checks whether code was gofmt-ed
+    - govet        # Examines Go source code and reports suspicious constructs
+    - errcheck     # Checks for unchecked errors
+    - staticcheck  # Go static analysis
+    - unused       # Checks for unused constants, variables, functions and types
+    - gosimple     # Simplify code
+    - ineffassign  # Detects when assignments to existing variables are not used
+
+    # Additional recommended linters for production code
+    - goimports    # Checks import statements are formatted correctly
+    - misspell     # Finds commonly misspelled English words in comments
+    - revive       # Fast, configurable, extensible, flexible, and beautiful linter for Go
+    - goconst      # Finds repeated strings that could be replaced by a constant
+    - unconvert    # Removes unnecessary type conversions
+    - unparam      # Reports unused function parameters
+    - gosec        # Inspects source code for security problems
+    - exportloopref # Checks for pointers to enclosing loop variables
+    - nolintlint   # Reports ill-formed or insufficient nolint directives
+    - bodyclose    # Checks whether HTTP response body is closed successfully
+
+linters-settings:
+  errcheck:
+    check-type-assertions: false
+    check-blank: false
+    exclude-functions:
+      - (io.Closer).Close
+      - (*database/sql.Rows).Close
+
+  govet:
+    enable-all: true
+    disable:
+      - shadow  # Too strict for most codebases
+      - fieldalignment  # Optimizes struct field order, but can reduce readability
+
+  staticcheck:
+    checks: ["all"]
+
+  revive:
+    rules:
+      - name: exported
+        disabled: false
+      - name: var-naming
+        disabled: false
+      - name: package-comments
+        disabled: true  # Not enforcing package comments for now
+      - name: unexported-return
+        disabled: true  # Allow unexported returns for flexibility
+
+  gosec:
+    excludes:
+      - G104  # Audit errors not checked - covered by errcheck
+      - G307  # Deferring unsafe method "Close" - too many false positives
+
+  goconst:
+    min-len: 3
+    min-occurrences: 3
+    ignore-tests: true
+
+  misspell:
+    locale: US
+    ignore-words:
+      - organisation  # UK spelling used in codebase
+
+  nolintlint:
+    allow-unused: false
+    require-explanation: true
+    require-specific: true
+
+issues:
+  exclude-rules:
+    # Exclude some linters from running on tests files
+    - path: _test\.go
+      linters:
+        - errcheck
+        - gosec
+        - unparam
+
+    # Exclude shadow check in main.go for common var names
+    - path: main\.go
+      linters:
+        - govet
+      text: "shadow: declaration of \"err\""
+
+    # Allow embed directive in handlers
+    - linters:
+        - revive
+      text: "package-comments"
+
+  max-issues-per-linter: 0
+  max-same-issues: 0
+
+  # Show all issues, don't hide any
+  exclude-use-default: false
+
+output:
+  formats:
+    - format: colored-line-number
+  print-issued-lines: true
+  print-linter-name: true
+  sort-results: true
