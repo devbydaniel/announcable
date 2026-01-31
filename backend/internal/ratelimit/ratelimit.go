@@ -61,8 +61,8 @@ func (tbr *TokenBucketRateLimit) Deduct(id string, cost float64) (float64, error
 		// Double-check after acquiring write lock (another goroutine might have created it)
 		bucket, ok = tbr.buckets[id]
 		if !ok {
-			bucket := Bucket{count: tbr.maxValue, refilledAt: now}
-			tbr.buckets[id] = &bucket
+			newBucket := &Bucket{count: tbr.maxValue, refilledAt: now}
+			tbr.buckets[id] = newBucket
 		}
 		tbr.mu.Unlock()
 		return tbr.Deduct(id, cost)
