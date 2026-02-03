@@ -30,6 +30,7 @@ func (f SupportedFormat) String() string {
 const (
 	JPEG SupportedFormat = "jpeg"
 	PNG  SupportedFormat = "png"
+	GIF  SupportedFormat = "gif"
 )
 
 type EncodedFormat string
@@ -39,7 +40,8 @@ func (f EncodedFormat) String() string {
 }
 
 const (
-	WebP EncodedFormat = "webp"
+	WebP       EncodedFormat = "webp"
+	GIFEncoded EncodedFormat = "gif"
 )
 
 func (f SupportedFormat) ToEncodedFormat() EncodedFormat {
@@ -48,6 +50,8 @@ func (f SupportedFormat) ToEncodedFormat() EncodedFormat {
 		return WebP
 	case PNG:
 		return WebP
+	case GIF:
+		return GIFEncoded // Keep GIFs as-is to preserve animation
 	default:
 		return ""
 	}
@@ -140,8 +144,15 @@ func Encode(img image.Image, format SupportedFormat) (*io.Reader, error) {
 
 func DecodeProcessEncode(img io.Reader, config *ImgProcessConfig) (*io.Reader, EncodedFormat, error) {
 	log.Trace().Msg("DecodeProcessEncode")
-	// Decode the image
-	imgDecoded, format, err := Decode(img)
+
+	// Read all data into buffer first (needed to detect format and potentially pass through)
+	imgData, err := io.ReadAll(img)
+	if err != nil {
+		return nil, "", fmt.Errorf("failed to read image data: %w", err)
+	}
+
+	// Decode to get format (and image for non-GIF processing)
+	imgDecoded, format, err := Decode(bytes.NewReader(imgData))
 	if err != nil {
 		return nil, "", err
 	}
@@ -151,7 +162,14 @@ func DecodeProcessEncode(img io.Reader, config *ImgProcessConfig) (*io.Reader, E
 		return nil, "", fmt.Errorf("unsupported image format: %s", format)
 	}
 
-	// Process the image
+	// For GIFs, pass through original data to preserve animation
+	if SupportedFormat(format) == GIF {
+		log.Debug().Msg("GIF detected, passing through original data to preserve animation")
+		reader := io.Reader(bytes.NewReader(imgData))
+		return &reader, GIFEncoded, nil
+	}
+
+	// Process the image (resize if needed)
 	imgProcessed, err := ProcessImage(imgDecoded, config.MaxWidth, config.Quality)
 	if err != nil {
 		return nil, "", err
@@ -169,7 +187,7 @@ func DecodeProcessEncode(img io.Reader, config *ImgProcessConfig) (*io.Reader, E
 func isFormatSupported(format string) bool {
 	log.Trace().Str("format", format).Msg("isFormatSupported")
 	switch SupportedFormat(format) {
-	case JPEG, PNG:
+	case JPEG, PNG, GIF:
 		return true
 	default:
 		return false

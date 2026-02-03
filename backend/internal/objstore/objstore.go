@@ -127,11 +127,31 @@ func (o *ObjStore) GetImageUrl(bucket, path string) (string, error) {
 	return urlProxy, nil
 }
 
+// getContentType returns the MIME type based on file extension
+func getContentType(path string) string {
+	if strings.HasSuffix(path, ".webp") {
+		return "image/webp"
+	}
+	if strings.HasSuffix(path, ".gif") {
+		return "image/gif"
+	}
+	if strings.HasSuffix(path, ".png") {
+		return "image/png"
+	}
+	if strings.HasSuffix(path, ".jpg") || strings.HasSuffix(path, ".jpeg") {
+		return "image/jpeg"
+	}
+	return "application/octet-stream"
+}
+
 func (o *ObjStore) UpdateImage(bucket, path string, img *io.Reader) error {
 	log.Trace().Msg("UpdateImage")
 	ctx := context.Background()
-	info, err := o.Client.PutObject(ctx, bucket, path, *img, -1, minio.PutObjectOptions{})
-	log.Debug().Interface("info", info).Msg("PutObject")
+	contentType := getContentType(path)
+	info, err := o.Client.PutObject(ctx, bucket, path, *img, -1, minio.PutObjectOptions{
+		ContentType: contentType,
+	})
+	log.Debug().Str("contentType", contentType).Interface("info", info).Msg("PutObject")
 	if err != nil {
 		log.Error().Err(err).Msg("Error uploading image")
 		return err
